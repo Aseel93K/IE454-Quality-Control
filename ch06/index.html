@@ -1,0 +1,602 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>IE454 Chapter 6 Variables Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: same as the Chapter 1 to 5 labs. Sticky header, hero with part chips, one rounded "station" per activity (scene banner + interactive body), star quiz last */
+:root{
+  --bg:#F3F8FE; --surface:#FFFFFF; --soft:#E8F2FC; --fg:#15233A; --muted:#55657E; --line:#D5E3F2;
+  --blue:#0070C0; --blue-ink:#FFFFFF; --sky:#DCEBFA; --sun:#FFC83D; --sun-ink:#3A2B00;
+  --coral:#FF6B5B; --mint:#1FA874; --violet:#7C5CFF; --teal:#12A5B8; --gold:#E0A100;
+  --ok-bg:#DDF6EA; --ok-fg:#0F6B47; --bad-bg:#FFE3DF; --bad-fg:#A3271B;
+  --display:"Nunito",ui-rounded,system-ui,sans-serif; --body:"Source Sans 3",system-ui,sans-serif;
+  --r:22px; --shadow:0 6px 22px rgba(0,60,120,.10);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1626; --surface:#162238; --soft:#1C2C47; --fg:#EAF1FB; --muted:#A7B6CC; --line:#2A3C5C;
+  --blue:#3FA2F0; --blue-ink:#06192C; --sky:#1D3352; --sun:#FFD15C; --sun-ink:#2E2200;
+  --coral:#FF8576; --mint:#3CCB93; --violet:#9C84FF; --teal:#3CC4D6; --gold:#C98F00;
+  --ok-bg:#123D2E; --ok-fg:#7FE3B5; --bad-bg:#4A1E1A; --bad-fg:#FFB0A5; --shadow:0 6px 22px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1626; --surface:#162238; --soft:#1C2C47; --fg:#EAF1FB; --muted:#A7B6CC; --line:#2A3C5C;
+  --blue:#3FA2F0; --blue-ink:#06192C; --sky:#1D3352; --sun:#FFD15C; --sun-ink:#2E2200;
+  --coral:#FF8576; --mint:#3CCB93; --violet:#9C84FF; --teal:#3CC4D6; --gold:#C98F00;
+  --ok-bg:#123D2E; --ok-fg:#7FE3B5; --bad-bg:#4A1E1A; --bad-fg:#FFB0A5; --shadow:0 6px 22px rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.55}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--blue);color:var(--blue-ink);padding:10px 16px}
+.top p{margin:0 auto;max-width:1120px;font-family:var(--display);font-weight:800;font-size:clamp(13px,1.7vw,16px)}
+.top .dot{opacity:.7;margin:0 .35em}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:24px 70px;display:flex;flex-direction:column;gap:28px}
+.hero{background:var(--surface);border-radius:32px;padding:clamp(20px,4vw,40px);box-shadow:var(--shadow);display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:center}
+@media (max-width:820px){.hero{grid-template-columns:1fr}}
+.hero h1{font-size:clamp(28px,4.4vw,46px);font-weight:900;color:var(--blue)}
+.hero .big{font-size:clamp(17px,2vw,20px);margin:12px 0 0;max-width:56ch}
+.hero .quote{margin-top:14px;padding:14px 18px;background:var(--sky);border-radius:18px;font-style:italic}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{display:inline-flex;gap:6px;align-items:center;padding:7px 14px;border-radius:99px;font-family:var(--display);font-weight:800;font-size:14px;text-decoration:none;color:var(--fg);background:var(--soft);border:2px solid transparent}
+.chip:hover{border-color:var(--blue)}
+.chip i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.heroart{width:100%;max-width:440px;justify-self:center}
+.station{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;scroll-margin-top:70px}
+.station.flash{animation:flash 1.6s ease-out 1}
+@keyframes flash{0%{box-shadow:0 0 0 6px var(--sun)}100%{box-shadow:var(--shadow)}}
+.scene{display:flex;gap:18px;align-items:center;padding:18px 22px;color:#fff}
+.scene svg.ico{width:64px;height:64px;flex:none;background:rgba(255,255,255,.22);border-radius:20px;padding:10px}
+.scene .lbl{font-family:var(--display);font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
+.scene h2{font-size:clamp(21px,2.6vw,28px);font-weight:900;color:#fff}
+.scene p{margin:2px 0 0;font-size:15px;opacity:.95}
+@media (max-width:520px){.scene{flex-direction:column;align-items:flex-start}}
+.body{padding:20px 22px 24px;display:flex;flex-direction:column;gap:14px}
+.body > p{margin:0;max-width:75ch}
+.sec{font-size:13px;color:var(--muted);font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid2.wide{grid-template-columns:1fr 1.4fr}
+@media (max-width:760px){.grid2,.grid2.wide{grid-template-columns:1fr}}
+.panel{background:var(--soft);border-radius:18px;padding:14px 16px;min-width:0}
+.panel h3{font-size:17px;font-weight:800;margin-bottom:8px}
+label.sl{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:600;margin-top:6px}
+label.sl span{font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--blue)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.stats.four{grid-template-columns:repeat(4,1fr)}
+@media (max-width:520px){.stats.four{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--surface);border-radius:14px;padding:8px 10px;min-width:0}
+.stat b{display:block;font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
+.stat small{font-size:12px;color:var(--muted)}
+canvas{width:100%;height:auto;display:block;border-radius:16px;background:var(--surface)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.qcard{background:var(--soft);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.qcard .tx{font-weight:600}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{border:2px solid var(--line);background:var(--surface);color:var(--fg);border-radius:99px;padding:5px 12px;font-size:14px;font-weight:700}
+.opt:hover{border-color:var(--blue)}
+.opt.right{background:var(--ok-bg);color:var(--ok-fg);border-color:var(--ok-fg)}
+.opt.wrong{background:var(--bad-bg);color:var(--bad-fg);border-color:var(--bad-fg)}
+.why{font-size:14px;color:var(--muted)}
+.score{font-family:var(--display);font-weight:800;padding:8px 14px;border-radius:99px;background:var(--sky);align-self:flex-start}
+.btn{border:0;border-radius:99px;padding:9px 18px;font-family:var(--display);font-weight:800;background:var(--blue);color:var(--blue-ink)}
+.btn.alt{background:var(--soft);color:var(--fg)}
+.panel .btn.alt{background:var(--surface);border:2px solid var(--line)}
+.btn.on{background:var(--sun);color:var(--sun-ink);border-color:var(--sun)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.stars{font-size:30px;letter-spacing:3px;color:var(--line)}
+.stars .on{color:var(--sun)}
+.quiz{display:flex;flex-direction:column;gap:12px}
+.feedback{font-family:var(--display);font-weight:800;font-size:18px}
+.note{background:var(--sky);border-radius:14px;padding:10px 14px;font-size:15px}
+.note b{font-family:var(--display)}
+.tag{display:inline-block;padding:2px 10px;border-radius:99px;font-family:var(--display);font-weight:800;font-size:13px;margin:2px 4px 2px 0}
+.tag.r1{background:var(--coral);color:#fff}.tag.r2{background:var(--violet);color:#fff}.tag.r3{background:var(--teal);color:#fff}.tag.r4{background:var(--gold);color:#fff}.tag.ok{background:var(--ok-bg);color:var(--ok-fg)}
+.checks{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.checks label{display:flex;gap:8px;align-items:center;font-size:15px;font-weight:600}
+.checks input[type=number]{font:inherit;width:6.5em;border:2px solid var(--line);background:var(--surface);color:var(--fg);border-radius:10px;padding:3px 6px}
+footer{color:var(--muted);font-size:13px;text-align:center}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Activities grouped by part: each part gets the accent color of its column on the slides' roadmap */
+.chips{flex-direction:column;align-items:flex-start;gap:8px}
+.chiprow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chiplbl{display:inline-block;min-width:64px;text-align:center;padding:7px 12px;border-radius:99px;background:var(--pc);color:#fff;font-family:var(--display);font-weight:900;font-size:13px;letter-spacing:.04em;text-transform:uppercase;text-decoration:none}
+.part{display:flex;flex-direction:column;gap:18px;border-left:7px solid var(--pc);padding-left:clamp(10px,2vw,20px);scroll-margin-top:70px}
+.parthead{display:flex;gap:14px;align-items:center}
+.parthead .pnum{flex:none;background:var(--pc);color:#fff;border-radius:16px;padding:10px 16px;font-family:var(--display);font-weight:900;font-size:clamp(16px,2vw,20px);letter-spacing:.04em;text-transform:uppercase}
+.parthead h2{font-size:clamp(22px,3vw,30px);font-weight:900;color:var(--fg)}
+.parthead p{margin:2px 0 0;color:var(--muted);font-weight:700;font-size:15px}
+.part .scene{background:var(--pc)}
+</style>
+
+<style>
+/* Chapter 6 additions: data pickers, constants table, two stacked charts */
+select,textarea{font:inherit;border:2px solid var(--line);background:var(--surface);color:var(--fg);border-radius:12px;padding:6px 10px}
+textarea{width:100%;min-height:84px;font-variant-numeric:tabular-nums;font-size:15px;resize:vertical}
+.tblwrap{overflow-x:auto}
+table.k{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px;width:100%}
+table.k th,table.k td{padding:4px 8px;text-align:right;border-bottom:1px solid var(--line)}
+table.k th{font-family:var(--display);color:var(--muted)}
+table.k tr.cur td{background:var(--sun);color:var(--sun-ink);font-weight:700}
+.stack{display:flex;flex-direction:column;gap:10px}
+.small{font-size:14px;color:var(--muted);margin:0}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <symbol id="i-ruler" viewBox="0 0 24 24"><rect x="2.5" y="7" width="19" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6 7v4M10 7v3M14 7v4M18 7v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M2 19c4 0 5-12 10-12s6 12 10 12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M5 4v16M19 4v16" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 2"/></symbol>
+  <symbol id="i-lanes" viewBox="0 0 24 24"><path d="M2 5h20M2 19h20" stroke="currentColor" stroke-width="1.8" stroke-dasharray="3 2"/><path d="M2 9h20M2 15h20" stroke="currentColor" stroke-width="1.8"/><path d="M4 12l3-1.5 3 2 3-1.5 3 1 4-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-wave" viewBox="0 0 24 24"><path d="M2 12c2-6 4-6 6 0s4 6 6 0 4-6 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M2 4h20M2 20h20" stroke="currentColor" stroke-width="1.4" opacity=".7"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></symbol>
+  <symbol id="i-ring" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M12 1.5v3M12 19.5v3" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-steps" viewBox="0 0 24 24"><path d="M2 6h5v4h5V6h4v6h6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M2 18h5v-3h5v3h4v-4h6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></symbol>
+  <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M14.5 8.5c-.6-.8-1.5-1.2-2.5-1.2-1.6 0-2.7.9-2.7 2.1 0 2.9 5.6 1.6 5.6 4.6 0 1.3-1.2 2.2-2.9 2.2-1.1 0-2.1-.5-2.7-1.3M12 5.5v2M12 16.5v2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+ </defs>
+</svg>
+
+<header class="top"><p><a href="../" style="color:inherit;text-decoration:none" title="All chapters">&larr; IE454 Quality Control</a><span class="dot">·</span>Chapter 6: Control Charts for Variables<span class="dot">·</span>Dr. Aseel Khanfar<span class="dot">·</span>Yarmouk University</p></header>
+
+<main class="wrap">
+<section class="hero">
+ <div>
+  <h1>Watch the center. Watch the spread.</h1>
+  <p class="big">When a quality characteristic is measured on a scale (a width in microns, a diameter in mm, a cost in dollars), one chart watches the process mean and a second chart watches its variability. Build x̄ and R charts from the book's hard-bake data, judge capability, read patterns, size the sample, then switch to s charts and individuals charts.</p>
+  <p class="quote">It is important to maintain control over both the process mean and process variability. Montgomery, Section 6.1</p>
+  <nav class="chips" aria-label="Activities by part">
+  <div class="chiprow" style="--pc:#0070C0"><a class="chiplbl" href="#part1">Part 1</a><a class="chip" href="#limits"><i style="background:#0070C0"></i>Build x̄ and R charts</a></div>
+  <div class="chiprow" style="--pc:#12A5B8"><a class="chiplbl" href="#part2">Part 2</a><a class="chip" href="#capability"><i style="background:#12A5B8"></i>Process capability</a><a class="chip" href="#specs"><i style="background:#12A5B8"></i>Control vs spec limits</a></div>
+  <div class="chiprow" style="--pc:#1A9467"><a class="chiplbl" href="#part3">Part 3</a><a class="chip" href="#patterns"><i style="background:#1A9467"></i>Name the pattern</a><a class="chip" href="#oc"><i style="background:#1A9467"></i>OC curve and ARL</a></div>
+  <div class="chiprow" style="--pc:#E8503F"><a class="chiplbl" href="#part4">Part 4</a><a class="chip" href="#xbars"><i style="background:#E8503F"></i>x̄ and s charts</a><a class="chip" href="#variable"><i style="background:#E8503F"></i>Variable sample size</a></div>
+  <div class="chiprow" style="--pc:#7A5AF8"><a class="chiplbl" href="#part5">Part 5</a><a class="chip" href="#individuals"><i style="background:#7A5AF8"></i>Individuals and MR charts</a></div>
+  <div class="chiprow"><span class="chiplbl" style="background:var(--sun);color:var(--sun-ink)">Review</span><a class="chip" href="#quiz"><i style="background:var(--sun)"></i>Star quiz</a></div>
+  </nav>
+ </div>
+ <svg class="heroart" viewBox="0 0 440 260" role="img" aria-label="Two control charts stacked: an x-bar chart for the mean on top and an R chart for the range below">
+  <rect x="0" y="0" width="440" height="260" rx="28" fill="var(--sky)"/>
+  <g font-family="Nunito,sans-serif" font-weight="800" font-size="13" fill="var(--fg)"><text x="28" y="30">x̄ chart: the center</text><text x="28" y="150">R chart: the spread</text></g>
+  <line x1="40" y1="46" x2="410" y2="46" stroke="var(--coral)" stroke-width="2.5" stroke-dasharray="7 5"/>
+  <line x1="40" y1="80" x2="410" y2="80" stroke="var(--fg)" stroke-width="2"/>
+  <line x1="40" y1="114" x2="410" y2="114" stroke="var(--coral)" stroke-width="2.5" stroke-dasharray="7 5"/>
+  <polyline points="56,84 86,70 116,92 146,76 176,96 206,72 236,86 266,64 296,90 326,74 356,82 386,68" fill="none" stroke="var(--blue)" stroke-width="3.5" stroke-linejoin="round"/>
+  <line x1="40" y1="166" x2="410" y2="166" stroke="var(--coral)" stroke-width="2.5" stroke-dasharray="7 5"/>
+  <line x1="40" y1="206" x2="410" y2="206" stroke="var(--fg)" stroke-width="2"/>
+  <line x1="40" y1="236" x2="410" y2="236" stroke="var(--coral)" stroke-width="2.5" stroke-dasharray="7 5"/>
+  <polyline points="56,210 86,196 116,214 146,200 176,220 206,190 236,212 266,204 296,218 326,198 356,156 386,206" fill="none" stroke="var(--mint)" stroke-width="3.5" stroke-linejoin="round"/>
+  <circle cx="356" cy="156" r="10" fill="var(--sun)" stroke="var(--fg)" stroke-width="2.5"/>
+ </svg>
+</section>
+
+<!-- Part 1 -->
+<div class="part" id="part1" style="--pc:#0070C0">
+ <div class="parthead"><span class="pnum">Part 1</span><div><h2>x̄ and R charts: the basics</h2><p>Sections 6.1–6.2.1 · 1 activity</p></div></div>
+<section class="station" id="limits">
+ <div class="scene"><svg class="ico"><use href="#i-ruler"/></svg><div><div class="lbl">Part 1 · Activity 1 of 1 · Section 6.2.1, Equations 6.2–6.5, Table 6.1 · Wafer fab, hard-bake step</div><h2>Build x̄ and R charts</h2><p>Start with the R chart (CL = R̄, limits D₃R̄ and D₄R̄), then the x̄ chart (CL = x̿, limits x̿ ± A₂R̄). Use the book's 25 samples of 5 wafers, or simulate your own process and add a shift in the mean or in the spread.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel stack"><h3>Data</h3>
+    <div class="row" id="limData"><button class="btn alt on" data-d="book">Table 6.1 (book)</button><button class="btn alt" data-d="sim">Simulate a process</button></div>
+    <div id="limSim" hidden>
+     <label class="sl" for="limN">Sample size n <span id="limNV"></span></label><input type="range" id="limN" min="2" max="10" step="1" value="5">
+     <div class="row" style="margin-top:8px"><button class="btn alt" id="limMean">Shift the mean after sample 15</button><button class="btn alt" id="limSpread">Double σ after sample 15</button><button class="btn alt" id="limNew">New samples</button></div>
+    </div>
+    <div class="stats four"><div class="stat"><b id="limXbb"></b><small>x̿ (grand mean)</small></div><div class="stat"><b id="limRb"></b><small>R̄ (average range)</small></div><div class="stat"><b id="limXU"></b><small>x̄ chart UCL</small></div><div class="stat"><b id="limXL"></b><small>x̄ chart LCL</small></div><div class="stat"><b id="limRU"></b><small>R chart UCL</small></div><div class="stat"><b id="limRL"></b><small>R chart LCL</small></div><div class="stat"><b id="limSig"></b><small>σ̂ = R̄/d₂</small></div><div class="stat"><b id="limOut"></b><small>points outside</small></div></div>
+    <div class="tblwrap"><table class="k" id="limTbl" aria-label="Appendix VI constants for the x-bar and R charts"></table></div>
+   </div>
+   <div class="panel stack"><h3>x̄ chart (top) and R chart (bottom)</h3><canvas id="limX" width="760" height="300" aria-label="x-bar chart"></canvas><canvas id="limR" width="760" height="260" aria-label="R chart"></canvas></div>
+  </div>
+  <p class="why" id="limMsg"></p>
+ </div>
+</section>
+</div>
+
+<!-- Part 2 -->
+<div class="part" id="part2" style="--pc:#12A5B8">
+ <div class="parthead"><span class="pnum">Part 2</span><div><h2>Phase I, capability and phase II</h2><p>Section 6.2.2 · 2 activities</p></div></div>
+<section class="station" id="capability">
+ <div class="scene"><svg class="ico"><use href="#i-bell"/></svg><div><div class="lbl">Part 2 · Activity 1 of 2 · Section 6.2.2, Equation 6.11, Figure 6.3 · Hard-bake process</div><h2>How capable is the process?</h2><p>Once the charts are in control, estimate σ̂ = R̄/d₂ and compare the natural spread 6σ̂ with the specification band. Cp = (USL − LSL)/6σ̂. The fallout is the share of parts outside the specs.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>Process and specifications</h3>
+    <div class="row"><button class="btn alt on" data-cp="book">Hard-bake (book)</button><button class="btn alt" data-cp="one">Cp = 1</button><button class="btn alt" data-cp="bad">Cp &lt; 1</button><button class="btn alt" data-cp="off">Capable but off center</button></div>
+    <label class="sl" for="cpM">Process mean μ <span id="cpMV"></span></label><input type="range" id="cpM" min="1.0" max="2.0" step="0.005" value="1.5056">
+    <label class="sl" for="cpS">Process σ <span id="cpSV"></span></label><input type="range" id="cpS" min="0.05" max="0.30" step="0.0005" value="0.1398">
+    <label class="sl" for="cpW">Half-width of the specs (target 1.50) <span id="cpWV"></span></label><input type="range" id="cpW" min="0.2" max="0.8" step="0.01" value="0.5">
+    <div class="stats four"><div class="stat"><b id="cpC"></b><small>Cp</small></div><div class="stat"><b id="cpP"></b><small>P = (1/Cp)100%</small></div><div class="stat"><b id="cpF"></b><small>fallout</small></div><div class="stat"><b id="cpPPM"></b><small>ppm out of spec</small></div></div>
+   </div>
+   <div class="panel"><h3>Flow width distribution and specs</h3><canvas id="cpCanvas" width="760" height="380" aria-label="Normal curve with specification limits and shaded fallout"></canvas></div>
+  </div>
+  <p class="why" id="cpMsg"></p>
+ </div>
+</section>
+
+<section class="station" id="specs">
+ <div class="scene"><svg class="ico"><use href="#i-lanes"/></svg><div><div class="lbl">Part 2 · Activity 2 of 2 · Section 6.2.2, Figure 6.6 · Any variables chart</div><h2>Control limits are not specification limits</h2><p>Control limits come from the spread of x̄, σ/√n. Natural tolerance limits are μ ± 3σ for single parts. Specification limits are set by the customer or designer. See how far apart they sit, then sort the statements.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>Three kinds of limits</h3>
+    <label class="sl" for="spN">Sample size n <span id="spNV"></span></label><input type="range" id="spN" min="1" max="16" step="1" value="5">
+    <label class="sl" for="spW">Spec half-width in σ units <span id="spWV"></span></label><input type="range" id="spW" min="1.5" max="6" step="0.1" value="3.6">
+    <p class="why" id="spMsg"></p>
+   </div>
+   <div class="panel"><h3>Individuals vs sample means</h3><canvas id="spCanvas" width="760" height="360" aria-label="Distribution of individual parts and of sample means with control, natural tolerance and specification limits"></canvas></div>
+  </div>
+  <div class="cards" id="spCards"></div>
+  <div class="score" id="spScore">0 of 6 correct</div>
+ </div>
+</section>
+</div>
+
+<!-- Part 3 -->
+<div class="part" id="part3" style="--pc:#1A9467">
+ <div class="parthead"><span class="pnum">Part 3</span><div><h2>Designing and reading the charts</h2><p>Sections 6.2.2–6.2.7 · 2 activities</p></div></div>
+<section class="station" id="patterns">
+ <div class="scene"><svg class="ico"><use href="#i-wave"/></svg><div><div class="lbl">Part 3 · Activity 1 of 2 · Section 6.2.4, Figures 6.8–6.12 · Any x̄ chart</div><h2>Name the pattern</h2><p>A chart can show trouble with every point inside the limits. Look at the 25 sample means and name the pattern: cycles, mixture, shift, trend or stratification. The feedback gives the usual assignable causes from the book.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>Your call</h3>
+    <div class="opts" id="patOpts"></div>
+    <p class="why" id="patMsg">Pick the pattern you see.</p>
+    <div class="row"><button class="btn" id="patNext">Next chart</button></div>
+    <div class="score" id="patScore">0 of 0 correct</div>
+   </div>
+   <div class="panel"><h3>x̄ chart</h3><canvas id="patCanvas" width="760" height="360" aria-label="Control chart showing a pattern to identify"></canvas></div>
+  </div>
+ </div>
+</section>
+
+<section class="station" id="oc">
+ <div class="scene"><svg class="ico"><use href="#i-target"/></svg><div><div class="lbl">Part 3 · Activity 2 of 2 · Sections 6.2.6–6.2.7, Equations 6.19–6.23, Figures 6.13 and 6.15 · Any x̄ chart</div><h2>OC curve and ARL</h2><p>The mean moves by kσ. β = Φ(L − k√n) − Φ(−L − k√n) is the chance the next sample still plots inside the limits. ARL₁ = 1/(1 − β), ATS = ARL₁·h, and I = n·ARL₁ units are inspected before the signal.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>Shift and design</h3>
+    <label class="sl" for="ocK">Shift k (in σ units) <span id="ocKV"></span></label><input type="range" id="ocK" min="0" max="3" step="0.05" value="1">
+    <label class="sl" for="ocN">Sample size n <span id="ocNV"></span></label><input type="range" id="ocN" min="1" max="20" step="1" value="5">
+    <label class="sl" for="ocL">Limits at L sigma <span id="ocLV"></span></label><input type="range" id="ocL" min="2" max="3.5" step="0.05" value="3">
+    <label class="sl" for="ocH">Hours between samples h <span id="ocHV"></span></label><input type="range" id="ocH" min="0.25" max="4" step="0.25" value="1">
+    <div class="row" style="margin-top:8px"><button class="btn alt" data-oc="2,5">Book: k = 2, n = 5</button><button class="btn alt" data-oc="1,5">Book: k = 1, n = 5</button><button class="btn alt" data-oc="1.5,4">k = 1.5, n = 4</button></div>
+    <div class="stats four"><div class="stat"><b id="ocB"></b><small>β</small></div><div class="stat"><b id="ocA"></b><small>ARL₁</small></div><div class="stat"><b id="ocT"></b><small>ATS (hours)</small></div><div class="stat"><b id="ocI"></b><small>I = n·ARL₁ units</small></div></div>
+   </div>
+   <div class="panel"><h3>OC curves for the x̄ chart</h3><canvas id="ocCanvas" width="760" height="380" aria-label="Operating characteristic curves for several sample sizes with the current design highlighted"></canvas></div>
+  </div>
+  <p class="why" id="ocMsg"></p>
+  <p class="note"><b>Book check.</b> In the k = 2, n = 5 example the book writes Φ(−1.47) − Φ(−7.37); the second value should be Φ(−7.47). It makes no difference: both are essentially 0, and β ≈ 0.0708. For k = 1 and n = 5 the book reads β ≈ 0.75 off Figure 6.13 and gets ARL₁ = 4; equation 6.19 gives β = 0.78 and ARL₁ ≈ 4.5.</p>
+ </div>
+</section>
+</div>
+
+<!-- Part 4 -->
+<div class="part" id="part4" style="--pc:#E8503F">
+ <div class="parthead"><span class="pnum">Part 4</span><div><h2>x̄ and s charts</h2><p>Section 6.3 · 2 activities</p></div></div>
+<section class="station" id="xbars">
+ <div class="scene"><svg class="ico"><use href="#i-ring"/></svg><div><div class="lbl">Part 4 · Activity 1 of 2 · Section 6.3.1, Equations 6.25–6.28, Example 6.3, Table 6.3 · Engine piston rings</div><h2>x̄ and s charts</h2><p>For larger samples the standard deviation s uses every observation, so it estimates σ better than the range. s chart: B₃s̄ to B₄s̄. x̄ chart: x̿ ± A₃s̄. σ̂ = s̄/c₄. Compare the s and R estimates as n grows.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel stack"><h3>Data</h3>
+    <div class="row" id="xsData"><button class="btn alt on" data-d="book">Table 6.3 piston rings (book)</button><button class="btn alt" data-d="sim">Simulate</button></div>
+    <div id="xsSim" hidden><label class="sl" for="xsN">Sample size n <span id="xsNV"></span></label><input type="range" id="xsN" min="2" max="25" step="1" value="12"><div class="row" style="margin-top:8px"><button class="btn alt" id="xsNew">New samples</button></div></div>
+    <div class="stats four"><div class="stat"><b id="xsXbb"></b><small>x̿</small></div><div class="stat"><b id="xsSb"></b><small>s̄</small></div><div class="stat"><b id="xsXU"></b><small>x̄ UCL / LCL</small></div><div class="stat"><b id="xsSU"></b><small>s UCL / LCL</small></div><div class="stat"><b id="xsC"></b><small>c₄, A₃</small></div><div class="stat"><b id="xsB"></b><small>B₃, B₄</small></div><div class="stat"><b id="xsSig"></b><small>σ̂ = s̄/c₄</small></div><div class="stat"><b id="xsSigR"></b><small>σ̂ = R̄/d₂</small></div></div>
+    <p class="why" id="xsMsg"></p>
+   </div>
+   <div class="panel stack"><h3>x̄ chart (top) and s chart (bottom)</h3><canvas id="xsX" width="760" height="290" aria-label="x-bar chart for piston rings"></canvas><canvas id="xsS" width="760" height="250" aria-label="s chart for piston rings"></canvas></div>
+  </div>
+ </div>
+</section>
+
+<section class="station" id="variable">
+ <div class="scene"><svg class="ico"><use href="#i-steps"/></svg><div><div class="lbl">Part 4 · Activity 2 of 2 · Section 6.3.2, Equations 6.30–6.31, Example 6.4, Tables 6.4–6.5, Figure 6.18 · Engine piston rings</div><h2>Variable sample size</h2><p>Some samples have 3 rings, some 4 or 5. Use the weighted x̿ and pooled s̄, then compute limits sample by sample with A₃, B₃ and B₄ for that sample's n. The limits become a staircase. Tap a sample to see its calculation.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>Sample <span id="vaI">2</span></h3>
+    <label class="sl" for="vaSel">Pick a sample <span id="vaSelV"></span></label><input type="range" id="vaSel" min="1" max="25" step="1" value="2">
+    <div class="stats four"><div class="stat"><b id="vaN"></b><small>n for this sample</small></div><div class="stat"><b id="vaA3"></b><small>A₃</small></div><div class="stat"><b id="vaXL"></b><small>x̄ LCL / UCL</small></div><div class="stat"><b id="vaSU"></b><small>s UCL (B₃ = 0)</small></div></div>
+    <p class="why" id="vaMsg"></p>
+   </div>
+   <div class="panel stack"><h3>x̄ chart (top) and s chart (bottom), Table 6.4</h3><canvas id="vaX" width="760" height="280" aria-label="x-bar chart with stair-step limits"></canvas><canvas id="vaS" width="760" height="240" aria-label="s chart with stair-step limits"></canvas></div>
+  </div>
+ </div>
+</section>
+</div>
+
+<!-- Part 5 -->
+<div class="part" id="part5" style="--pc:#7A5AF8">
+ <div class="parthead"><span class="pnum">Part 5</span><div><h2>Charts for individual measurements</h2><p>Sections 6.4–6.5 · 1 activity</p></div></div>
+<section class="station" id="individuals">
+ <div class="scene"><svg class="ico"><use href="#i-coin"/></svg><div><div class="lbl">Part 5 · Activity 1 of 1 · Section 6.4, Equation 6.33, Example 6.5, Tables 6.6–6.7, Figures 6.19–6.20 · Bank, mortgage loan processing</div><h2>Individuals and moving range charts</h2><p>One number per week, so n = 1. The moving range MRᵢ = |xᵢ − xᵢ₋₁| stands in for the range: σ̂ = MR̄/1.128, limits x̄ ± 3MR̄/1.128, and the MR chart runs from 0 to 3.267·MR̄. Set up phase I on weeks 1–20, then add weeks 21–40.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel stack"><h3>Weekly cost per loan ($)</h3>
+    <label for="inData" class="small">Phase I data (weeks 1–20, Table 6.6). Edit any value and the charts update.</label>
+    <textarea id="inData">310 288 297 298 307 303 294 297 308 306 294 299 297 299 314 295 293 306 301 304</textarea>
+    <div class="row"><button class="btn alt" id="inP2">Add phase II weeks 21–40 (Table 6.7)</button><button class="btn alt" id="inReset">Reset to the book data</button></div>
+    <div class="stats four"><div class="stat"><b id="inXb"></b><small>x̄</small></div><div class="stat"><b id="inMR"></b><small>MR̄</small></div><div class="stat"><b id="inLim"></b><small>LCL / UCL</small></div><div class="stat"><b id="inMRU"></b><small>MR chart UCL</small></div></div>
+    <p class="why" id="inMsg"></p>
+   </div>
+   <div class="panel stack"><h3>Individuals chart (top) and moving range chart (bottom)</h3><canvas id="inX" width="760" height="290" aria-label="Individuals control chart"></canvas><canvas id="inM" width="760" height="240" aria-label="Moving range chart"></canvas></div>
+  </div>
+ </div>
+</section>
+</div>
+
+<section class="station" id="quiz">
+ <div class="scene" style="background:var(--gold)"><svg class="ico"><use href="#i-star"/></svg><div><div class="lbl">Self-check · Whole chapter</div><h2>Star quiz</h2><p>Ten quick questions. Each right answer lights a star.</p></div></div>
+ <div class="body">
+  <div class="stars" id="qStars" aria-live="polite"></div>
+  <div class="quiz" id="qBox"></div>
+  <div class="row"><button class="btn" id="qNext" hidden>Next question</button><button class="btn alt" id="qAgain" hidden>Try the quiz again</button></div>
+ </div>
+</section>
+
+<footer>Activities built on Montgomery, <i>Introduction to Statistical Quality Control</i>, 8th ed., Wiley, Chapter 6. The hard-bake flow width data (Table 6.1, Example 6.1, Section 6.2.2), the Appendix VI constants, the OC example of Section 6.2.6, the piston-ring data (Tables 6.3 and 6.4) and the loan processing costs (Tables 6.6 and 6.7) are from the book; the simulated processes, the pattern charts, all other examples and the quiz are teaching examples. Prepared for IE454 by Dr. Aseel Khanfar, Department of Industrial Engineering, Yarmouk University.<br><b>© 2026 Dr. Aseel Khanfar, Yarmouk University. All rights reserved.</b> No part of this page may be copied, adapted or republished without written permission.</footer>
+</main>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const erf=x=>{const s=Math.sign(x);x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y};
+const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
+/* tail probability with better accuracy far out (for alpha at 3 to 4 sigma) */
+const upper=z=>{if(z<5){const t=1/(1+0.2316419*z);const d=Math.exp(-z*z/2)/Math.sqrt(2*Math.PI);return d*t*(0.319381530+t*(-0.356563782+t*(1.781477937+t*(-1.821255978+t*1.330274429))))}return 0};
+const f4=v=>v.toFixed(4);
+function rng(seed){let s=seed>>>0||1;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+function gauss(r){let u=0,v=0;while(!u)u=r();v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+const redraws=[];
+function onTheme(f){redraws.push(f)}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>redraws.forEach(f=>f()));
+new MutationObserver(()=>redraws.forEach(f=>f())).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+/* shared chart frame */
+function frame(cv,{xmin,xmax,ymin=0,ymax,L=62,R=20,T=18,B=48,xt=[],yt=[],xl='',yl='',yfmt=v=>v,xfmt=v=>v}){
+  const g=cv.getContext('2d'),W=cv.width,H=cv.height;g.clearRect(0,0,W,H);g.fillStyle=css('--surface');g.fillRect(0,0,W,H);
+  const X=v=>L+(v-xmin)/(xmax-xmin)*(W-L-R),Y=v=>H-B-(v-ymin)/(ymax-ymin)*(H-T-B);
+  g.strokeStyle=css('--line');g.lineWidth=1;g.fillStyle=css('--muted');g.font='600 17px "Source Sans 3",sans-serif';
+  g.textAlign='right';yt.forEach(v=>{const y=Y(v);g.beginPath();g.moveTo(L,y);g.lineTo(W-R,y);g.stroke();g.fillText(yfmt(v),L-8,y+6)});
+  g.textAlign='center';xt.forEach(v=>g.fillText(xfmt(v),X(v),H-B+22));
+  g.strokeStyle=css('--fg');g.lineWidth=2;g.beginPath();g.moveTo(L,H-B);g.lineTo(W-R,H-B);g.stroke();
+  if(xl){g.font='800 16px Nunito,sans-serif';g.fillStyle=css('--muted');g.fillText(xl,(L+W-R)/2,H-4)}
+  return {g,X,Y,W,H,L,R,T,B};
+}
+const ticks=(a,b,n)=>{const st=Math.pow(10,Math.floor(Math.log10((b-a)/n)));const m=[1,2,2.5,5,10].map(k=>k*st).find(s=>(b-a)/s<=n)||st*10;const r=[];for(let v=Math.ceil(a/m)*m;v<=b+1e-9;v+=m)r.push(+v.toFixed(6));return r};
+function hline(F,y,color,dash,label,side){const g=F.g;g.strokeStyle=color;g.lineWidth=2.5;g.setLineDash(dash||[]);g.beginPath();g.moveTo(F.L,F.Y(y));g.lineTo(F.W-F.R,F.Y(y));g.stroke();g.setLineDash([]);
+  if(label){g.fillStyle=css('--fg');g.font='800 14px Nunito,sans-serif';g.textAlign=side==='l'?'left':'right';g.fillText(label,side==='l'?F.L+6:F.W-F.R-4,F.Y(y)-6)}}
+function dot(F,x,y,color,r){F.g.fillStyle=color;F.g.beginPath();F.g.arc(F.X(x),F.Y(y),r||6,0,7);F.g.fill()}
+
+/* multiple-choice card set (same as earlier labs) */
+function mcSet(boxId,scoreId,items,choices){
+  const box=$(boxId);let right=0,done=0;
+  items.forEach(it=>{const c=document.createElement('div');c.className='qcard';c.innerHTML='<div class="tx"></div><div class="opts"></div><div class="why" hidden></div>';
+    c.querySelector('.tx').textContent=it.q;const o=c.querySelector('.opts'),w=c.querySelector('.why');
+    choices.forEach(ch=>{const b=document.createElement('button');b.className='opt';b.type='button';b.textContent=ch;
+      b.onclick=()=>{if(c.dataset.done)return;c.dataset.done=1;done++;
+        if(ch===it.a){b.classList.add('right');right++}else{b.classList.add('wrong');[...o.children].find(x=>x.textContent===it.a).classList.add('right')}
+        w.hidden=false;w.textContent=it.why;$(scoreId).textContent=right+' of '+items.length+' correct'+(done===items.length?(right===items.length?'. Perfect!':'. Nice work.'):'')};o.appendChild(b)});
+    box.appendChild(c)});
+}
+
+
+/* Appendix VI constants (n = 2..25): d2 from the table; c4, A3, B3, B4 computed exactly */
+const D2={2:1.128,3:1.693,4:2.059,5:2.326,6:2.534,7:2.704,8:2.847,9:2.970,10:3.078,11:3.173,12:3.258,13:3.336,14:3.407,15:3.472,16:3.532,17:3.588,18:3.640,19:3.689,20:3.735,21:3.778,22:3.819,23:3.858,24:3.895,25:3.931};
+const D3T={2:0,3:0,4:0,5:0,6:0,7:0.076,8:0.136,9:0.184,10:0.223};
+const D4T={2:3.267,3:2.574,4:2.282,5:2.114,6:2.004,7:1.924,8:1.864,9:1.816,10:1.777};
+const A2T={2:1.880,3:1.023,4:0.729,5:0.577,6:0.483,7:0.419,8:0.373,9:0.337,10:0.308};
+const lgam=x=>{const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+0.5)*Math.log(t);let s=1.000000000190015;for(const k of c)s+=k/++y;return -t+Math.log(2.5066282746310005*s/x)};
+const c4=n=>Math.sqrt(2/(n-1))*Math.exp(lgam(n/2)-lgam((n-1)/2));
+const A3=n=>3/(c4(n)*Math.sqrt(n));
+const B3=n=>Math.max(0,1-3*Math.sqrt(1-c4(n)**2)/c4(n));
+const B4=n=>1+3*Math.sqrt(1-c4(n)**2)/c4(n);
+const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
+const sd=a=>{const m=mean(a);return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/(a.length-1))};
+const range=a=>Math.max(...a)-Math.min(...a);
+
+/* one control chart; ucl/lcl may be numbers or arrays (stair-step limits) */
+function cchart(cv,pts,cl,ucl,lcl,o={}){
+  const n=pts.length,U=i=>Array.isArray(ucl)?ucl[i]:ucl,Lo=i=>Array.isArray(lcl)?lcl[i]:lcl;
+  const allU=pts.map((_,i)=>U(i)),allL=pts.map((_,i)=>Lo(i));
+  let lo=Math.min(...pts,...allL),hi=Math.max(...pts,...allU);const pad=(hi-lo)*0.12||1;lo-=pad;hi+=pad;if(o.zero&&lo<0)lo=0;
+  const xt=n<=25?[1,5,10,15,20,25].filter(v=>v<=n):[1,10,20,30,40].filter(v=>v<=n);
+  const F=frame(cv,{xmin:0.5,xmax:n+0.5,ymin:lo,ymax:hi,yt:ticks(lo,hi,5),xt,xl:o.xl||'Sample number',yfmt:o.yfmt||(v=>+v.toFixed(4)),L:72,R:118,B:44});
+  const g=F.g;
+  if(o.shade){g.fillStyle=css('--sky');g.fillRect(F.X(o.shade-0.5),F.T,F.X(n+0.5)-F.X(o.shade-0.5),F.Y(lo)-F.T)}
+  const step=(fn,col)=>{g.strokeStyle=col;g.lineWidth=2.5;g.setLineDash([8,6]);g.beginPath();pts.forEach((_,i)=>{const y=F.Y(fn(i));const x0=F.X(i+0.5),x1=F.X(i+1.5);i?g.lineTo(x0,y):g.moveTo(x0,y);g.lineTo(x1,y)});g.stroke();g.setLineDash([])};
+  step(U,css('--coral'));step(Lo,css('--coral'));
+  g.strokeStyle=css('--fg');g.lineWidth=2;g.beginPath();g.moveTo(F.L,F.Y(cl));g.lineTo(F.W-F.R,F.Y(cl));g.stroke();
+  g.font='800 14px Nunito,sans-serif';g.textAlign='left';g.fillStyle=css('--fg');const fmt=o.lfmt||(v=>v.toFixed(4));
+  g.fillText('UCL '+fmt(U(n-1)),F.W-F.R+6,F.Y(U(n-1))+5);g.fillText((o.cln||'CL')+' '+fmt(cl),F.W-F.R+6,F.Y(cl)+5);g.fillText('LCL '+fmt(Lo(n-1)),F.W-F.R+6,F.Y(Lo(n-1))+5);
+  g.strokeStyle=o.col||css('--blue');g.lineWidth=3;g.beginPath();pts.forEach((v,i)=>{const X=F.X(i+1),Y=F.Y(v);i?g.lineTo(X,Y):g.moveTo(X,Y)});g.stroke();
+  let out=[];pts.forEach((v,i)=>{const bad=v>U(i)+1e-12||v<Lo(i)-1e-12;if(bad)out.push(i+1);const sel=o.sel===i+1;
+    dot(F,i+1,v,bad?css('--sun'):(o.col||css('--blue')),bad||sel?9:5.5);if(bad||sel){g.strokeStyle=css('--fg');g.lineWidth=2;g.beginPath();g.arc(F.X(i+1),F.Y(v),9,0,7);g.stroke()}});
+  return out;
+}
+
+/* ---------- Part 1: x-bar and R ---------- */
+const T61=[[1.3235,1.4128,1.6744,1.4573,1.6914],[1.4314,1.3592,1.6075,1.4666,1.6109],[1.4284,1.4871,1.4932,1.4324,1.5674],[1.5028,1.6352,1.3841,1.2831,1.5507],[1.5604,1.2735,1.5265,1.4363,1.6441],[1.5955,1.5451,1.3574,1.3281,1.4198],[1.6274,1.5064,1.8366,1.4177,1.5144],[1.4190,1.4303,1.6637,1.6067,1.5519],[1.3884,1.7277,1.5355,1.5176,1.3688],[1.4039,1.6697,1.5089,1.4627,1.5220],[1.4158,1.7667,1.4278,1.5928,1.4181],[1.5821,1.3355,1.5777,1.3908,1.7559],[1.2856,1.4106,1.4447,1.6398,1.1928],[1.4951,1.4036,1.5893,1.6458,1.4969],[1.3589,1.2863,1.5996,1.2497,1.5471],[1.5747,1.5301,1.5171,1.1839,1.8662],[1.3680,1.7269,1.3957,1.5014,1.4449],[1.4163,1.3864,1.3057,1.6210,1.5573],[1.5796,1.4185,1.6541,1.5116,1.7247],[1.7106,1.4412,1.2361,1.3820,1.7601],[1.4371,1.5051,1.3485,1.5670,1.4880],[1.4738,1.5936,1.6583,1.4973,1.4720],[1.5917,1.4333,1.5551,1.5295,1.6866],[1.6399,1.5243,1.5705,1.5563,1.5530],[1.5797,1.3663,1.6240,1.3732,1.6887]];
+let limMode='book',limSeed=5,limShM=false,limShS=false;
+function limits(){
+  document.querySelectorAll('#limData .btn').forEach(b=>b.classList.toggle('on',b.dataset.d===limMode));
+  $('limSim').hidden=limMode!=='sim';
+  let data,n;
+  if(limMode==='book'){data=T61;n=5}
+  else{n=+$('limN').value;$('limNV').textContent=n;const r=rng(limSeed);data=[];for(let i=0;i<25;i++){const mu=1.5+(limShM&&i>=15?0.2:0),s=0.14*(limShS&&i>=15?2:1);const row=[];for(let j=0;j<n;j++)row.push(mu+s*gauss(r));data.push(row)}}
+  const xb=data.map(mean),R=data.map(range),xbb=mean(xb),Rb=mean(R);
+  const xu=xbb+A2T[n]*Rb,xl=xbb-A2T[n]*Rb,ru=D4T[n]*Rb,rl=D3T[n]*Rb;
+  $('limXbb').textContent=xbb.toFixed(4);$('limRb').textContent=Rb.toFixed(5);$('limXU').textContent=xu.toFixed(5);$('limXL').textContent=xl.toFixed(5);$('limRU').textContent=ru.toFixed(5);$('limRL').textContent=rl.toFixed(3);$('limSig').textContent=(Rb/D2[n]).toFixed(4);
+  const sh=limMode==='sim'&&(limShM||limShS)?16:0;
+  const o1=cchart($('limX'),xb,xbb,xu,xl,{shade:sh,cln:'x̿'}),o2=cchart($('limR'),R,Rb,ru,rl,{shade:sh,cln:'R̄',col:css('--mint'),zero:true});
+  $('limOut').textContent=o1.length+o2.length;
+  $('limTbl').innerHTML='<tr><th>n</th><th>A₂</th><th>d₂</th><th>D₃</th><th>D₄</th></tr>'+[2,3,4,5,6,7,8,9,10].map(k=>`<tr${k===n?' class="cur"':''}><td>${k}</td><td>${A2T[k].toFixed(3)}</td><td>${D2[k].toFixed(3)}</td><td>${D3T[k].toFixed(3)}</td><td>${D4T[k].toFixed(3)}</td></tr>`).join('');
+  let m=`R chart: CL = R̄ = ${Rb.toFixed(5)}, UCL = D₄R̄ = ${D4T[n]}(${Rb.toFixed(5)}) = ${ru.toFixed(5)}, LCL = ${rl.toFixed(3)}. x̄ chart: ${xbb.toFixed(4)} ± ${A2T[n]}(${Rb.toFixed(5)}) gives ${xl.toFixed(5)} to ${xu.toFixed(5)}. `;
+  if(limMode==='book')m+='These match Example 6.1 (1.31795, 1.69325 and 0.68749). No point is outside on either chart, so the trial limits are adopted for phase II.';
+  else if(limShM||limShS)m+=(o1.length||o2.length?`Signals at sample ${[...new Set([...o1,...o2])].sort((a,b)=>a-b).join(', ')}. `:'No signal yet; press New samples or raise n. ')+(limShS?'A bigger σ widens the ranges, so the R chart reacts first; it also inflates R̄, which widens the x̄ limits. That is why you set up the R chart first.':'The mean moved up 0.2 μm (about 1.4σ). The x̄ chart reacts; the R chart should stay quiet.');
+  else m+=(o1.length+o2.length?'A point outside with no assignable cause is a false alarm; it happens now and then.':'All points inside: the process looks in control.');
+  $('limMsg').textContent=m;
+}
+document.querySelectorAll('#limData .btn').forEach(b=>b.onclick=()=>{limMode=b.dataset.d;limits()});
+$('limN').addEventListener('input',limits);
+$('limMean').onclick=()=>{limShM=!limShM;$('limMean').classList.toggle('on',limShM);limits()};
+$('limSpread').onclick=()=>{limShS=!limShS;$('limSpread').classList.toggle('on',limShS);limits()};
+$('limNew').onclick=()=>{limSeed=Math.floor(Math.random()*1e9);limits()};limits();onTheme(limits);
+
+/* ---------- Part 2: capability ---------- */
+const CP={book:[1.5056,0.1398,0.5],one:[1.5,0.1667,0.5],bad:[1.5,0.22,0.5],off:[1.7,0.1,0.5]};
+let cpMode='book';
+function cap(){
+  const m=+$('cpM').value,s=+$('cpS').value,w=+$('cpW').value,LSL=1.5-w,USL=1.5+w;
+  $('cpMV').textContent=m.toFixed(4);$('cpSV').textContent=s.toFixed(4);$('cpWV').textContent='±'+w.toFixed(2)+' ('+LSL.toFixed(2)+' to '+USL.toFixed(2)+')';
+  const C=(USL-LSL)/(6*s),lo=Phi((LSL-m)/s),hi=1-Phi((USL-m)/s),p=lo+hi;
+  $('cpC').textContent=C.toFixed(3);$('cpP').textContent=(100/C).toFixed(1)+'%';$('cpF').textContent=p<0.0001?p.toExponential(1):p.toFixed(5);$('cpPPM').textContent=Math.round(p*1e6).toLocaleString();
+  const F=frame($('cpCanvas'),{xmin:0.6,xmax:2.4,ymax:1.15/(s*Math.sqrt(2*Math.PI)),yt:[],xt:[0.6,0.8,1,1.2,1.4,1.6,1.8,2,2.2,2.4],xl:'Flow width (microns)',xfmt:v=>v.toFixed(1)});
+  const pdf=x=>Math.exp(-(((x-m)/s)**2)/2)/(s*Math.sqrt(2*Math.PI)),g=F.g;
+  const fill=(a,b,col)=>{g.fillStyle=col;g.beginPath();g.moveTo(F.X(a),F.Y(0));for(let x=a;x<=b;x+=0.002)g.lineTo(F.X(x),F.Y(pdf(x)));g.lineTo(F.X(b),F.Y(0));g.closePath();g.fill()};
+  fill(Math.max(0.6,m-3*s),Math.min(2.4,m+3*s),css('--sky'));fill(0.6,LSL,css('--coral'));fill(USL,2.4,css('--coral'));
+  g.strokeStyle=css('--teal');g.lineWidth=3.5;g.beginPath();for(let x=0.6;x<=2.4;x+=0.004){const X=F.X(x),Y=F.Y(pdf(x));x===0.6?g.moveTo(X,Y):g.lineTo(X,Y)}g.stroke();
+  const v=(x,col,lab,dy)=>{g.strokeStyle=col;g.lineWidth=2.5;g.setLineDash([7,5]);g.beginPath();g.moveTo(F.X(x),F.T);g.lineTo(F.X(x),F.Y(0));g.stroke();g.setLineDash([]);g.fillStyle=css('--fg');g.font='800 14px Nunito,sans-serif';g.textAlign='center';g.fillText(lab,F.X(x),F.T+12+dy)};
+  v(LSL,css('--fg'),'LSL',0);v(USL,css('--fg'),'USL',0);v(m-3*s,css('--muted'),'μ − 3σ',22);v(m+3*s,css('--muted'),'μ + 3σ',22);
+  const book=Math.abs(m-1.5056)<1e-6&&Math.abs(s-0.1398)<1e-6&&Math.abs(w-0.5)<1e-9;
+  $('cpMsg').textContent=`Cp = ${(USL-LSL).toFixed(2)}/(6 × ${s.toFixed(4)}) = ${C.toFixed(3)}: the process uses ${(100/C).toFixed(1)}% of the specification band. Fallout = Φ(${((LSL-m)/s).toFixed(2)}) + 1 − Φ(${((USL-m)/s).toFixed(2)}) = ${p.toFixed(5)}, about ${Math.round(p*1e6).toLocaleString()} ppm. `+(book?'Book: Cp = 1.192, P = 83.89%, fallout 0.00035 (350 ppm). The small differences come from rounding in the book.':C<1?'Cp < 1: the natural spread is wider than the specs, so many parts fail even when the process is in control.':Math.abs(m-1.5)>0.1?'Cp looks fine but the process is off center, so most fallout comes from one side. Cp ignores where the mean sits (Chapter 8 adds Cpk).':'');
+}
+['cpM','cpS','cpW'].forEach(id=>$(id).addEventListener('input',()=>{document.querySelectorAll('[data-cp]').forEach(b=>b.classList.remove('on'));cap()}));
+document.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>{const [m,s,w]=CP[b.dataset.cp];$('cpM').value=m;$('cpS').value=s;$('cpW').value=w;document.querySelectorAll('[data-cp]').forEach(x=>x.classList.toggle('on',x===b));cap()});cap();onTheme(cap);
+
+/* ---------- Part 2: control vs spec limits ---------- */
+function specs(){
+  const n=+$('spN').value,w=+$('spW').value;$('spNV').textContent=n;$('spWV').textContent='±'+w.toFixed(1)+'σ';
+  const sx=1/Math.sqrt(n),ymax=1.1/(sx*Math.sqrt(2*Math.PI));
+  const F=frame($('spCanvas'),{xmin:-6.5,xmax:6.5,ymax,yt:[],xt:[-6,-4,-3,-2,0,2,3,4,6],xl:'Distance from the mean (σ of individual parts)',xfmt:v=>v===0?'μ':(v>0?'+':'−')+Math.abs(v)+'σ'});
+  const g=F.g,curve=(s,col,wd)=>{g.strokeStyle=col;g.lineWidth=wd;g.beginPath();for(let x=-6.5;x<=6.5;x+=0.02){const X=F.X(x),Y=F.Y(Math.exp(-((x/s)**2)/2)/(s*Math.sqrt(2*Math.PI)));x===-6.5?g.moveTo(X,Y):g.lineTo(X,Y)}g.stroke()};
+  curve(1,css('--teal'),3);curve(sx,css('--blue'),3);
+  const v=(x,col,lab,y)=>{g.strokeStyle=col;g.lineWidth=2.5;g.setLineDash([7,5]);g.beginPath();g.moveTo(F.X(x),F.T);g.lineTo(F.X(x),F.Y(0));g.stroke();g.setLineDash([]);g.fillStyle=col;g.font='800 13px Nunito,sans-serif';g.textAlign='center';g.fillText(lab,F.X(x),F.T+y)};
+  [-1,1].forEach(sg=>{v(sg*3*sx,css('--blue'),sg<0?'LCL':'UCL',14);v(sg*3,css('--teal'),sg<0?'LNTL':'UNTL',34);v(sg*w,css('--coral'),sg<0?'LSL':'USL',54)});
+  g.font='800 14px Nunito,sans-serif';g.textAlign='left';g.fillStyle=css('--blue');g.fillText('sample means x̄ (σ/√n)',F.L+8,F.T+80);g.fillStyle=css('--teal');g.fillText('individual parts (σ)',F.L+8,F.T+100);
+  $('spMsg').textContent=`With n = ${n}, the control limits sit at ±${(3*sx).toFixed(2)}σ, but single parts spread to ±3σ (natural tolerance limits). `+(w<3?`The specs (±${w.toFixed(1)}σ) are inside the natural spread: the chart can be in control while ${(200*(1-Phi(w))).toFixed(2)}% of parts are out of spec.`:`The specs (±${w.toFixed(1)}σ) are outside the natural spread, so an in-control process makes almost no bad parts.`)+' Never draw spec limits on an x̄ chart.';
+}
+['spN','spW'].forEach(id=>$(id).addEventListener('input',specs));specs();onTheme(specs);
+mcSet('spCards','spScore',shuffle([
+ {q:'They are set by the customer, the designer or management.',a:'Specification limits',why:'Specification limits are determined externally (Section 6.2.2).'},
+ {q:'They are computed as x̿ ± A₂R̄.',a:'Control limits',why:'Control limits come from the variability of the sample means.'},
+ {q:'They are μ ± 3σ for single units of product.',a:'Natural tolerance limits',why:'The natural tolerance limits describe where individual parts fall (Figure 6.6).'},
+ {q:'They get closer to the center line when n grows.',a:'Control limits',why:'They depend on σ/√n, so bigger samples give narrower limits.'},
+ {q:'They have no mathematical or statistical link to the process.',a:'Specification limits',why:'There is no relationship between the control limits and the specification limits.'},
+ {q:'Comparing them with the specs tells you whether the process is capable.',a:'Natural tolerance limits',why:'If the natural tolerance limits fall inside the specs, almost all parts conform.'}
+]),['Control limits','Natural tolerance limits','Specification limits']);
+
+/* ---------- Part 3: patterns ---------- */
+const PAT={
+ 'Cycles':['Cyclic patterns come from systematic environmental changes such as temperature, operator fatigue, regular rotation of operators or machines, or voltage swings (Figure 6.8). On an R chart they can come from maintenance schedules or tool wear.',i=>1.8*Math.sin(i*2*Math.PI/7)],
+ 'Mixture':['Points pile up near or slightly outside the limits and few sit near the center line. Two or more overlapping distributions, for example over-control: an operator who adjusts too often (Figure 6.9).',i=>(i%2?2.1:-2.1)],
+ 'Shift':['A sudden shift in level: new workers, methods, raw materials or machines, a change in inspection, or a change in skill or motivation (Figure 6.10).',i=>i>=13?1.8:0],
+ 'Trend':['A continuous movement in one direction: gradual wear of a tool, operator fatigue, or seasonal effects such as temperature (Figure 6.11).',i=>-2+i*0.17],
+ 'Stratification':['Points hug the center line with too little natural variation. Often the control limits were computed wrongly, or each subgroup mixes several distributions, so the range is inflated (Figure 6.12).',i=>0]
+};
+let patAns='Cycles',patSeed=3,patRight=0,patDone=0,patLock=false;
+function patDraw(){
+  const r=rng(patSeed),z=[];for(let i=0;i<25;i++){const base=patAns==='Mixture'?(r()<0.5?2.1:-2.1):PAT[patAns][1](i),noise=patAns==='Stratification'?0.25:patAns==='Mixture'?0.55:0.6;z.push(base+noise*gauss(r))}
+  cchart($('patCanvas'),z,0,3,-3,{yfmt:v=>v===0?'CL':v.toFixed(0)+'σ',lfmt:v=>v===0?'':(v>0?'+':'')+v+'σ'});
+}
+function patNew(){const k=Object.keys(PAT);let a;do{a=k[Math.floor(Math.random()*k.length)]}while(a===patAns&&patDone);patAns=a;patSeed=Math.floor(Math.random()*1e9);patLock=false;
+  $('patOpts').innerHTML='';Object.keys(PAT).forEach(name=>{const b=document.createElement('button');b.className='opt';b.type='button';b.textContent=name;b.onclick=()=>{if(patLock)return;patLock=true;patDone++;
+    if(name===patAns){b.classList.add('right');patRight++}else{b.classList.add('wrong');[...$('patOpts').children].find(x=>x.textContent===patAns).classList.add('right')}
+    $('patMsg').textContent=(name===patAns?'Right. ':'This one is '+patAns.toLowerCase()+'. ')+PAT[patAns][0];$('patScore').textContent=patRight+' of '+patDone+' correct'};$('patOpts').appendChild(b)});
+  $('patMsg').textContent='Pick the pattern you see.';patDraw()}
+$('patNext').onclick=patNew;patAns='Cycles';patNew();onTheme(patDraw);
+
+/* ---------- Part 3: OC and ARL ---------- */
+const beta=(k,n,L)=>Phi(L-k*Math.sqrt(n))-Phi(-L-k*Math.sqrt(n));
+function oc(){
+  const k=+$('ocK').value,n=+$('ocN').value,L=+$('ocL').value,h=+$('ocH').value;
+  $('ocKV').textContent=k.toFixed(2)+'σ';$('ocNV').textContent=n;$('ocLV').textContent=L.toFixed(2);$('ocHV').textContent=h;
+  const b=beta(k,n,L),A=1/(1-b);
+  const f=v=>v>=1000?Math.round(v).toLocaleString():v.toFixed(2);
+  $('ocB').textContent=b.toFixed(4);$('ocA').textContent=f(A);$('ocT').textContent=f(A*h);$('ocI').textContent=f(n*A);
+  const F=frame($('ocCanvas'),{xmin:0,xmax:3,ymax:1.05,yt:[0,0.2,0.4,0.6,0.8,1],xt:[0,0.5,1,1.5,2,2.5,3],xl:'Shift k (σ units)',yfmt:v=>v.toFixed(1),xfmt:v=>v+'σ'});
+  const g=F.g;
+  [[1,'--muted'],[3,'--gold'],[5,'--teal'],[10,'--violet'],[20,'--coral']].forEach(([nn,c])=>{g.strokeStyle=css(c);g.lineWidth=nn===n?4.5:2;g.beginPath();for(let x=0;x<=3.0001;x+=0.02){const X=F.X(x),Y=F.Y(beta(x,nn,L));x?g.lineTo(X,Y):g.moveTo(X,Y)}g.stroke();
+    const xl=Math.min(2.85,(L-0.2)/Math.sqrt(nn)+0.05);g.fillStyle=css(c);g.font='800 13px Nunito,sans-serif';g.textAlign='left';g.fillText('n = '+nn,F.X(xl)+6,F.Y(beta(xl,nn,L))-6)});
+  if(![1,3,5,10,20].includes(n)){g.strokeStyle=css('--blue');g.lineWidth=4.5;g.beginPath();for(let x=0;x<=3.0001;x+=0.02){const X=F.X(x),Y=F.Y(beta(x,n,L));x?g.lineTo(X,Y):g.moveTo(X,Y)}g.stroke()}
+  g.strokeStyle=css('--fg');g.setLineDash([5,5]);g.lineWidth=1.5;g.beginPath();g.moveTo(F.X(k),F.T);g.lineTo(F.X(k),F.Y(0));g.stroke();g.setLineDash([]);
+  dot(F,k,b,css('--sun'),9);g.strokeStyle=css('--fg');g.lineWidth=2;g.beginPath();g.arc(F.X(k),F.Y(b),9,0,7);g.stroke();
+  const d=k*Math.sqrt(n);
+  $('ocMsg').textContent=k===0?`No shift: β = 1 − α = ${b.toFixed(4)}, and ARL₀ = 1/α = ${f(A)} samples between false alarms.`:
+   `β = Φ(${L.toFixed(2)} − ${d.toFixed(2)}) − Φ(−${L.toFixed(2)} − ${d.toFixed(2)}) = ${b.toFixed(4)}. The first sample after the shift catches it with probability ${(1-b).toFixed(4)}; the second with ${(b*(1-b)).toFixed(4)}. On average ARL₁ = ${f(A)} samples, ${f(A*h)} hours, and ${f(n*A)} units inspected.`;
+}
+['ocK','ocN','ocL','ocH'].forEach(id=>$(id).addEventListener('input',oc));
+document.querySelectorAll('[data-oc]').forEach(b=>b.onclick=()=>{const [k,n]=b.dataset.oc.split(',');$('ocK').value=k;$('ocN').value=n;$('ocL').value=3;oc()});oc();onTheme(oc);
+
+/* ---------- Part 4: x-bar and s ---------- */
+const T63=[[74.030,74.002,74.019,73.992,74.008],[73.995,73.992,74.001,74.011,74.004],[73.988,74.024,74.021,74.005,74.002],[74.002,73.996,73.993,74.015,74.009],[73.992,74.007,74.015,73.989,74.014],[74.009,73.994,73.997,73.985,73.993],[73.995,74.006,73.994,74.000,74.005],[73.985,74.003,73.993,74.015,73.988],[74.008,73.995,74.009,74.005,74.004],[73.998,74.000,73.990,74.007,73.995],[73.994,73.998,73.994,73.995,73.990],[74.004,74.000,74.007,74.000,73.996],[73.983,74.002,73.998,73.997,74.012],[74.006,73.967,73.994,74.000,73.984],[74.012,74.014,73.998,73.999,74.007],[74.000,73.984,74.005,73.998,73.996],[73.994,74.012,73.986,74.005,74.007],[74.006,74.010,74.018,74.003,74.000],[73.984,74.002,74.003,74.005,73.997],[74.000,74.010,74.013,74.020,74.003],[73.982,74.001,74.015,74.005,73.996],[74.004,73.999,73.990,74.006,74.009],[74.010,73.989,73.990,74.009,74.014],[74.015,74.008,73.993,74.000,74.010],[73.982,73.984,73.995,74.017,74.013]];
+let xsMode='book',xsSeed=9;
+function xs(){
+  document.querySelectorAll('#xsData .btn').forEach(b=>b.classList.toggle('on',b.dataset.d===xsMode));$('xsSim').hidden=xsMode!=='sim';
+  let data,n;if(xsMode==='book'){data=T63;n=5}else{n=+$('xsN').value;$('xsNV').textContent=n;const r=rng(xsSeed);data=[];for(let i=0;i<25;i++){const row=[];for(let j=0;j<n;j++)row.push(74+0.01*gauss(r));data.push(row)}}
+  const xb=data.map(mean),S=data.map(sd),R=data.map(range),xbb=mean(xb),sb=mean(S),Rb=mean(R);
+  const xu=xbb+A3(n)*sb,xl=xbb-A3(n)*sb,su=B4(n)*sb,sl=B3(n)*sb;
+  $('xsXbb').textContent=xbb.toFixed(3);$('xsSb').textContent=sb.toFixed(4);$('xsXU').textContent=xu.toFixed(3)+' / '+xl.toFixed(3);$('xsSU').textContent=su.toFixed(4)+' / '+sl.toFixed(4);
+  $('xsC').textContent=c4(n).toFixed(4)+', '+A3(n).toFixed(3);$('xsB').textContent=B3(n).toFixed(3)+', '+B4(n).toFixed(3);$('xsSig').textContent=(sb/c4(n)).toFixed(4);$('xsSigR').textContent=(Rb/D2[n]).toFixed(4);
+  const o1=cchart($('xsX'),xb,xbb,xu,xl,{cln:'x̿',lfmt:v=>v.toFixed(3)}),o2=cchart($('xsS'),S,sb,su,sl,{cln:'s̄',col:css('--mint'),zero:true});
+  $('xsMsg').textContent=(xsMode==='book'?`Example 6.3: x̿ = 74.001, s̄ = 0.0094, so the x̄ chart runs from 73.988 to 74.014 and the s chart from 0 to 0.0196. σ̂ = 0.0094/0.9400 = 0.01. `:`Simulated rings with true σ = 0.0100 and n = ${n}. `)+`The s estimate is ${(sb/c4(n)).toFixed(4)} and the R estimate is ${(Rb/D2[n]).toFixed(4)}. `+(n>10?'For n above 10 or 12 the range throws away information; the s chart is the better choice.':'For small n the two estimates are close, which is why the R chart is popular.')+(o1.length+o2.length?' Points outside: '+[...new Set([...o1,...o2])].join(', ')+'.':' No point is outside the limits.');
+}
+document.querySelectorAll('#xsData .btn').forEach(b=>b.onclick=()=>{xsMode=b.dataset.d;xs()});$('xsN').addEventListener('input',xs);$('xsNew').onclick=()=>{xsSeed=Math.floor(Math.random()*1e9);xs()};xs();onTheme(xs);
+
+/* ---------- Part 4: variable sample size ---------- */
+const T64=T63.map(r=>r.slice());
+T64[1]=[73.995,73.992,74.001];T64[5]=[74.009,73.994,73.997,73.985];T64[6]=[73.995,74.006,73.994,74.000];T64[8]=[74.008,73.995,74.009,74.005];T64[12]=[73.983,74.002,73.998];T64[14]=[74.012,74.014,73.998];T64[16]=[73.994,74.012,73.986,74.005];T64[19]=[74.000,74.010,74.013];
+function vari(){
+  const ns=T64.map(r=>r.length),xb=T64.map(mean),S=T64.map(sd),N=ns.reduce((a,b)=>a+b,0);
+  const xbb=T64.reduce((a,r,i)=>a+ns[i]*xb[i],0)/N,sb=Math.sqrt(T64.reduce((a,r,i)=>a+(ns[i]-1)*S[i]**2,0)/(N-25));
+  const xu=ns.map(n=>xbb+A3(n)*sb),xl=ns.map(n=>xbb-A3(n)*sb),su=ns.map(n=>B4(n)*sb),sl=ns.map(n=>B3(n)*sb);
+  const i=+$('vaSel').value,n=ns[i-1];$('vaSelV').textContent=i;$('vaI').textContent=i;
+  $('vaN').textContent=n;$('vaA3').textContent=A3(n).toFixed(3);$('vaXL').textContent=xl[i-1].toFixed(3)+' / '+xu[i-1].toFixed(3);$('vaSU').textContent=su[i-1].toFixed(4);
+  cchart($('vaX'),xb,xbb,xu,xl,{cln:'x̿',lfmt:v=>v.toFixed(3),sel:i});cchart($('vaS'),S,sb,su,sl,{cln:'s̄',col:css('--mint'),zero:true,sel:i});
+  $('vaMsg').textContent=`Weighted x̿ = Σnᵢx̄ᵢ/Σnᵢ = ${xbb.toFixed(3)} (Σnᵢ = ${N}); pooled s̄ = [Σ(nᵢ − 1)sᵢ²/(Σnᵢ − 25)]^½ = ${sb.toFixed(4)}. Sample ${i} has n = ${n}: x̄ limits ${xbb.toFixed(3)} ± ${A3(n).toFixed(3)}(${sb.toFixed(4)}) = ${xl[i-1].toFixed(3)} to ${xu[i-1].toFixed(3)}; s chart UCL = ${B4(n).toFixed(3)}(${sb.toFixed(4)}) = ${su[i-1].toFixed(4)}. Smaller samples get wider limits. Book (Table 6.5): n = 5 gives 73.986 to 74.016 and 0.022; n = 3 gives 73.981 to 74.021 and 0.026.`;
+}
+$('vaSel').addEventListener('input',vari);vari();onTheme(vari);
+
+/* ---------- Part 5: individuals ---------- */
+const P1='310 288 297 298 307 303 294 297 308 306 294 299 297 299 314 295 293 306 301 304',P2=[305,282,305,296,314,295,287,301,298,311,310,292,305,299,304,310,304,305,333,328];
+let inPh2=false;
+function indiv(){
+  const x=$('inData').value.trim().split(/[\s,;]+/).filter(t=>t!=='').map(Number).filter(v=>isFinite(v));
+  if(x.length<3){$('inMsg').textContent='Enter at least three numbers, separated by spaces.';return}
+  const mr=x.slice(1).map((v,i)=>Math.abs(v-x[i])),xb=mean(x),MR=mean(mr),U=xb+3*MR/1.128,Lo=xb-3*MR/1.128,MU=3.267*MR;
+  $('inXb').textContent=xb.toFixed(2);$('inMR').textContent=MR.toFixed(2);$('inLim').textContent=Lo.toFixed(2)+' / '+U.toFixed(2);$('inMRU').textContent=MU.toFixed(2);
+  const all=inPh2?x.concat(P2):x,mrA=all.slice(1).map((v,i)=>Math.abs(v-all[i]));
+  const o1=cchart($('inX'),all,xb,U,Lo,{cln:'x̄',xl:'Week',lfmt:v=>v.toFixed(2),shade:inPh2?x.length+1:0,yfmt:v=>v.toFixed(0)});
+    const o2=cchart($('inM'),mrA,MR,MU,0,{cln:'MR̄',xl:'Moving range number (week i to week i + 1)',col:css('--mint'),zero:true,lfmt:v=>v.toFixed(2),shade:inPh2?x.length:0,yfmt:v=>v.toFixed(0)});
+  $('inMsg').textContent=`σ̂ = MR̄/d₂ = ${MR.toFixed(2)}/1.128 = ${(MR/1.128).toFixed(2)}, so the limits are ${xb.toFixed(2)} ± 3(${(MR/1.128).toFixed(2)}) = ${Lo.toFixed(2)} to ${U.toFixed(2)}. MR chart: 0 to 3.267 × ${MR.toFixed(2)} = ${MU.toFixed(2)}. `+(inPh2?(o1.length?`Phase II: week${o1.length>1?'s':''} ${o1.join(' and ')} plot above the UCL and the MR chart spikes at the jump. The cost shifted up around week 39; look for the assignable cause there (for example extra manual underwriting or temporary staff).`:'Phase II weeks plot inside the limits.'):(o1.length||o2.length?'Some points are out in phase I: look for causes before adopting the limits.':'Book: x̄ = 300.5, MR̄ = 7.79, limits 279.78 to 321.22, MR UCL 25.45. No point is out, so the limits are adopted.'));
+}
+$('inData').addEventListener('input',indiv);
+$('inP2').onclick=()=>{inPh2=!inPh2;$('inP2').classList.toggle('on',inPh2);$('inP2').textContent=inPh2?'Hide weeks 21–40':'Add phase II weeks 21–40 (Table 6.7)';indiv()};
+$('inReset').onclick=()=>{$('inData').value=P1;indiv()};indiv();onTheme(indiv);
+
+/* ---------- quiz ---------- */
+const Q=[
+ ['Why do we usually set up the R chart before the x̄ chart?',['It is easier to draw','The x̄ limits use R̄, so they mean little unless variability is in control','The book says so for no reason','The R chart has no LCL'],1,'The x̄ limits are x̿ ± A₂R̄. If the spread is out of control, R̄ is wrong and so are the x̄ limits.'],
+ ['For n = 5, R̄ = 0.30. What is σ̂ = R̄/d₂?',['0.060','0.129','0.173','0.30'],1,'d₂ = 2.326 for n = 5, so σ̂ = 0.30/2.326 ≈ 0.129.'],
+ ['In Example 6.1, x̿ = 1.5056, R̄ = 0.32521 and A₂ = 0.577. The x̄ chart UCL is…',['1.6056','1.6933','1.8308','2.0000'],1,'1.5056 + 0.577(0.32521) = 1.69325.'],
+ ['Specs 1.00 to 2.00, σ̂ = 0.1398. Cp is about…',['0.84','1.00','1.19','2.38'],2,'Cp = 1.00/(6 × 0.1398) = 1.192.'],
+ ['Which statement about control and specification limits is true?',['Control limits should equal the specs','There is no mathematical relationship between them','Spec limits come from R̄','Control limits are set by the customer'],1,'Control limits come from process variability; specs are set externally.'],
+ ['Points pile up near both control limits and few are near the center line. This pattern is…',['a trend','stratification','a mixture','a cycle'],2,'A mixture: overlapping distributions, often from over-adjustment (Figure 6.9).'],
+ ['A 1σ shift with n = 5 has β ≈ 0.75. The average run length to detect it is…',['1.33','4','0.25','370'],1,'ARL₁ = 1/(1 − β) = 1/0.25 = 4 samples.'],
+ ['For samples larger than about 10 or 12, the better chart for variability is…',['the R chart','the s or s² chart','the individuals chart','no chart'],1,'The range loses efficiency as n grows; s uses every observation.'],
+ ['With variable sample sizes on x̄ and s charts, the control limits…',['stay the same for every sample','change with each sample’s n','are not used','depend only on x̿'],1,'A₃, B₃ and B₄ depend on n, so the limits form a staircase (Figure 6.18).'],
+ ['For an individuals chart, σ is estimated by…',['MR̄/1.128','MR̄/2.326','s̄/c₄','R̄/d₂ with n = 5'],0,'A moving range of two observations: d₂ = 1.128.']
+];
+let qi=0,qs=0;
+function stars(){$('qStars').innerHTML=Q.map((_,i)=>'<span'+(i<qs?' class="on"':'')+'>★</span>').join('')}
+function qShow(){stars();$('qNext').hidden=true;$('qAgain').hidden=true;const box=$('qBox');box.innerHTML='';
+  if(qi>=Q.length){const f=document.createElement('div');f.className='feedback';f.textContent=`You earned ${qs} of ${Q.length} stars. `+(qs>=9?'Excellent, you own Chapter 6.':qs>=7?'Strong work. Review the ones you missed.':'Revisit the activities above, then try again.');box.appendChild(f);$('qAgain').hidden=false;return}
+  const [q,o,a,w]=Q[qi];const h=document.createElement('div');h.className='qcard';h.innerHTML='<div class="sec"></div><div class="tx"></div><div class="opts"></div><div class="why" hidden></div>';
+  h.querySelector('.sec').textContent='Question '+(qi+1)+' of '+Q.length;h.querySelector('.tx').textContent=q;
+  o.forEach((t,i)=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=t;b.onclick=()=>{if(h.dataset.done)return;h.dataset.done=1;
+    if(i===a){b.classList.add('right');qs++}else{b.classList.add('wrong');h.querySelectorAll('.opt')[a].classList.add('right')}
+    const wy=h.querySelector('.why');wy.hidden=false;wy.textContent=w;stars();qi++;$('qNext').hidden=false;$('qNext').textContent=qi>=Q.length?'See my stars':'Next question'};h.querySelector('.opts').appendChild(b)});
+  box.appendChild(h)}
+$('qNext').onclick=qShow;$('qAgain').onclick=()=>{qi=0;qs=0;qShow()};qShow();
+
+function jump(){const id=location.hash.slice(1);const el=id&&document.getElementById(id);if(el&&el.classList.contains('station')){el.scrollIntoView({behavior:'smooth',block:'start'});el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}}
+addEventListener('hashchange',jump);setTimeout(jump,300);
+})();
+</script>
+
+</body></html>

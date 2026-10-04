@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IE454 Quality Control Labs</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Landing page: header bar, hero, one colored card per chapter, then the Class Lab card */
+:root{
+  --bg:#F3F8FE; --surface:#FFFFFF; --soft:#E8F2FC; --fg:#15233A; --muted:#55657E; --line:#D5E3F2;
+  --blue:#0070C0; --blue-ink:#FFFFFF; --sky:#DCEBFA; --sun:#FFC83D; --sun-ink:#3A2B00;
+  --display:"Nunito",ui-rounded,system-ui,sans-serif; --body:"Source Sans 3",system-ui,sans-serif;
+  --shadow:0 6px 22px rgba(0,60,120,.10); color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1626; --surface:#162238; --soft:#1C2C47; --fg:#EAF1FB; --muted:#A7B6CC; --line:#2A3C5C;
+  --blue:#3FA2F0; --blue-ink:#06192C; --sky:#1D3352; --sun:#FFD15C; --sun-ink:#2E2200;
+  --shadow:0 6px 22px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1626; --surface:#162238; --soft:#1C2C47; --fg:#EAF1FB; --muted:#A7B6CC; --line:#2A3C5C;
+  --blue:#3FA2F0; --blue-ink:#06192C; --sky:#1D3352; --sun:#FFD15C; --sun-ink:#2E2200;
+  --shadow:0 6px 22px rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.55}
+h1,h2{font-family:var(--display);line-height:1.15;margin:0;text-wrap:balance}
+a:focus-visible{outline:3px solid var(--sun);outline-offset:3px}
+.top{background:var(--blue);color:var(--blue-ink);padding:10px 16px}
+.top p{margin:0 auto;max-width:1120px;font-family:var(--display);font-weight:800;font-size:clamp(13px,1.7vw,16px)}
+.top .dot{opacity:.7;margin:0 .35em}
+.wrap{max-width:1120px;margin:0 auto;padding:24px 16px 60px;display:flex;flex-direction:column;gap:28px}
+.hero{background:var(--surface);border-radius:32px;padding:clamp(20px,4vw,40px);box-shadow:var(--shadow)}
+.hero h1{font-size:clamp(28px,4.4vw,46px);font-weight:900;color:var(--blue)}
+.hero p{font-size:clamp(17px,2vw,20px);margin:12px 0 0;max-width:62ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.card{display:flex;flex-direction:column;background:var(--surface);border-radius:22px;box-shadow:var(--shadow);overflow:hidden;text-decoration:none;color:var(--fg);transition:transform .15s}
+.card:hover{transform:translateY(-3px)}
+.card .band{background:var(--c);color:#fff;padding:16px 20px;display:flex;gap:14px;align-items:center}
+.card .num{flex:none;width:52px;height:52px;border-radius:16px;background:rgba(255,255,255,.22);display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:24px}
+.card .lbl{font-family:var(--display);font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
+.card h2{font-size:21px;font-weight:900;color:#fff}
+.card .tag{padding:14px 20px 18px;margin:0;flex:1;display:flex;flex-direction:column;gap:10px}
+.card .tag i{font-style:normal;font-weight:600}
+.card .go{align-self:flex-start;font-family:var(--display);font-weight:800;font-size:14px;padding:6px 14px;border-radius:99px;background:var(--soft)}
+.lab .band{background:var(--sun);color:var(--sun-ink)}
+.lab h2{color:var(--sun-ink)}
+.lab .num{background:rgba(0,0,0,.08)}
+footer{color:var(--muted);font-size:13px;text-align:center}
+@media (prefers-reduced-motion:reduce){.card{transition:none}}
+</style>
+</head>
+<body>
+<header class="top"><p>IE454 Quality Control<span class="dot">·</span>Dr. Aseel Khanfar<span class="dot">·</span>Department of Industrial Engineering<span class="dot">·</span>Yarmouk University</p></header>
+<main class="wrap">
+<section class="hero">
+ <h1>Interactive labs for every chapter</h1>
+ <p>Each chapter has its own page of hands-on activities and a star quiz. Open the one for this week's lecture, or follow a "Run it live" link from the slides.</p>
+</section>
+
+<nav class="grid" aria-label="Chapters">
+ <a class="card" href="ch01/" style="--c:#0070C0"><div class="band"><span class="num">1</span><div><div class="lbl">Chapter 1</div><h2>Quality Improvement in the Modern Business Environment</h2></div></div><p class="tag"><i>Quality is the enemy of variability</i><span class="go">Open lab</span></p></a>
+ <a class="card" href="ch02/" style="--c:#12A5B8"><div class="band"><span class="num">2</span><div><div class="lbl">Chapter 2</div><h2>The DMAIC Process</h2></div></div><p class="tag"><i>Fix the cause, then hold the gain</i><span class="go">Open lab</span></p></a>
+ <a class="card" href="ch03/" style="--c:#1FA874"><div class="band"><span class="num">3</span><div><div class="lbl">Chapter 3</div><h2>Modeling Process Quality</h2></div></div><p class="tag"><i>Every process varies. A model tells you how much.</i><span class="go">Open lab</span></p></a>
+ <a class="card" href="ch05/" style="--c:#E8503F"><div class="band"><span class="num">5</span><div><div class="lbl">Chapter 5</div><h2>Methods and Philosophy of Statistical Process Control</h2></div></div><p class="tag"><i>Is it noise, or is something wrong?</i><span class="go">Open lab</span></p></a>
+ <a class="card" href="ch06/" style="--c:#7A5AF8"><div class="band"><span class="num">6</span><div><div class="lbl">Chapter 6</div><h2>Control Charts for Variables</h2></div></div><p class="tag"><i>Watch the center. Watch the spread.</i><span class="go">Open lab</span></p></a>
+ <a class="card" href="ch07/" style="--c:#C2410C"><div class="band"><span class="num">7</span><div><div class="lbl">Chapter 7</div><h2>Control Charts for Attributes</h2></div></div><p class="tag"><i>Can't measure it? Count it.</i><span class="go">Open lab</span></p></a>
+ <a class="card" href="ch08/" style="--c:#005A9C"><div class="band"><span class="num">8</span><div><div class="lbl">Chapter 8</div><h2>Process and Measurement System Capability Analysis</h2></div></div><p class="tag"><i>In control is not the same as capable</i><span class="go">Open lab</span></p></a>
+ <a class="card lab" href="lab/"><div class="band"><span class="num">★</span><div><div class="lbl">In class</div><h2>IE454 Class Lab</h2></div></div><p class="tag"><i>Make the data, then chart it. Enter the class's numbers on the projector and watch the charts build.</i><span class="go">Open Class Lab</span></p></a>
+</nav>
+
+<footer>Activities built on Montgomery, <i>Introduction to Statistical Quality Control</i>, 8th ed., Wiley. Prepared for IE454 by Dr. Aseel Khanfar, Department of Industrial Engineering, Yarmouk University.<br><b>© 2026 Dr. Aseel Khanfar, Yarmouk University. All rights reserved.</b> No part of this page may be copied, adapted or republished without written permission.</footer>
+</main>
+</body>
+</html>

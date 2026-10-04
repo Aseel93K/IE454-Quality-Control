@@ -1,0 +1,573 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>IE454 Chapter 3 Variation Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: same as the Chapter 1 and 2 labs. Sticky header, hero with part chips, one rounded "station" per activity (scene banner + interactive body), star quiz last */
+:root{
+  --bg:#F3F8FE; --surface:#FFFFFF; --soft:#E8F2FC; --fg:#15233A; --muted:#55657E; --line:#D5E3F2;
+  --blue:#0070C0; --blue-ink:#FFFFFF; --sky:#DCEBFA; --sun:#FFC83D; --sun-ink:#3A2B00;
+  --coral:#FF6B5B; --mint:#1FA874; --violet:#7C5CFF; --teal:#12A5B8; --gold:#E0A100;
+  --ok-bg:#DDF6EA; --ok-fg:#0F6B47; --bad-bg:#FFE3DF; --bad-fg:#A3271B;
+  --display:"Nunito",ui-rounded,system-ui,sans-serif; --body:"Source Sans 3",system-ui,sans-serif;
+  --r:22px; --shadow:0 6px 22px rgba(0,60,120,.10);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1626; --surface:#162238; --soft:#1C2C47; --fg:#EAF1FB; --muted:#A7B6CC; --line:#2A3C5C;
+  --blue:#3FA2F0; --blue-ink:#06192C; --sky:#1D3352; --sun:#FFD15C; --sun-ink:#2E2200;
+  --coral:#FF8576; --mint:#3CCB93; --violet:#9C84FF; --teal:#3CC4D6; --gold:#C98F00;
+  --ok-bg:#123D2E; --ok-fg:#7FE3B5; --bad-bg:#4A1E1A; --bad-fg:#FFB0A5; --shadow:0 6px 22px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1626; --surface:#162238; --soft:#1C2C47; --fg:#EAF1FB; --muted:#A7B6CC; --line:#2A3C5C;
+  --blue:#3FA2F0; --blue-ink:#06192C; --sky:#1D3352; --sun:#FFD15C; --sun-ink:#2E2200;
+  --coral:#FF8576; --mint:#3CCB93; --violet:#9C84FF; --teal:#3CC4D6; --gold:#C98F00;
+  --ok-bg:#123D2E; --ok-fg:#7FE3B5; --bad-bg:#4A1E1A; --bad-fg:#FFB0A5; --shadow:0 6px 22px rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.55}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--blue);color:var(--blue-ink);padding:10px 16px}
+.top p{margin:0 auto;max-width:1120px;font-family:var(--display);font-weight:800;font-size:clamp(13px,1.7vw,16px)}
+.top .dot{opacity:.7;margin:0 .35em}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:24px 70px;display:flex;flex-direction:column;gap:28px}
+.hero{background:var(--surface);border-radius:32px;padding:clamp(20px,4vw,40px);box-shadow:var(--shadow);display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:center}
+@media (max-width:820px){.hero{grid-template-columns:1fr}}
+.hero h1{font-size:clamp(28px,4.4vw,46px);font-weight:900;color:var(--blue)}
+.hero .big{font-size:clamp(17px,2vw,20px);margin:12px 0 0;max-width:56ch}
+.hero .quote{margin-top:14px;padding:14px 18px;background:var(--sky);border-radius:18px;font-style:italic}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{display:inline-flex;gap:6px;align-items:center;padding:7px 14px;border-radius:99px;font-family:var(--display);font-weight:800;font-size:14px;text-decoration:none;color:var(--fg);background:var(--soft);border:2px solid transparent}
+.chip:hover{border-color:var(--blue)}
+.chip i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.heroart{width:100%;max-width:440px;justify-self:center}
+.station{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;scroll-margin-top:70px}
+.station.flash{animation:flash 1.6s ease-out 1}
+@keyframes flash{0%{box-shadow:0 0 0 6px var(--sun)}100%{box-shadow:var(--shadow)}}
+.scene{display:flex;gap:18px;align-items:center;padding:18px 22px;color:#fff}
+.scene svg.ico{width:64px;height:64px;flex:none;background:rgba(255,255,255,.22);border-radius:20px;padding:10px}
+.scene .lbl{font-family:var(--display);font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
+.scene h2{font-size:clamp(21px,2.6vw,28px);font-weight:900;color:#fff}
+.scene p{margin:2px 0 0;font-size:15px;opacity:.95}
+.body{padding:20px 22px 24px;display:flex;flex-direction:column;gap:14px}
+.body > p{margin:0;max-width:75ch}
+.sec{font-size:13px;color:var(--muted);font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid2.wide{grid-template-columns:1fr 1.4fr}
+@media (max-width:760px){.grid2,.grid2.wide{grid-template-columns:1fr}}
+.panel{background:var(--soft);border-radius:18px;padding:14px 16px;min-width:0}
+.panel h3{font-size:17px;font-weight:800;margin-bottom:8px}
+label.sl{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:600;margin-top:6px}
+label.sl span{font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--blue)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.stats.four{grid-template-columns:repeat(4,1fr)}
+@media (max-width:520px){.stats.four{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--surface);border-radius:14px;padding:8px 10px;min-width:0}
+.stat b{display:block;font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
+.stat small{font-size:12px;color:var(--muted)}
+canvas{width:100%;height:auto;display:block;border-radius:16px;background:var(--surface)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.qcard{background:var(--soft);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.qcard .tx{font-weight:600}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{border:2px solid var(--line);background:var(--surface);color:var(--fg);border-radius:99px;padding:5px 12px;font-size:14px;font-weight:700}
+.opt:hover{border-color:var(--blue)}
+.opt.right{background:var(--ok-bg);color:var(--ok-fg);border-color:var(--ok-fg)}
+.opt.wrong{background:var(--bad-bg);color:var(--bad-fg);border-color:var(--bad-fg)}
+.why{font-size:14px;color:var(--muted)}
+.score{font-family:var(--display);font-weight:800;padding:8px 14px;border-radius:99px;background:var(--sky);align-self:flex-start}
+.btn{border:0;border-radius:99px;padding:9px 18px;font-family:var(--display);font-weight:800;background:var(--blue);color:var(--blue-ink)}
+.btn.alt{background:var(--soft);color:var(--fg)}
+.panel .btn.alt{background:var(--surface);border:2px solid var(--line)}
+.btn.on{background:var(--sun);color:var(--sun-ink);border-color:var(--sun)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.stars{font-size:30px;letter-spacing:3px;color:var(--line)}
+.stars .on{color:var(--sun)}
+.quiz{display:flex;flex-direction:column;gap:12px}
+.feedback{font-family:var(--display);font-weight:800;font-size:18px}
+.stem{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:16px;line-height:1.7;background:var(--surface);border-radius:14px;padding:10px 14px;overflow-x:auto}
+.stem .st{display:inline-block;width:2.2em;text-align:right;color:var(--muted);margin-right:.6em}
+.stem .lf{display:inline-block;width:1.05em;text-align:center;border-radius:6px}
+.stem .lf.hit{background:var(--sun);color:var(--sun-ink);font-weight:700}
+.stem .lf.in{background:var(--sky)}
+.shafts{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+@media (max-width:520px){.shafts{grid-template-columns:repeat(3,1fr)}}
+.shafts label{display:flex;flex-direction:column;font-size:12px;color:var(--muted);font-weight:700;gap:2px;min-width:0}
+.shafts input{font:inherit;font-variant-numeric:tabular-nums;border:2px solid var(--line);background:var(--surface);color:var(--fg);border-radius:12px;padding:6px 8px;width:100%;min-width:0}
+.tbl{overflow-x:auto}
+table.dv{border-collapse:collapse;width:100%;font-size:15px;font-variant-numeric:tabular-nums}
+table.dv th{font-family:var(--display);font-size:13px;color:var(--muted);text-align:right;padding:4px 8px}
+table.dv td{text-align:right;padding:4px 8px;border-top:1px solid var(--line)}
+table.dv tr.tot td{font-weight:700;border-top:2px solid var(--fg)}
+.formula{font-family:var(--display);font-weight:700;background:var(--surface);border-radius:14px;padding:10px 14px;font-variant-numeric:tabular-nums}
+footer{color:var(--muted);font-size:13px;text-align:center}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Activities grouped by part: each part gets the accent color of its column on the slides' roadmap */
+.chips{flex-direction:column;align-items:flex-start;gap:8px}
+.chiprow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chiplbl{display:inline-block;min-width:64px;text-align:center;padding:7px 12px;border-radius:99px;background:var(--pc);color:#fff;font-family:var(--display);font-weight:900;font-size:13px;letter-spacing:.04em;text-transform:uppercase;text-decoration:none}
+.part{display:flex;flex-direction:column;gap:18px;border-left:7px solid var(--pc);padding-left:clamp(10px,2vw,20px);scroll-margin-top:70px}
+.parthead{display:flex;gap:14px;align-items:center}
+.parthead .pnum{flex:none;background:var(--pc);color:#fff;border-radius:16px;padding:10px 16px;font-family:var(--display);font-weight:900;font-size:clamp(16px,2vw,20px);letter-spacing:.04em;text-transform:uppercase}
+.parthead h2{font-size:clamp(22px,3vw,30px);font-weight:900;color:var(--fg)}
+.parthead p{margin:2px 0 0;color:var(--muted);font-weight:700;font-size:15px}
+.part .scene{background:var(--pc)}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19C5 10 11 4 20 4c0 9-6 15-15 15z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M5 19l9-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-wafer" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 7v10M12 5v14M16 7v10M5 10h14M5 14h14" stroke="currentColor" stroke-width="1.2"/></symbol>
+  <symbol id="i-shaft" viewBox="0 0 24 24"><rect x="2" y="9" width="20" height="6" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 9v6M17 9v6M2 5h20M2 4v2M22 4v2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-screen" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10 19h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9 7l3 3M14 6l-2 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-glass" viewBox="0 0 24 24"><path d="M3 7c6-3 12-3 18 0l-2 11c-5 2-9 2-14 0z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="9" cy="11" r="1.3" fill="currentColor"/><circle cx="14" cy="13" r="1" fill="currentColor"/><circle cx="12" cy="9" r=".8" fill="currentColor"/></symbol>
+  <symbol id="i-dice" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/></symbol>
+  <symbol id="i-bottle" viewBox="0 0 24 24"><path d="M10 2h4v3l2 3v12a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V8l2-3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 12h8M8 17h8" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="i-fan" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><path d="M12 10c-1-4 1-6 3-6 1 2 0 5-3 6zM14 12.5c4-.5 5.5 1.8 5 3.8-2 .6-4.8-.6-5-3.8zM10.5 13.5c-2.5 3-5.2 2.6-6.2.8 1.2-1.8 4.2-2.5 6.2-.8z" fill="currentColor"/></symbol>
+  <symbol id="i-plot" viewBox="0 0 24 24"><path d="M3 3v18h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M5 19L20 5" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 2"/><circle cx="8" cy="15" r="1.4" fill="currentColor"/><circle cx="11" cy="12.5" r="1.4" fill="currentColor"/><circle cx="14" cy="10" r="1.4" fill="currentColor"/><circle cx="17" cy="7.5" r="1.4" fill="currentColor"/></symbol>
+  <symbol id="i-which" viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M15 16.5h4M17 14.5v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+ </defs>
+</svg>
+
+<header class="top"><p><a href="../" style="color:inherit;text-decoration:none" title="All chapters">&larr; IE454 Quality Control</a><span class="dot">·</span>Chapter 3: Modeling Process Quality<span class="dot">·</span>Dr. Aseel Khanfar<span class="dot">·</span>Yarmouk University</p></header>
+
+<main class="wrap">
+<section class="hero">
+ <div>
+  <h1>Every process varies. A model tells you how much.</h1>
+  <p class="big">No two bottles, wafers or shafts are exactly alike. First you picture the variation in your data, then you choose a probability model that describes it, then you use the model to predict how many parts will be out of spec. Try each step below with real numbers from the book.</p>
+  <p class="quote">Statistics is the science of analyzing data and drawing conclusions, taking variation in the data into account. Montgomery, Section 3.1</p>
+  <nav class="chips" aria-label="Activities by part">
+  <div class="chiprow" style="--pc:#0070C0"><a class="chiplbl" href="#part1">Part 1</a><a class="chip" href="#stem"><i style="background:#0070C0"></i>Stem-and-leaf</a><a class="chip" href="#histogram"><i style="background:#0070C0"></i>Histogram bins</a><a class="chip" href="#spread"><i style="background:#0070C0"></i>Mean and spread</a></div>
+  <div class="chiprow" style="--pc:#1A9467"><a class="chiplbl" href="#part3">Part 3</a><a class="chip" href="#binomial"><i style="background:#1A9467"></i>Binomial</a><a class="chip" href="#poisson"><i style="background:#1A9467"></i>Poisson</a><a class="chip" href="#which"><i style="background:#1A9467"></i>Which model?</a></div>
+  <div class="chiprow" style="--pc:#E8503F"><a class="chiplbl" href="#part4">Part 4</a><a class="chip" href="#normal"><i style="background:#E8503F"></i>Normal fill</a><a class="chip" href="#clt"><i style="background:#E8503F"></i>Dice and the CLT</a><a class="chip" href="#exponential"><i style="background:#E8503F"></i>Fan life</a></div>
+  <div class="chiprow" style="--pc:#7A5AF8"><a class="chiplbl" href="#part5">Part 5</a><a class="chip" href="#probplot"><i style="background:#7A5AF8"></i>Probability plot</a></div>
+  <div class="chiprow"><span class="chiplbl" style="background:var(--sun);color:var(--sun-ink)">Review</span><a class="chip" href="#quiz"><i style="background:var(--sun)"></i>Star quiz</a></div>
+  </nav>
+ </div>
+ <svg class="heroart" viewBox="0 0 440 240" role="img" aria-label="Data turn into a histogram, the histogram is described by a normal curve, and the curve predicts the share below a specification limit">
+  <rect x="0" y="0" width="440" height="240" rx="28" fill="var(--sky)"/>
+  <g fill="var(--blue)" opacity=".85">
+   <rect x="80" y="170" width="28" height="22" rx="4"/><rect x="112" y="138" width="28" height="54" rx="4"/><rect x="144" y="96" width="28" height="96" rx="4"/>
+   <rect x="176" y="62" width="28" height="130" rx="4"/><rect x="208" y="58" width="28" height="134" rx="4"/><rect x="240" y="92" width="28" height="100" rx="4"/>
+   <rect x="272" y="134" width="28" height="58" rx="4"/><rect x="304" y="164" width="28" height="28" rx="4"/>
+  </g>
+  <path d="M40 190 C120 188 150 52 206 52 C262 52 292 188 380 190" fill="none" stroke="var(--coral)" stroke-width="5" stroke-linecap="round"/>
+  <line x1="96" y1="40" x2="96" y2="196" stroke="var(--fg)" stroke-width="3" stroke-dasharray="6 6"/>
+  <line x1="40" y1="194" x2="400" y2="194" stroke="var(--fg)" stroke-width="3" stroke-linecap="round"/>
+  <g font-family="Nunito,sans-serif" font-weight="800" font-size="14" fill="var(--fg)">
+   <text x="104" y="40">LSL</text>
+   <text x="300" y="70">model: N(μ, σ²)</text>
+   <text x="220" y="222" text-anchor="middle">data → picture → model → prediction</text>
+  </g>
+ </svg>
+</section>
+
+<!-- Part 1: Describing variation -->
+<div class="part" id="part1" style="--pc:#0070C0">
+ <div class="parthead"><span class="pnum">Part 1</span><div><h2>Describing variation</h2><p>Sections 3.1.1–3.1.4 · 3 activities</p></div></div>
+<section class="station" id="stem">
+ <div class="scene"><svg class="ico"><use href="#i-leaf"/></svg><div><div class="lbl">Part 1 · Activity 1 of 3 · Section 3.1.1, Table 3.1, Figure 3.1 · Insurance claims office</div><h2>Find percentiles in a stem-and-leaf plot</h2><p>Days to process and pay 40 employee health insurance claims. The stems are split: leaves 0–4 sit on the first line of a stem, 5–9 on the second. Pick a percentile and watch where it lands.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>Stem-and-leaf of days (leaf unit = 1)</h3><div class="stem" id="stemBox" aria-live="polite"></div></div>
+   <div class="panel"><h3>Pick a percentile</h3>
+    <div class="row"><button class="btn alt" data-k="0.1">10th</button><button class="btn alt" data-k="0.25">Q1</button><button class="btn alt" data-k="0.5">Median</button><button class="btn alt" data-k="0.75">Q3</button></div>
+    <label class="sl" for="pk">Percentile 100k <span id="pkV"></span></label><input type="range" id="pk" min="0.05" max="0.95" step="0.05" value="0.5">
+    <div class="stats"><div class="stat"><b id="pkRank"></b><small>rank = 40k + 0.5</small></div><div class="stat"><b id="pkVal"></b><small>value (days)</small></div><div class="stat"><b>12.5</b><small>IQR = Q3 − Q1</small></div></div>
+    <p class="why" id="pkMsg"></p>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="station" id="histogram">
+ <div class="scene"><svg class="ico"><use href="#i-wafer"/></svg><div><div class="lbl">Part 1 · Activity 2 of 3 · Section 3.1.2, Table 3.2, Figures 3.3–3.4 · Wafer fab</div><h2>How many bins should a histogram have?</h2><p>Layer thickness (Å) on 100 semiconductor wafers. Too few bins hide the shape; too many make it look ragged. The book suggests roughly √n bins, so about 10 here.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>Bins</h3>
+    <label class="sl" for="nb">Number of bins <span id="nbV"></span></label><input type="range" id="nb" min="3" max="30" step="1" value="10">
+    <div class="row" style="margin-top:8px"><button class="btn alt" data-b="4">4 bins</button><button class="btn alt" data-b="10">√100 = 10</button><button class="btn alt" data-b="15">15 (Fig. 3.4)</button><button class="btn alt" data-b="30">30 bins</button></div>
+    <div class="stats"><div class="stat"><b>450.01</b><small>x̄ (Å)</small></div><div class="stat"><b>13.43</b><small>s (Å)</small></div><div class="stat"><b id="bw"></b><small>bin width (Å)</small></div></div>
+    <p class="why" id="nbMsg"></p>
+   </div>
+   <div class="panel"><h3>Histogram of layer thickness</h3><canvas id="hCanvas" width="760" height="380" aria-label="Histogram of the 100 layer thickness values"></canvas></div>
+  </div>
+ </div>
+</section>
+
+<section class="station" id="spread">
+ <div class="scene"><svg class="ico"><use href="#i-shaft"/></svg><div><div class="lbl">Part 1 · Activity 3 of 3 · Section 3.1.3, Equations 3.1–3.3 · Machining cell</div><h2>Mean, variance and standard deviation</h2><p>A lathe in a machining cell turns 10.00 mm shafts. Five shafts were measured. Change any value and watch every step of the calculation update.</p></div></div>
+ <div class="body">
+  <div class="shafts" id="shafts"></div>
+  <div class="row"><button class="btn alt" id="spEx">Example values</button><button class="btn alt" id="spWide">Worn tool (more spread)</button></div>
+  <div class="grid2">
+   <div class="panel"><h3>Deviations from the mean</h3><div class="tbl"><table class="dv"><thead><tr><th>i</th><th>xᵢ (mm)</th><th>xᵢ − x̄</th><th>(xᵢ − x̄)²</th></tr></thead><tbody id="spBody"></tbody></table></div></div>
+   <div class="panel"><h3>Results</h3>
+    <div class="stats"><div class="stat"><b id="spM"></b><small>x̄ (mm)</small></div><div class="stat"><b id="spV"></b><small>s² (mm²)</small></div><div class="stat"><b id="spS"></b><small>s (mm)</small></div></div>
+    <canvas id="spCanvas" width="700" height="160" style="margin-top:10px" aria-label="Dot plot of the five shaft diameters"></canvas>
+    <p class="why" id="spMsg"></p>
+   </div>
+  </div>
+ </div>
+</section>
+</div>
+
+<!-- Part 3: Discrete distributions -->
+<div class="part" id="part3" style="--pc:#1A9467">
+ <div class="parthead"><span class="pnum">Part 3</span><div><h2>Discrete distributions</h2><p>Section 3.2 · 3 activities</p></div></div>
+<section class="station" id="binomial">
+ <div class="scene"><svg class="ico"><use href="#i-screen"/></svg><div><div class="lbl">Part 3 · Activity 1 of 3 · Section 3.2.2, Equation 3.11 · Incoming inspection</div><h2>Binomial: defective phone screens in a sample</h2><p>A supplier's screens are 2% defective. You inspect a random sample of n screens from a large shipment. How many defectives should you expect, and how likely is a clean sample?</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>Sample</h3>
+    <label class="sl" for="bn">Sample size n <span id="bnV"></span></label><input type="range" id="bn" min="5" max="100" step="1" value="20">
+    <label class="sl" for="bp">Fraction defective p <span id="bpV"></span></label><input type="range" id="bp" min="0.01" max="0.5" step="0.01" value="0.02">
+    <label class="sl" for="bc">Accept the lot if defectives ≤ c <span id="bcV"></span></label><input type="range" id="bc" min="0" max="10" step="1" value="0">
+    <div class="stats four"><div class="stat"><b id="b0"></b><small>P(x = 0)</small></div><div class="stat"><b id="bA"></b><small>P(x ≤ c)</small></div><div class="stat"><b id="bMu"></b><small>mean np</small></div><div class="stat"><b id="bSd"></b><small>σ = √(np(1−p))</small></div></div>
+   </div>
+   <div class="panel"><h3>p(x) for x defectives</h3><canvas id="bCanvas" width="760" height="380" aria-label="Binomial probability bars"></canvas></div>
+  </div>
+  <p class="why" id="bMsg"></p>
+ </div>
+</section>
+
+<section class="station" id="poisson">
+ <div class="scene"><svg class="ico"><use href="#i-glass"/></svg><div><div class="lbl">Part 3 · Activity 2 of 3 · Section 3.2.3, Equation 3.15 · Windshield glass plant</div><h2>Poisson: bubbles per windshield</h2><p>Small bubbles appear at random in float glass, on average λ per windshield. A windshield with more than c bubbles is rejected. What fraction is rejected?</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>Defect rate</h3>
+    <label class="sl" for="pl">Average bubbles per windshield λ <span id="plV"></span></label><input type="range" id="pl" min="0.2" max="12" step="0.1" value="2">
+    <label class="sl" for="pc">Reject if bubbles &gt; c <span id="pcV"></span></label><input type="range" id="pc" min="0" max="15" step="1" value="2">
+    <div class="row" style="margin-top:8px"><button class="btn alt" data-l="2">λ = 2</button><button class="btn alt" data-l="4">Book: λ = 4</button><button class="btn alt" data-l="8">λ = 8</button></div>
+    <div class="stats"><div class="stat"><b id="p0"></b><small>P(x = 0) = e<sup>−λ</sup></small></div><div class="stat"><b id="pA"></b><small>P(x ≤ c)</small></div><div class="stat"><b id="pR"></b><small>rejected</small></div></div>
+   </div>
+   <div class="panel"><h3>p(x) = e<sup>−λ</sup>λ<sup>x</sup>/x!</h3><canvas id="pCanvas" width="760" height="380" aria-label="Poisson probability bars"></canvas></div>
+  </div>
+  <p class="why" id="pMsg"></p>
+ </div>
+</section>
+
+<section class="station" id="which">
+ <div class="scene"><svg class="ico"><use href="#i-which"/></svg><div><div class="lbl">Part 3 · Activity 3 of 3 · Sections 3.2.1–3.2.4 · Pick the model from the story</div><h2>Which discrete distribution fits?</h2><p>Read each situation and name the model. Ask: is the lot small and sampled without replacement? Are there n independent trials? Are you counting defects in a unit? Or counting trials until a success?</p></div></div>
+ <div class="body">
+  <div class="cards" id="whCards"></div>
+  <div class="score" id="whScore">0 of 8 correct</div>
+ </div>
+</section>
+</div>
+
+<!-- Part 4: Continuous distributions -->
+<div class="part" id="part4" style="--pc:#E8503F">
+ <div class="parthead"><span class="pnum">Part 4</span><div><h2>Continuous distributions</h2><p>Section 3.3 · 3 activities</p></div></div>
+<section class="station" id="normal">
+ <div class="scene"><svg class="ico"><use href="#i-bottle"/></svg><div><div class="lbl">Part 4 · Activity 1 of 3 · Section 3.3.1, Equations 3.21–3.23 · Water bottling line</div><h2>Normal: how many bottles are underfilled?</h2><p>The filler puts N(μ, σ²) millilitres into 500 mL bottles. The lower specification is 495 mL. Standardize with z = (x − μ)/σ, then read Φ(z).</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>Filler settings</h3>
+    <label class="sl" for="nm">Mean fill μ (mL) <span id="nmV"></span></label><input type="range" id="nm" min="494" max="506" step="0.5" value="500">
+    <label class="sl" for="ns">Standard deviation σ (mL) <span id="nsV"></span></label><input type="range" id="ns" min="0.5" max="5" step="0.1" value="2">
+    <label class="sl" for="nl">Lower spec LSL (mL) <span id="nlV"></span></label><input type="range" id="nl" min="488" max="500" step="0.5" value="495">
+    <div class="stats"><div class="stat"><b id="nz"></b><small>z = (LSL − μ)/σ</small></div><div class="stat"><b id="np"></b><small>P(x &lt; LSL)</small></div><div class="stat"><b id="nppm"></b><small>ppm underfilled</small></div></div>
+   </div>
+   <div class="panel"><h3>Fill volume distribution</h3><canvas id="nCanvas" width="760" height="380" aria-label="Normal curve with the area below the lower specification shaded"></canvas></div>
+  </div>
+  <p class="why" id="nMsg"></p>
+ </div>
+</section>
+
+<section class="station" id="clt">
+ <div class="scene"><svg class="ico"><use href="#i-dice"/></svg><div><div class="lbl">Part 4 · Activity 2 of 3 · Section 3.3.1, Central limit theorem · Classroom dice</div><h2>Average some dice and a bell appears</h2><p>One die is flat: every face has probability 1/6. Roll n dice, take the average, repeat 2,000 times. As n grows, the averages pile up in a bell shape and the spread shrinks like σ/√n.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>Dice per average</h3>
+    <div class="row" id="cltBtns"><button class="btn alt" data-n="1">1 die</button><button class="btn alt" data-n="2">2 dice</button><button class="btn alt" data-n="5">5 dice</button><button class="btn alt" data-n="10">10 dice</button><button class="btn alt" data-n="30">30 dice</button></div>
+    <div class="row" style="margin-top:8px"><button class="btn" id="cltRoll">Roll again</button></div>
+    <div class="stats"><div class="stat"><b id="cM"></b><small>mean of averages</small></div><div class="stat"><b id="cS"></b><small>sd of averages</small></div><div class="stat"><b id="cT"></b><small>theory 1.708/√n</small></div></div>
+   </div>
+   <div class="panel"><h3>2,000 averages</h3><canvas id="cCanvas" width="760" height="380" aria-label="Histogram of simulated dice averages"></canvas></div>
+  </div>
+  <p class="why" id="cMsg"></p>
+ </div>
+</section>
+
+<section class="station" id="exponential">
+ <div class="scene"><svg class="ico"><use href="#i-fan"/></svg><div><div class="lbl">Part 4 · Activity 3 of 3 · Section 3.3.3, Equations 3.31–3.34 · Server room</div><h2>Exponential: when will the cooling fan fail?</h2><p>A fan's life is exponential with mean time to failure 1/λ. Move the time slider, then switch on "already ran" to see the lack-of-memory property.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>Fan life</h3>
+    <label class="sl" for="em">Mean time to failure 1/λ (hours) <span id="emV"></span></label><input type="range" id="em" min="2000" max="40000" step="1000" value="10000">
+    <label class="sl" for="et">Mission time t (hours) <span id="etV"></span></label><input type="range" id="et" min="500" max="40000" step="500" value="5000">
+    <label class="sl" for="es">Fan has already run s hours without failing <span id="esV"></span></label><input type="range" id="es" min="0" max="30000" step="1000" value="0">
+    <div class="stats"><div class="stat"><b id="eF"></b><small>P(fail before t)</small></div><div class="stat"><b id="eR"></b><small>P(survive t more hours | ran s)</small></div><div class="stat"><b id="eMean"></b><small>P(fail before the mean)</small></div></div>
+   </div>
+   <div class="panel"><h3>f(x) = λe<sup>−λx</sup></h3><canvas id="eCanvas" width="760" height="380" aria-label="Exponential density with the failure window shaded"></canvas></div>
+  </div>
+  <p class="why" id="eMsg"></p>
+ </div>
+</section>
+</div>
+
+<!-- Part 5: Probability plots -->
+<div class="part" id="part5" style="--pc:#7A5AF8">
+ <div class="parthead"><span class="pnum">Part 5</span><div><h2>Probability plots</h2><p>Section 3.4 · 1 activity</p></div></div>
+<section class="station" id="probplot">
+ <div class="scene"><svg class="ico"><use href="#i-plot"/></svg><div><div class="lbl">Part 5 · Activity 1 of 1 · Section 3.4.1, Example 3.13, Figure 3.27 · Fuel lab</div><h2>Does the fat pencil cover the points?</h2><p>Plot each sorted value x<sub>(j)</sub> against its normal score z<sub>j</sub>, where Φ(z<sub>j</sub>) = (j − 0.5)/n. If a fat pencil laid on the line covers every point, a normal model is reasonable.</p></div></div>
+ <div class="body">
+  <div class="row"><button class="btn alt on" data-d="oct">Road octane (book)</button><button class="btn alt" data-d="rep">Repair times (skewed)</button><button class="btn alt" data-d="wafer">Wafer thickness</button></div>
+  <div class="grid2 wide">
+   <div class="panel"><h3>What the plot says</h3>
+    <div class="stats"><div class="stat"><b id="ppMean"></b><small>mean: line at z = 0</small></div><div class="stat"><b id="ppSd"></b><small>σ: line at z = 1 minus z = 0</small></div><div class="stat"><b id="ppN"></b><small>points</small></div></div>
+    <p class="why" id="ppMsg" style="margin-top:10px"></p>
+   </div>
+   <div class="panel"><h3>Normal probability plot (z<sub>j</sub> vs x<sub>(j)</sub>)</h3><canvas id="ppCanvas" width="760" height="420" aria-label="Normal probability plot with a fitted line and a fat pencil band"></canvas></div>
+  </div>
+ </div>
+</section>
+</div>
+
+<section class="station" id="quiz">
+ <div class="scene" style="background:var(--gold)"><svg class="ico"><use href="#i-star"/></svg><div><div class="lbl">Self-check · Whole chapter</div><h2>Star quiz</h2><p>Ten quick questions. Each right answer lights a star.</p></div></div>
+ <div class="body">
+  <div class="stars" id="qStars" aria-live="polite"></div>
+  <div class="quiz" id="qBox"></div>
+  <div class="row"><button class="btn" id="qNext" hidden>Next question</button><button class="btn alt" id="qAgain" hidden>Try the quiz again</button></div>
+ </div>
+</section>
+
+<footer>Activities built on Montgomery, <i>Introduction to Statistical Quality Control</i>, 8th ed., Wiley, Chapter 3. The insurance claim times (Table 3.1), wafer layer thickness (Table 3.2), road octane numbers (Example 3.13), the wire-bonding Poisson example (λ = 4) and the board-lot hypergeometric example are from the book; all other examples and the quiz are teaching examples. Prepared for IE454 by Dr. Aseel Khanfar, Department of Industrial Engineering, Yarmouk University.<br><b>© 2026 Dr. Aseel Khanfar, Yarmouk University. All rights reserved.</b> No part of this page may be copied, adapted or republished without written permission.</footer>
+</main>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const erf=x=>{const s=Math.sign(x);x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y};
+const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
+const invPhi=p=>{let lo=-8,hi=8;for(let i=0;i<80;i++){const m=(lo+hi)/2;if(Phi(m)<p)lo=m;else hi=m}return (lo+hi)/2};
+const f4=v=>v.toFixed(4);
+const redraws=[];
+function onTheme(f){redraws.push(f)}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>redraws.forEach(f=>f()));
+new MutationObserver(()=>redraws.forEach(f=>f())).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+/* shared chart frame */
+function frame(cv,{xmin,xmax,ymin=0,ymax,L=62,R=20,T=18,B=48,xt=[],yt=[],xl='',yfmt=v=>v,xfmt=v=>v}){
+  const g=cv.getContext('2d'),W=cv.width,H=cv.height;g.clearRect(0,0,W,H);g.fillStyle=css('--surface');g.fillRect(0,0,W,H);
+  const X=v=>L+(v-xmin)/(xmax-xmin)*(W-L-R),Y=v=>H-B-(v-ymin)/(ymax-ymin)*(H-T-B);
+  g.strokeStyle=css('--line');g.lineWidth=1;g.fillStyle=css('--muted');g.font='600 17px "Source Sans 3",sans-serif';
+  g.textAlign='right';yt.forEach(v=>{const y=Y(v);g.beginPath();g.moveTo(L,y);g.lineTo(W-R,y);g.stroke();g.fillText(yfmt(v),L-8,y+6)});
+  g.textAlign='center';xt.forEach(v=>g.fillText(xfmt(v),X(v),H-B+22));
+  g.strokeStyle=css('--fg');g.lineWidth=2;g.beginPath();g.moveTo(L,H-B);g.lineTo(W-R,H-B);g.stroke();
+  if(xl){g.font='800 16px Nunito,sans-serif';g.fillText(xl,(L+W-R)/2,H-4)}
+  return {g,X,Y,W,H,L,R,T,B};
+}
+const ticks=(a,b,n)=>{const st=Math.pow(10,Math.floor(Math.log10((b-a)/n)));const m=[1,2,2.5,5,10].map(k=>k*st).find(s=>(b-a)/s<=n)||st*10;const r=[];for(let v=Math.ceil(a/m)*m;v<=b+1e-9;v+=m)r.push(+v.toFixed(6));return r};
+function bars(cv,vals,hit,xl){
+  const n=vals.length,ymax=Math.max(...vals)*1.15||1;
+  const F=frame(cv,{xmin:-0.5,xmax:n-0.5,ymax,yt:ticks(0,ymax,5),xt:ticks(0,n-1,12).filter(v=>Number.isInteger(v)),xl,yfmt:v=>v.toFixed(2)});
+  const w=(F.X(1)-F.X(0))*0.72;
+  vals.forEach((v,i)=>{F.g.fillStyle=hit(i)?css('--blue'):css('--coral');const y=F.Y(v);F.g.fillRect(F.X(i)-w/2,y,w,F.Y(0)-y)});
+}
+
+/* 1. stem-and-leaf (Table 3.1) */
+const CL=[48,41,35,36,37,26,36,46,35,47,35,34,36,42,43,36,56,32,46,30,37,43,17,26,28,27,45,33,22,27,16,22,33,30,24,23,22,30,31,17];
+const SRT=CL.slice().sort((a,b)=>a-b);
+function stem(){
+  const k=+$('pk').value,r=40*k+0.5,lo=Math.floor(r),hit=r===lo?[lo]:[lo,lo+1];
+  const val=r===lo?SRT[lo-1]:(SRT[lo-1]+SRT[lo])/2;
+  $('pkV').textContent=Math.round(k*100)+'th';$('pkRank').textContent=r.toFixed(1);$('pkVal').textContent=val%1?val.toFixed(1):val;
+  const rows=[];let rank=0;
+  for(let s=1;s<=5;s++)for(const half of [0,1]){const leaves=SRT.filter(v=>Math.floor(v/10)===s&&((v%10)>=5)===!!half);if(!leaves.length)continue;
+    rows.push('<div><span class="st">'+s+'</span>'+leaves.map(v=>{rank++;return '<span class="lf'+(hit.includes(rank)?' hit':rank<hit[0]?' in':'')+'">'+(v%10)+'</span>'}).join('')+'</div>')}
+  $('stemBox').innerHTML=rows.join('');
+  $('pkMsg').textContent=r===lo?`Rank ${r} is a whole number, so the ${Math.round(k*100)}th percentile is the ${lo}th smallest value: ${val} days.`:`Rank ${r.toFixed(1)} falls halfway between observations ${lo} and ${lo+1} (${SRT[lo-1]} and ${SRT[lo]}), so the percentile is ${val%1?val.toFixed(1):val} days. Shaded leaves are below it.`;
+}
+$('pk').addEventListener('input',stem);document.querySelectorAll('#stem [data-k]').forEach(b=>b.onclick=()=>{$('pk').value=b.dataset.k;stem()});stem();
+
+/* 2. histogram (Table 3.2) */
+const TH=[438,450,487,451,452,441,444,461,432,471,413,450,430,437,465,444,471,453,431,458,444,450,446,444,466,458,471,452,455,445,468,459,450,453,473,454,458,438,447,463,445,466,456,434,471,437,459,445,454,423,472,470,433,454,464,443,449,435,435,451,474,457,455,448,478,465,462,454,425,440,454,441,459,435,446,435,460,428,449,442,455,450,423,432,459,444,445,454,449,441,449,445,455,441,464,457,437,434,452,439];
+function hist(){
+  const k=+$('nb').value,a=410,b=490,w=(b-a)/k;$('nbV').textContent=k;$('bw').textContent=w%1?w.toFixed(1):w;
+  const c=new Array(k).fill(0);TH.forEach(v=>c[Math.min(k-1,Math.floor((v-a)/w))]++);
+  const ymax=Math.max(...c)*1.15;
+  const F=frame($('hCanvas'),{xmin:a,xmax:b,ymax,yt:ticks(0,ymax,5),xt:ticks(a,b,8),xl:'Layer thickness (Å)'});
+  c.forEach((v,i)=>{const x0=F.X(a+i*w),x1=F.X(a+(i+1)*w),y=F.Y(v);F.g.fillStyle=css('--blue');F.g.fillRect(x0+1,y,x1-x0-2,F.Y(0)-y)});
+  const xm=F.X(450.01);F.g.strokeStyle=css('--coral');F.g.lineWidth=3;F.g.setLineDash([7,5]);F.g.beginPath();F.g.moveTo(xm,F.T);F.g.lineTo(xm,F.Y(0));F.g.stroke();F.g.setLineDash([]);
+  F.g.fillStyle=css('--fg');F.g.textAlign='left';F.g.font='800 16px Nunito,sans-serif';F.g.fillText('x̄ = 450.01',xm+6,F.T+16);
+  $('nbMsg').textContent=k<6?'With so few bins the bell shape is lost: almost everything falls in one or two bars.':k>20?'With this many bins the picture gets ragged and some bins are empty. The shape is harder to see.':'A good choice: the histogram is roughly symmetric and bell-shaped, centered near 450 Å.';
+}
+$('nb').addEventListener('input',hist);document.querySelectorAll('#histogram [data-b]').forEach(b=>b.onclick=()=>{$('nb').value=b.dataset.b;hist()});hist();onTheme(hist);
+
+/* 3. mean and spread */
+const SP0=[10.02,9.98,10.01,9.99,10.00],SPW=[10.06,9.95,10.03,9.97,10.04];
+$('shafts').innerHTML=SP0.map((v,i)=>`<label for="sh${i}">Shaft ${i+1} (mm)<input id="sh${i}" type="number" step="0.01" value="${v.toFixed(2)}" inputmode="decimal"></label>`).join('');
+function spread(){
+  const x=SP0.map((_,i)=>parseFloat($('sh'+i).value)).filter(v=>!isNaN(v));if(x.length<2){$('spMsg').textContent='Enter at least two diameters.';return}
+  const n=x.length,m=x.reduce((a,b)=>a+b,0)/n,d=x.map(v=>v-m),ss=d.reduce((a,b)=>a+b*b,0),s2=ss/(n-1),s=Math.sqrt(s2);
+  $('spBody').innerHTML=x.map((v,i)=>`<tr><td>${i+1}</td><td>${v.toFixed(2)}</td><td>${d[i]>=0?'+':''}${d[i].toFixed(3)}</td><td>${(d[i]*d[i]).toFixed(5)}</td></tr>`).join('')+`<tr class="tot"><td>Σ</td><td>${(m*n).toFixed(2)}</td><td>0.000</td><td>${ss.toFixed(5)}</td></tr>`;
+  $('spM').textContent=m.toFixed(3);$('spV').textContent=s2.toFixed(5);$('spS').textContent=s.toFixed(4);
+  $('spMsg').textContent=`s² = ${ss.toFixed(5)} / (${n} − 1) = ${s2.toFixed(5)} mm², so s = √s² = ${s.toFixed(4)} mm. Notice that s is in mm, the same unit as the data. The deviations always add to zero.`;
+  const lo=Math.min(9.9,...x),hi=Math.max(10.1,...x);
+  const F=frame($('spCanvas'),{xmin:lo,xmax:hi,ymax:1,L:20,B:40,T:10,xt:ticks(lo,hi,6),xfmt:v=>v.toFixed(2)});
+  F.g.fillStyle=css('--sky');F.g.fillRect(F.X(m-s),F.T,F.X(m+s)-F.X(m-s),F.Y(0)-F.T);
+  x.forEach(v=>{F.g.fillStyle=css('--teal');F.g.beginPath();F.g.arc(F.X(v),F.Y(0.35),9,0,7);F.g.fill()});
+  F.g.strokeStyle=css('--coral');F.g.lineWidth=3;F.g.beginPath();F.g.moveTo(F.X(m),F.T);F.g.lineTo(F.X(m),F.Y(0));F.g.stroke();
+  F.g.fillStyle=css('--fg');F.g.font='800 15px Nunito,sans-serif';F.g.textAlign='left';F.g.fillText('x̄ ± s',F.X(m-s)+4,F.T+16);
+}
+SP0.forEach((_,i)=>$('sh'+i).addEventListener('input',spread));
+$('spEx').onclick=()=>{SP0.forEach((v,i)=>$('sh'+i).value=v.toFixed(2));spread()};
+$('spWide').onclick=()=>{SPW.forEach((v,i)=>$('sh'+i).value=v.toFixed(2));spread()};
+spread();onTheme(spread);
+
+/* 4. binomial */
+const lchoose=(n,k)=>{let r=0;for(let i=1;i<=k;i++)r+=Math.log(n-k+i)-Math.log(i);return r};
+function binom(){
+  const n=+$('bn').value,p=+$('bp').value,c=+$('bc').value;$('bnV').textContent=n;$('bpV').textContent=p.toFixed(2);$('bcV').textContent=c;
+  const pm=[];for(let x=0;x<=n;x++)pm.push(Math.exp(lchoose(n,x)+x*Math.log(p)+(n-x)*Math.log(1-p)));
+  const acc=pm.slice(0,c+1).reduce((a,b)=>a+b,0);
+  $('b0').textContent=f4(pm[0]);$('bA').textContent=f4(acc);$('bMu').textContent=(n*p).toFixed(2);$('bSd').textContent=Math.sqrt(n*p*(1-p)).toFixed(3);
+  const shown=Math.min(n,Math.max(10,Math.ceil(n*p+4*Math.sqrt(n*p*(1-p)+0.25))));
+  bars($('bCanvas'),pm.slice(0,shown+1),i=>i<=c,'x = number of defective screens (blue: lot accepted)');
+  $('bMsg').textContent=`P(x = 0) = (1 − ${p})^${n} = ${f4(pm[0])}. So even a ${Math.round(p*100)}% defective supplier passes a "zero defectives" check ${Math.round(pm[0]*100)}% of the time with n = ${n}. P(at least one) = ${f4(1-pm[0])}.`;
+}
+['bn','bp','bc'].forEach(id=>$(id).addEventListener('input',binom));binom();onTheme(binom);
+
+/* 5. poisson */
+function pois(){
+  const l=+$('pl').value,c=+$('pc').value;$('plV').textContent=l.toFixed(1);$('pcV').textContent=c;
+  const N=Math.max(12,Math.ceil(l+4*Math.sqrt(l)+2)),pm=[];let t=Math.exp(-l);for(let x=0;x<=N;x++){pm.push(t);t*=l/(x+1)}
+  const acc=pm.slice(0,c+1).reduce((a,b)=>a+b,0);
+  $('p0').textContent=f4(pm[0]);$('pA').textContent=f4(acc);$('pR').textContent=(100*(1-acc)).toFixed(1)+'%';
+  bars($('pCanvas'),pm,i=>i<=c,'x = bubbles per windshield (blue: accepted)');
+  $('pMsg').textContent=`P(x ≤ ${c}) = `+pm.slice(0,Math.min(c,3)+1).map((v,i)=>f4(v)).join(' + ')+(c>3?' + …':'')+` = ${f4(acc)}. Mean = variance = λ = ${l.toFixed(1)}. `+(Math.abs(l-4)<1e-9&&c===2?'This matches the book\'s wire-bonding example: P(x ≤ 2) = 0.238104.':'');
+}
+['pl','pc'].forEach(id=>$(id).addEventListener('input',pois));document.querySelectorAll('#poisson [data-l]').forEach(b=>b.onclick=()=>{$('pl').value=b.dataset.l;pois()});pois();onTheme(pois);
+
+/* 6. which model */
+function mcSet(boxId,scoreId,items,choices){
+  const box=$(boxId);let right=0,done=0;
+  items.forEach(it=>{const c=document.createElement('div');c.className='qcard';c.innerHTML='<div class="tx"></div><div class="opts"></div><div class="why" hidden></div>';
+    c.querySelector('.tx').textContent=it.q;const o=c.querySelector('.opts'),w=c.querySelector('.why');
+    choices.forEach(ch=>{const b=document.createElement('button');b.className='opt';b.type='button';b.textContent=ch;
+      b.onclick=()=>{if(c.dataset.done)return;c.dataset.done=1;done++;
+        if(ch===it.a){b.classList.add('right');right++}else{b.classList.add('wrong');[...o.children].find(x=>x.textContent===it.a).classList.add('right')}
+        w.hidden=false;w.textContent=it.why;$(scoreId).textContent=right+' of '+items.length+' correct'+(done===items.length?(right===items.length?'. Perfect!':'. Nice work.'):'')};o.appendChild(b)});
+    box.appendChild(c)});
+}
+mcSet('whCards','whScore',shuffle([
+ {q:'A lot of 50 valve bodies contains 4 defectives. You pick 6 without replacement. x = defectives in the sample.',a:'Hypergeometric',why:'Small finite lot, sampled without replacement, so the probability changes from draw to draw.'},
+ {q:'From a huge production run that is 3% defective, you sample 25 parts. x = defectives found.',a:'Binomial',why:'n independent trials with a constant p: the book uses this for sampling from an "infinitely large" population.'},
+ {q:'x = number of paint blemishes on one car hood.',a:'Poisson',why:'Counting defects in one unit of area is the classic Poisson use (count data).'},
+ {q:'x = number of calls arriving at a help desk in one hour.',a:'Poisson',why:'Occurrences per unit time, at a roughly constant average rate.'},
+ {q:'Records are checked one by one. x = the record on which the first error is found.',a:'Geometric',why:'Trials until the first success: the negative binomial with r = 1.'},
+ {q:'Chips are tested until the 3rd defective chip turns up. x = number of chips tested.',a:'Negative binomial',why:'Trials until the r-th success, with r = 3 (also called the Pascal distribution).'},
+ {q:'An inspector draws 10 boards from a lot of 100 that holds 5 defectives (the book\'s example).',a:'Hypergeometric',why:'N = 100, D = 5, n = 10, without replacement. The book gets P(x ≤ 1) = 0.923.'},
+ {q:'Each of 15 welds independently passes an X-ray test with probability 0.9. x = welds that fail.',a:'Binomial',why:'Fixed n = 15 Bernoulli trials with constant probability.'}
+]),['Hypergeometric','Binomial','Poisson','Geometric','Negative binomial']);
+
+/* 7. normal */
+function normal(){
+  const m=+$('nm').value,s=+$('ns').value,l=+$('nl').value;$('nmV').textContent=m.toFixed(1);$('nsV').textContent=s.toFixed(1);$('nlV').textContent=l.toFixed(1);
+  const z=(l-m)/s,p=Phi(z);$('nz').textContent=z.toFixed(2);$('np').textContent=p<0.0001?p.toExponential(2):f4(p);$('nppm').textContent=Math.round(p*1e6).toLocaleString();
+  const a=480,b=520,pk=1/(s*Math.sqrt(2*Math.PI)),ymax=Math.max(pk*1.15,0.1);
+  const F=frame($('nCanvas'),{xmin:a,xmax:b,ymax,yt:[],xt:ticks(a,b,8),xl:'Fill volume (mL)'});
+  const f=x=>Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
+  F.g.fillStyle=css('--coral');F.g.beginPath();F.g.moveTo(F.X(a),F.Y(0));for(let x=a;x<=l;x+=0.05)F.g.lineTo(F.X(x),F.Y(f(x)));F.g.lineTo(F.X(l),F.Y(0));F.g.fill();
+  F.g.strokeStyle=css('--blue');F.g.lineWidth=4;F.g.beginPath();for(let x=a;x<=b;x+=0.05){const X=F.X(x),Y=F.Y(f(x));x===a?F.g.moveTo(X,Y):F.g.lineTo(X,Y)}F.g.stroke();
+  F.g.strokeStyle=css('--fg');F.g.lineWidth=2;F.g.setLineDash([7,6]);F.g.beginPath();F.g.moveTo(F.X(l),F.T);F.g.lineTo(F.X(l),F.Y(0));F.g.stroke();F.g.setLineDash([]);
+  F.g.fillStyle=css('--fg');F.g.font='800 16px Nunito,sans-serif';F.g.textAlign='right';F.g.fillText('LSL '+l,F.X(l)-6,F.T+16);
+  $('nMsg').textContent=`P(x < ${l}) = Φ((${l} − ${m}) / ${s}) = Φ(${z.toFixed(2)}) = ${p<0.0001?p.toExponential(2):f4(p)}. `+(Math.abs(z+2.5)<0.01?'Same z as the book\'s Example 3.7 (Figure 3.18): Φ(−2.5) = 0.0062. ':'')+'Raise the mean or cut σ to shrink the red tail.';
+}
+['nm','ns','nl'].forEach(id=>$(id).addEventListener('input',normal));normal();onTheme(normal);
+
+/* 8. CLT */
+let cN=1,cData=[];
+function cRoll(){cData=[];for(let r=0;r<2000;r++){let t=0;for(let i=0;i<cN;i++)t+=1+Math.floor(Math.random()*6);cData.push(t/cN)}cDraw()}
+function cDraw(){
+  document.querySelectorAll('#cltBtns .btn').forEach(b=>b.classList.toggle('on',+b.dataset.n===cN));
+  const m=cData.reduce((a,b)=>a+b,0)/cData.length,sd=Math.sqrt(cData.reduce((a,b)=>a+(b-m)**2,0)/(cData.length-1));
+  $('cM').textContent=m.toFixed(3);$('cS').textContent=sd.toFixed(3);$('cT').textContent=(1.7078/Math.sqrt(cN)).toFixed(3);
+  const step=1/cN,bins=Math.round(5/step)+1,c=new Array(bins).fill(0);cData.forEach(v=>c[Math.round((v-1)/step)]++);
+  const ymax=Math.max(...c)*1.15;
+  const F=frame($('cCanvas'),{xmin:0.5,xmax:6.5,ymax,yt:ticks(0,ymax,5),xt:[1,2,3,4,5,6],xl:'average of '+cN+(cN===1?' die':' dice')});
+  const w=Math.max(2,(F.X(1)-F.X(0))*step*0.8);
+  c.forEach((v,i)=>{const x=F.X(1+i*step),y=F.Y(v);F.g.fillStyle=css('--mint');F.g.fillRect(x-w/2,y,w,F.Y(0)-y)});
+  if(cN>1){F.g.strokeStyle=css('--coral');F.g.lineWidth=3;F.g.beginPath();const s=1.7078/Math.sqrt(cN);
+    for(let x=0.5;x<=6.5;x+=0.01){const y=2000*step*Math.exp(-0.5*((x-3.5)/s)**2)/(s*Math.sqrt(2*Math.PI));x===0.5?F.g.moveTo(F.X(x),F.Y(y)):F.g.lineTo(F.X(x),F.Y(Math.min(y,ymax)))}F.g.stroke()}
+  $('cMsg').textContent=cN===1?'One die: a flat (uniform) shape. Nothing normal about it.':cN===2?'Two dice: already a triangle peaked at 3.5.':`${cN} dice: the averages follow a bell curve (red, the normal approximation) even though each die is flat. That is the central limit theorem, and it is why x̄ charts work.`;
+}
+document.querySelectorAll('#cltBtns .btn').forEach(b=>b.onclick=()=>{cN=+b.dataset.n;cRoll()});$('cltRoll').onclick=cRoll;cRoll();onTheme(cDraw);
+
+/* 9. exponential */
+function expo(){
+  const mt=+$('em').value,t=+$('et').value,s=+$('es').value,l=1/mt;
+  $('emV').textContent=mt.toLocaleString();$('etV').textContent=t.toLocaleString();$('esV').textContent=s.toLocaleString();
+  const F_t=1-Math.exp(-l*t),cond=Math.exp(-l*t);
+  $('eF').textContent=f4(F_t);$('eR').textContent=f4(cond);$('eMean').textContent='0.6321';
+  const xmax=Math.max(40000,s+t)*1.02,ymax=l*1.15;
+  const F=frame($('eCanvas'),{xmin:0,xmax,ymax,yt:[],xt:ticks(0,xmax,8),xl:'hours',xfmt:v=>v>=1000?(v/1000)+'k':v});
+  const f=x=>l*Math.exp(-l*x);
+  F.g.fillStyle=css('--violet');F.g.globalAlpha=.55;F.g.beginPath();F.g.moveTo(F.X(s),F.Y(0));for(let x=s;x<=s+t;x+=xmax/400)F.g.lineTo(F.X(x),F.Y(f(x)));F.g.lineTo(F.X(s+t),F.Y(0));F.g.fill();F.g.globalAlpha=1;
+  F.g.strokeStyle=css('--blue');F.g.lineWidth=4;F.g.beginPath();for(let x=0;x<=xmax;x+=xmax/400){x===0?F.g.moveTo(F.X(x),F.Y(f(x))):F.g.lineTo(F.X(x),F.Y(f(x)))}F.g.stroke();
+  F.g.strokeStyle=css('--fg');F.g.lineWidth=2;F.g.setLineDash([6,6]);F.g.beginPath();F.g.moveTo(F.X(mt),F.T);F.g.lineTo(F.X(mt),F.Y(0));F.g.stroke();F.g.setLineDash([]);
+  F.g.fillStyle=css('--fg');F.g.font='800 15px Nunito,sans-serif';F.g.textAlign='left';F.g.fillText('mean 1/λ',F.X(mt)+6,F.T+16);
+  $('eMsg').textContent=`P(fail before ${t.toLocaleString()} h) = 1 − e^(−${t}/${mt}) = ${f4(F_t)}. `+(s>0?`Given the fan already ran ${s.toLocaleString()} h, the chance it survives ${t.toLocaleString()} more hours is still e^(−λt) = ${f4(cond)}: exactly the same as for a new fan. That is the lack-of-memory property, so the exponential suits random failures, not wear-out.`:'Now move the "already ran" slider: the answer for the next t hours does not change.')+' Any exponential item fails before its mean life with probability 0.63212.';
+}
+['em','et','es'].forEach(id=>$(id).addEventListener('input',expo));expo();onTheme(expo);
+
+/* 10. probability plot */
+const PD={oct:{x:[88.9,87.0,90.0,88.2,87.2,87.4,87.8,89.7,86.0,89.6],u:'',msg:'All ten points fit under the fat pencil, so the book concludes the normal model is fine for road octane number (Example 3.13). From Figure 3.26: mean ≈ 88.2, σ ≈ 90 − 88.2 = 1.8.'},
+ rep:{x:[0.4,0.6,0.7,0.9,1.1,1.2,1.5,1.8,2.3,3.1,4.6,7.9],u:' h',msg:'The points bend upward on the right: a few very long repairs. A fat pencil cannot cover them. Right-skewed times like these need another model, such as the exponential, lognormal or Weibull.'},
+ wafer:{x:TH,u:' Å',msg:'With 100 points the plot hugs the line through the middle and wanders only a little in the tails. Normal is a reasonable model for the wafer thickness data in Table 3.2.'}};
+let ppKey='oct';
+function pp(){
+  const d=PD[ppKey],x=d.x.slice().sort((a,b)=>a-b),n=x.length,z=x.map((_,j)=>invPhi((j+1-0.5)/n));
+  const zb=z.reduce((a,b)=>a+b,0)/n,xb=x.reduce((a,b)=>a+b,0)/n;
+  const slope=z.reduce((a,v,j)=>a+(v-zb)*(x[j]-xb),0)/z.reduce((a,v)=>a+(v-zb)**2,0),mid=xb-slope*zb;
+  $('ppMean').textContent=mid.toFixed(1)+d.u;$('ppSd').textContent=slope.toFixed(2)+d.u;$('ppN').textContent=n;$('ppMsg').textContent=d.msg;
+  const pad=(x[n-1]-x[0])*0.08,xmin=x[0]-pad,xmax=x[n-1]+pad,zl=Math.max(2.6,Math.ceil(Math.abs(z[0])*10)/10+0.3);
+  const F=frame($('ppCanvas'),{xmin,xmax,ymin:-zl,ymax:zl,yt:[-2,-1,0,1,2],xt:ticks(xmin,xmax,7),xl:'sorted value x(j)'+d.u,yfmt:v=>v.toFixed(0),xfmt:v=>+v.toFixed(1)});
+  const lz=v=>(v-mid)/slope;const pw=Math.max(18,(F.Y(0)-F.Y(0.45)));
+  F.g.strokeStyle=css('--sun');F.g.globalAlpha=.6;F.g.lineWidth=pw;F.g.lineCap='round';F.g.beginPath();F.g.moveTo(F.X(xmin),F.Y(lz(xmin)));F.g.lineTo(F.X(xmax),F.Y(lz(xmax)));F.g.stroke();F.g.globalAlpha=1;F.g.lineCap='butt';
+  F.g.strokeStyle=css('--fg');F.g.lineWidth=2;F.g.beginPath();F.g.moveTo(F.X(xmin),F.Y(lz(xmin)));F.g.lineTo(F.X(xmax),F.Y(lz(xmax)));F.g.stroke();
+  x.forEach((v,j)=>{F.g.fillStyle=css('--teal');F.g.beginPath();F.g.arc(F.X(v),F.Y(z[j]),n>50?4:7,0,7);F.g.fill()});
+  F.g.save();F.g.translate(16,(F.T+F.H-F.B)/2);F.g.rotate(-Math.PI/2);F.g.fillStyle=css('--muted');F.g.font='800 16px Nunito,sans-serif';F.g.textAlign='center';F.g.fillText('normal score z(j)',0,0);F.g.restore();
+}
+document.querySelectorAll('#probplot [data-d]').forEach(b=>b.onclick=()=>{ppKey=b.dataset.d;document.querySelectorAll('#probplot [data-d]').forEach(x=>x.classList.toggle('on',x===b));pp()});pp();onTheme(pp);
+
+/* quiz */
+const Q=[
+ ['For the 40 claim times, the median is the average of which ranked observations?',['10th and 11th','20th and 21st','30th and 31st','40th only'],1,'n = 40 is even, so the median averages ranks 20 and 21: (33 + 34)/2 = 33.5 days.'],
+ ['The sample variance divides the sum of squared deviations by…',['n','n − 1','n + 1','√n'],1,'Equation 3.2: s² = Σ(xᵢ − x̄)² / (n − 1).'],
+ ['What does the box in a box plot enclose?',['Minimum to maximum','The mean ± 1 standard deviation','The interquartile range, Q1 to Q3','The middle 99.73%'],2,'The box runs from Q1 to Q3, with a line at the median.'],
+ ['The number of nonconforming chips in a random sample of 25 from a large process follows a…',['Poisson distribution','binomial distribution','normal distribution','geometric distribution'],1,'n = 25 independent trials, constant p: binomial (Example 3.5).'],
+ ['For a Poisson distribution with λ = 4, the variance is…',['2','4','16','√4'],1,'For the Poisson, mean = variance = λ.'],
+ ['When r = 1, the negative binomial distribution becomes the…',['binomial','hypergeometric','geometric','exponential'],2,'Trials until the first success: the geometric distribution.'],
+ ['x ~ N(40, 2²). What is P(x ≤ 35)?',['0.0062','0.0228','0.1587','0.3085'],0,'z = (35 − 40)/2 = −2.5 and Φ(−2.5) = 0.0062 (Example 3.7).'],
+ ['The central limit theorem says the sum of many independent random variables is approximately…',['uniform','exponential','normal','Poisson'],2,'Whatever the individual distributions, the sum tends to normal as n grows.'],
+ ['Which continuous distribution has the lack-of-memory property?',['Normal','Exponential','Lognormal','Uniform'],1,'The exponential is the only continuous distribution with it.'],
+ ['On a normal probability plot, the standard deviation can be estimated by…',['the 50th percentile','the 84th minus the 50th percentile','the slope times n','the largest point minus the smallest'],1,'One σ is the gap between the 84th and 50th percentiles: 90 − 88.2 = 1.8 for the octane data.']
+];
+let qi=0,qs=0;
+function stars(){$('qStars').innerHTML=Q.map((_,i)=>'<span'+(i<qs?' class="on"':'')+'>★</span>').join('')}
+function qShow(){stars();$('qNext').hidden=true;$('qAgain').hidden=true;const box=$('qBox');box.innerHTML='';
+  if(qi>=Q.length){const f=document.createElement('div');f.className='feedback';f.textContent=`You earned ${qs} of ${Q.length} stars. `+(qs>=9?'Excellent, you own Chapter 3.':qs>=7?'Strong work. Review the ones you missed.':'Revisit the activities above, then try again.');box.appendChild(f);$('qAgain').hidden=false;return}
+  const [q,o,a,w]=Q[qi];const h=document.createElement('div');h.className='qcard';h.innerHTML='<div class="sec"></div><div class="tx"></div><div class="opts"></div><div class="why" hidden></div>';
+  h.querySelector('.sec').textContent='Question '+(qi+1)+' of '+Q.length;h.querySelector('.tx').textContent=q;
+  o.forEach((t,i)=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=t;b.onclick=()=>{if(h.dataset.done)return;h.dataset.done=1;
+    if(i===a){b.classList.add('right');qs++}else{b.classList.add('wrong');h.querySelectorAll('.opt')[a].classList.add('right')}
+    const wy=h.querySelector('.why');wy.hidden=false;wy.textContent=w;stars();qi++;$('qNext').hidden=false;$('qNext').textContent=qi>=Q.length?'See my stars':'Next question'};h.querySelector('.opts').appendChild(b)});
+  box.appendChild(h)}
+$('qNext').onclick=qShow;$('qAgain').onclick=()=>{qi=0;qs=0;qShow()};qShow();
+
+function jump(){const id=location.hash.slice(1);const el=id&&document.getElementById(id);if(el&&el.classList.contains('station')){el.scrollIntoView({behavior:'smooth',block:'start'});el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}}
+addEventListener('hashchange',jump);setTimeout(jump,300);
+})();
+</script>
+
+
+</body></html>

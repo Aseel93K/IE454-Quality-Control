@@ -1,0 +1,571 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>IE454 Chapter 5 SPC Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: same as the Chapter 1 to 3 labs. Sticky header, hero with part chips, one rounded "station" per activity (scene banner + interactive body), star quiz last */
+:root{
+  --bg:#F3F8FE; --surface:#FFFFFF; --soft:#E8F2FC; --fg:#15233A; --muted:#55657E; --line:#D5E3F2;
+  --blue:#0070C0; --blue-ink:#FFFFFF; --sky:#DCEBFA; --sun:#FFC83D; --sun-ink:#3A2B00;
+  --coral:#FF6B5B; --mint:#1FA874; --violet:#7C5CFF; --teal:#12A5B8; --gold:#E0A100;
+  --ok-bg:#DDF6EA; --ok-fg:#0F6B47; --bad-bg:#FFE3DF; --bad-fg:#A3271B;
+  --display:"Nunito",ui-rounded,system-ui,sans-serif; --body:"Source Sans 3",system-ui,sans-serif;
+  --r:22px; --shadow:0 6px 22px rgba(0,60,120,.10);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1626; --surface:#162238; --soft:#1C2C47; --fg:#EAF1FB; --muted:#A7B6CC; --line:#2A3C5C;
+  --blue:#3FA2F0; --blue-ink:#06192C; --sky:#1D3352; --sun:#FFD15C; --sun-ink:#2E2200;
+  --coral:#FF8576; --mint:#3CCB93; --violet:#9C84FF; --teal:#3CC4D6; --gold:#C98F00;
+  --ok-bg:#123D2E; --ok-fg:#7FE3B5; --bad-bg:#4A1E1A; --bad-fg:#FFB0A5; --shadow:0 6px 22px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1626; --surface:#162238; --soft:#1C2C47; --fg:#EAF1FB; --muted:#A7B6CC; --line:#2A3C5C;
+  --blue:#3FA2F0; --blue-ink:#06192C; --sky:#1D3352; --sun:#FFD15C; --sun-ink:#2E2200;
+  --coral:#FF8576; --mint:#3CCB93; --violet:#9C84FF; --teal:#3CC4D6; --gold:#C98F00;
+  --ok-bg:#123D2E; --ok-fg:#7FE3B5; --bad-bg:#4A1E1A; --bad-fg:#FFB0A5; --shadow:0 6px 22px rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.55}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--blue);color:var(--blue-ink);padding:10px 16px}
+.top p{margin:0 auto;max-width:1120px;font-family:var(--display);font-weight:800;font-size:clamp(13px,1.7vw,16px)}
+.top .dot{opacity:.7;margin:0 .35em}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:24px 70px;display:flex;flex-direction:column;gap:28px}
+.hero{background:var(--surface);border-radius:32px;padding:clamp(20px,4vw,40px);box-shadow:var(--shadow);display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:center}
+@media (max-width:820px){.hero{grid-template-columns:1fr}}
+.hero h1{font-size:clamp(28px,4.4vw,46px);font-weight:900;color:var(--blue)}
+.hero .big{font-size:clamp(17px,2vw,20px);margin:12px 0 0;max-width:56ch}
+.hero .quote{margin-top:14px;padding:14px 18px;background:var(--sky);border-radius:18px;font-style:italic}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{display:inline-flex;gap:6px;align-items:center;padding:7px 14px;border-radius:99px;font-family:var(--display);font-weight:800;font-size:14px;text-decoration:none;color:var(--fg);background:var(--soft);border:2px solid transparent}
+.chip:hover{border-color:var(--blue)}
+.chip i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.heroart{width:100%;max-width:440px;justify-self:center}
+.station{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;scroll-margin-top:70px}
+.station.flash{animation:flash 1.6s ease-out 1}
+@keyframes flash{0%{box-shadow:0 0 0 6px var(--sun)}100%{box-shadow:var(--shadow)}}
+.scene{display:flex;gap:18px;align-items:center;padding:18px 22px;color:#fff}
+.scene svg.ico{width:64px;height:64px;flex:none;background:rgba(255,255,255,.22);border-radius:20px;padding:10px}
+.scene .lbl{font-family:var(--display);font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
+.scene h2{font-size:clamp(21px,2.6vw,28px);font-weight:900;color:#fff}
+.scene p{margin:2px 0 0;font-size:15px;opacity:.95}
+@media (max-width:520px){.scene{flex-direction:column;align-items:flex-start}}
+.body{padding:20px 22px 24px;display:flex;flex-direction:column;gap:14px}
+.body > p{margin:0;max-width:75ch}
+.sec{font-size:13px;color:var(--muted);font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid2.wide{grid-template-columns:1fr 1.4fr}
+@media (max-width:760px){.grid2,.grid2.wide{grid-template-columns:1fr}}
+.panel{background:var(--soft);border-radius:18px;padding:14px 16px;min-width:0}
+.panel h3{font-size:17px;font-weight:800;margin-bottom:8px}
+label.sl{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:600;margin-top:6px}
+label.sl span{font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--blue)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.stats.four{grid-template-columns:repeat(4,1fr)}
+@media (max-width:520px){.stats.four{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--surface);border-radius:14px;padding:8px 10px;min-width:0}
+.stat b{display:block;font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
+.stat small{font-size:12px;color:var(--muted)}
+canvas{width:100%;height:auto;display:block;border-radius:16px;background:var(--surface)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.qcard{background:var(--soft);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.qcard .tx{font-weight:600}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{border:2px solid var(--line);background:var(--surface);color:var(--fg);border-radius:99px;padding:5px 12px;font-size:14px;font-weight:700}
+.opt:hover{border-color:var(--blue)}
+.opt.right{background:var(--ok-bg);color:var(--ok-fg);border-color:var(--ok-fg)}
+.opt.wrong{background:var(--bad-bg);color:var(--bad-fg);border-color:var(--bad-fg)}
+.why{font-size:14px;color:var(--muted)}
+.score{font-family:var(--display);font-weight:800;padding:8px 14px;border-radius:99px;background:var(--sky);align-self:flex-start}
+.btn{border:0;border-radius:99px;padding:9px 18px;font-family:var(--display);font-weight:800;background:var(--blue);color:var(--blue-ink)}
+.btn.alt{background:var(--soft);color:var(--fg)}
+.panel .btn.alt{background:var(--surface);border:2px solid var(--line)}
+.btn.on{background:var(--sun);color:var(--sun-ink);border-color:var(--sun)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.stars{font-size:30px;letter-spacing:3px;color:var(--line)}
+.stars .on{color:var(--sun)}
+.quiz{display:flex;flex-direction:column;gap:12px}
+.feedback{font-family:var(--display);font-weight:800;font-size:18px}
+.note{background:var(--sky);border-radius:14px;padding:10px 14px;font-size:15px}
+.note b{font-family:var(--display)}
+.tag{display:inline-block;padding:2px 10px;border-radius:99px;font-family:var(--display);font-weight:800;font-size:13px;margin:2px 4px 2px 0}
+.tag.r1{background:var(--coral);color:#fff}.tag.r2{background:var(--violet);color:#fff}.tag.r3{background:var(--teal);color:#fff}.tag.r4{background:var(--gold);color:#fff}.tag.ok{background:var(--ok-bg);color:var(--ok-fg)}
+.checks{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.checks label{display:flex;gap:8px;align-items:center;font-size:15px;font-weight:600}
+.checks input[type=number]{font:inherit;width:6.5em;border:2px solid var(--line);background:var(--surface);color:var(--fg);border-radius:10px;padding:3px 6px}
+footer{color:var(--muted);font-size:13px;text-align:center}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Activities grouped by part: each part gets the accent color of its column on the slides' roadmap */
+.chips{flex-direction:column;align-items:flex-start;gap:8px}
+.chiprow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chiplbl{display:inline-block;min-width:64px;text-align:center;padding:7px 12px;border-radius:99px;background:var(--pc);color:#fff;font-family:var(--display);font-weight:900;font-size:13px;letter-spacing:.04em;text-transform:uppercase;text-decoration:none}
+.part{display:flex;flex-direction:column;gap:18px;border-left:7px solid var(--pc);padding-left:clamp(10px,2vw,20px);scroll-margin-top:70px}
+.parthead{display:flex;gap:14px;align-items:center}
+.parthead .pnum{flex:none;background:var(--pc);color:#fff;border-radius:16px;padding:10px 16px;font-family:var(--display);font-weight:900;font-size:clamp(16px,2vw,20px);letter-spacing:.04em;text-transform:uppercase}
+.parthead h2{font-size:clamp(22px,3vw,30px);font-weight:900;color:var(--fg)}
+.parthead p{margin:2px 0 0;color:var(--muted);font-weight:700;font-size:15px}
+.part .scene{background:var(--pc)}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-wafer" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 7v10M12 5v14M16 7v10M5 10h14M5 14h14" stroke="currentColor" stroke-width="1.2"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 21h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></symbol>
+  <symbol id="i-zones" viewBox="0 0 24 24"><path d="M2 4h20M2 8h20M2 12h20M2 16h20M2 20h20" stroke="currentColor" stroke-width="1" opacity=".7"/><path d="M3 13l4-5 4 3 4-6 5 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+  <symbol id="i-siren" viewBox="0 0 24 24"><path d="M6 19v-6a6 6 0 0 1 12 0v6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M4 19h16M12 2v2.5M4.5 5l1.8 1.8M19.5 5l-1.8 1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-bars" viewBox="0 0 24 24"><path d="M3 21h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="4" y="5" width="3.5" height="16" rx="1" fill="currentColor"/><rect x="9" y="9" width="3.5" height="12" rx="1" fill="currentColor"/><rect x="14" y="13" width="3.5" height="8" rx="1" fill="currentColor"/><path d="M5.5 4c5 1 10 3 14 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><path d="M3 3v18h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="7" cy="17" r="1.5" fill="currentColor"/><circle cx="9.5" cy="14" r="1.5" fill="currentColor"/><circle cx="12" cy="15" r="1.5" fill="currentColor"/><circle cx="14" cy="10.5" r="1.5" fill="currentColor"/><circle cx="17" cy="9" r="1.5" fill="currentColor"/><circle cx="19" cy="5.5" r="1.5" fill="currentColor"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+ </defs>
+</svg>
+
+<header class="top"><p><a href="../" style="color:inherit;text-decoration:none" title="All chapters">&larr; IE454 Quality Control</a><span class="dot">·</span>Chapter 5: Methods and Philosophy of Statistical Process Control<span class="dot">·</span>Dr. Aseel Khanfar<span class="dot">·</span>Yarmouk University</p></header>
+
+<main class="wrap">
+<section class="hero">
+ <div>
+  <h1>Is it noise, or is something wrong?</h1>
+  <p class="big">Every process wiggles. A control chart tells the normal wiggle (chance causes) apart from a real problem (an assignable cause), so you fix what is broken and leave the rest alone. Build a chart, catch a shift, read the zone rules, then use the other six tools to find the cause.</p>
+  <p class="quote">It is impossible to inspect or test quality into a product; the product must be built right the first time. Montgomery, Part 3</p>
+  <nav class="chips" aria-label="Activities by part">
+  <div class="chiprow" style="--pc:#0070C0"><a class="chiplbl" href="#part1">Part 1</a><a class="chip" href="#causes"><i style="background:#0070C0"></i>Chance or assignable?</a></div>
+  <div class="chiprow" style="--pc:#12A5B8"><a class="chiplbl" href="#part2">Part 2</a><a class="chip" href="#limits"><i style="background:#12A5B8"></i>Build a control chart</a></div>
+  <div class="chiprow" style="--pc:#1A9467"><a class="chiplbl" href="#part3">Part 3</a><a class="chip" href="#arl"><i style="background:#1A9467"></i>False alarms and ARL</a><a class="chip" href="#oc"><i style="background:#1A9467"></i>Catch the shift</a></div>
+  <div class="chiprow" style="--pc:#E8503F"><a class="chiplbl" href="#part4">Part 4</a><a class="chip" href="#rules"><i style="background:#E8503F"></i>Zone rules</a><a class="chip" href="#alarms"><i style="background:#E8503F"></i>More rules, more alarms</a></div>
+  <div class="chiprow" style="--pc:#7A5AF8"><a class="chiplbl" href="#part5">Part 5</a><a class="chip" href="#pareto"><i style="background:#7A5AF8"></i>Pareto chart</a><a class="chip" href="#scatter"><i style="background:#7A5AF8"></i>Scatter diagram</a></div>
+  <div class="chiprow"><span class="chiplbl" style="background:var(--sun);color:var(--sun-ink)">Review</span><a class="chip" href="#quiz"><i style="background:var(--sun)"></i>Star quiz</a></div>
+  </nav>
+ </div>
+ <svg class="heroart" viewBox="0 0 440 240" role="img" aria-label="A control chart with a center line, upper and lower control limits, and one point above the upper limit marked as a signal">
+  <rect x="0" y="0" width="440" height="240" rx="28" fill="var(--sky)"/>
+  <line x1="40" y1="60" x2="400" y2="60" stroke="var(--coral)" stroke-width="3" stroke-dasharray="8 6"/>
+  <line x1="40" y1="120" x2="400" y2="120" stroke="var(--fg)" stroke-width="2.5"/>
+  <line x1="40" y1="180" x2="400" y2="180" stroke="var(--coral)" stroke-width="3" stroke-dasharray="8 6"/>
+  <polyline points="56,128 86,104 116,140 146,112 176,150 206,118 236,98 266,132 296,108 326,40 356,124 386,138" fill="none" stroke="var(--blue)" stroke-width="4" stroke-linejoin="round"/>
+  <g fill="var(--blue)"><circle cx="56" cy="128" r="6"/><circle cx="86" cy="104" r="6"/><circle cx="116" cy="140" r="6"/><circle cx="146" cy="112" r="6"/><circle cx="176" cy="150" r="6"/><circle cx="206" cy="118" r="6"/><circle cx="236" cy="98" r="6"/><circle cx="266" cy="132" r="6"/><circle cx="296" cy="108" r="6"/><circle cx="356" cy="124" r="6"/><circle cx="386" cy="138" r="6"/></g>
+  <circle cx="326" cy="40" r="11" fill="var(--sun)" stroke="var(--fg)" stroke-width="2.5"/>
+  <g font-family="Nunito,sans-serif" font-weight="800" font-size="14" fill="var(--fg)">
+   <text x="44" y="52">UCL</text><text x="44" y="112">CL</text><text x="44" y="198">LCL</text>
+   <text x="300" y="24">signal!</text>
+   <text x="220" y="224" text-anchor="middle">chance causes inside, assignable causes out</text>
+  </g>
+ </svg>
+</section>
+
+<!-- Part 1: SPC and variation -->
+<div class="part" id="part1" style="--pc:#0070C0">
+ <div class="parthead"><span class="pnum">Part 1</span><div><h2>SPC and variation</h2><p>Sections 5.1–5.2 · 1 activity</p></div></div>
+<section class="station" id="causes">
+ <div class="scene"><svg class="ico"><use href="#i-gear"/></svg><div><div class="lbl">Part 1 · Activity 1 of 1 · Section 5.2, Figure 5.1 · Around the plant</div><h2>Chance cause or assignable cause?</h2><p>Chance causes are the many small, unavoidable sources of background noise. Assignable causes are bigger and fixable: badly adjusted machines, operator errors, defective raw material. Sort each scene.</p></div></div>
+ <div class="body">
+  <div class="cards" id="caCards"></div>
+  <div class="score" id="caScore">0 of 8 correct</div>
+ </div>
+</section>
+</div>
+
+<!-- Part 2: How a control chart works -->
+<div class="part" id="part2" style="--pc:#12A5B8">
+ <div class="parthead"><span class="pnum">Part 2</span><div><h2>How a control chart works</h2><p>Section 5.3.1 · 1 activity</p></div></div>
+<section class="station" id="limits">
+ <div class="scene"><svg class="ico"><use href="#i-wafer"/></svg><div><div class="lbl">Part 2 · Activity 1 of 1 · Section 5.3.1, Figures 5.3–5.4, Equation 5.1 · Wafer fab, hard-bake step</div><h2>Build an x̄ control chart</h2><p>Flow width of the photoresist has μ = 1.5 microns and σ = 0.15 microns. Every hour 5 wafers are measured and their average is plotted. Set the chart, then add an assignable cause and see if the chart catches it.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>Chart settings</h3>
+    <label class="sl" for="lm">Process mean μ <span id="lmV"></span></label><input type="range" id="lm" min="1.3" max="1.7" step="0.01" value="1.5">
+    <label class="sl" for="ls">Process standard deviation σ <span id="lsV"></span></label><input type="range" id="ls" min="0.05" max="0.3" step="0.01" value="0.15">
+    <label class="sl" for="ln">Sample size n <span id="lnV"></span></label><input type="range" id="ln" min="1" max="20" step="1" value="5">
+    <label class="sl" for="lL">Limits at L sigma <span id="lLV"></span></label><input type="range" id="lL" min="1.5" max="4" step="0.05" value="3">
+    <div class="row" style="margin-top:8px"><button class="btn alt" id="lShift">Add a shift at sample 13</button><button class="btn alt" id="lNew">New samples</button></div>
+    <div class="stats four"><div class="stat"><b id="lSx"></b><small>σx̄ = σ/√n</small></div><div class="stat"><b id="lU"></b><small>UCL</small></div><div class="stat"><b id="lL2"></b><small>LCL</small></div><div class="stat"><b id="lOut"></b><small>points outside</small></div></div>
+   </div>
+   <div class="panel"><h3>x̄ chart for average flow width</h3><canvas id="lCanvas" width="760" height="380" aria-label="x-bar control chart with center line and control limits"></canvas></div>
+  </div>
+  <p class="why" id="lMsg"></p>
+ </div>
+</section>
+</div>
+
+<!-- Part 3: Designing the chart -->
+<div class="part" id="part3" style="--pc:#1A9467">
+ <div class="parthead"><span class="pnum">Part 3</span><div><h2>Designing the chart</h2><p>Sections 5.3.2–5.3.3 · 2 activities</p></div></div>
+<section class="station" id="arl">
+ <div class="scene"><svg class="ico"><use href="#i-bell"/></svg><div><div class="lbl">Part 3 · Activity 1 of 2 · Sections 5.3.2–5.3.3, Equations 5.2–5.3 · Hard-bake process</div><h2>False alarms and the in-control ARL</h2><p>Even a perfect process sometimes plots a point outside the limits by chance. That is a type I error, a false alarm. The average run length ARL₀ = 1/α tells you how many samples pass, on average, before one happens.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>Choose the limits</h3>
+    <label class="sl" for="aL">Limits at L sigma <span id="aLV"></span></label><input type="range" id="aL" min="1.5" max="4" step="0.01" value="3">
+    <div class="row" style="margin-top:8px"><button class="btn alt" data-L="2">2σ (warning)</button><button class="btn alt" data-L="3">3σ (usual)</button><button class="btn alt" data-L="3.09">3.09σ (0.001 limits)</button></div>
+    <label class="sl" for="ah">Hours between samples h <span id="ahV"></span></label><input type="range" id="ah" min="0.25" max="4" step="0.25" value="1">
+    <div class="stats four"><div class="stat"><b id="aA"></b><small>α (both sides)</small></div><div class="stat"><b id="aR"></b><small>ARL₀ = 1/α</small></div><div class="stat"><b id="aT"></b><small>ATS = ARL₀·h</small></div><div class="stat"><b id="aP"></b><small>10th / 50th pct run</small></div></div>
+    <div class="row" style="margin-top:10px"><button class="btn" id="aSim">Run the in-control process 40 times</button></div>
+   </div>
+   <div class="panel"><h3>Run lengths until a false alarm</h3><canvas id="aCanvas" width="760" height="380" aria-label="Bars of simulated run lengths until the first false alarm"></canvas></div>
+  </div>
+  <p class="why" id="aMsg"></p>
+ </div>
+</section>
+
+<section class="station" id="oc">
+ <div class="scene"><svg class="ico"><use href="#i-target"/></svg><div><div class="lbl">Part 3 · Activity 2 of 2 · Section 5.3.3, Figure 5.9 · Hard-bake process</div><h2>How fast will the chart catch a shift?</h2><p>The mean drifts from 1.500 to a new value. β is the chance a sample still plots inside the limits; p = 1 − β is the chance it signals. Then ARL₁ = 1/p and ATS = ARL₁ × h. Bigger samples or more frequent sampling catch shifts sooner.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>Shift and design</h3>
+    <label class="sl" for="oM">New process mean (microns) <span id="oMV"></span></label><input type="range" id="oM" min="1.5" max="1.875" step="0.005" value="1.725">
+    <label class="sl" for="oN">Sample size n <span id="oNV"></span></label><input type="range" id="oN" min="1" max="20" step="1" value="5">
+    <label class="sl" for="oH">Hours between samples h <span id="oHV"></span></label><input type="range" id="oH" min="0.25" max="4" step="0.25" value="1">
+    <div class="row" style="margin-top:8px"><button class="btn alt" data-d="5,1">Design 1: n = 5, every hour</button><button class="btn alt" data-d="5,0.5">n = 5, every half hour</button><button class="btn alt" data-d="10,1">Design 2: n = 10, every hour</button></div>
+    <div class="stats four"><div class="stat"><b id="oB"></b><small>β (inside limits)</small></div><div class="stat"><b id="oP"></b><small>p = 1 − β</small></div><div class="stat"><b id="oA"></b><small>ARL₁ = 1/p</small></div><div class="stat"><b id="oT"></b><small>ATS (hours)</small></div></div>
+   </div>
+   <div class="panel"><h3>Operating-characteristic curves (3σ limits)</h3><canvas id="oCanvas" width="760" height="380" aria-label="Operating characteristic curves for n equals 5, 10 and 15, with the current design highlighted"></canvas></div>
+  </div>
+  <p class="note"><b>Book check.</b> For n = 5 and a shift to 1.725, Figure 5.9 gives about 0.35 as the probability of plotting <i>between</i> the limits. That is β, so p = 1 − 0.35 = 0.65 and ARL₁ ≈ 1.5 samples. The book's text uses p = 0.35 (ARL₁ = 2.86), which mixes up β and p. The exact normal calculation here gives β ≈ 0.36.</p>
+  <p class="why" id="oMsg"></p>
+ </div>
+</section>
+</div>
+
+<!-- Part 4: Reading the chart -->
+<div class="part" id="part4" style="--pc:#E8503F">
+ <div class="parthead"><span class="pnum">Part 4</span><div><h2>Reading the chart</h2><p>Sections 5.3.4–5.3.7 · 2 activities</p></div></div>
+<section class="station" id="rules">
+ <div class="scene"><svg class="ico"><use href="#i-zones"/></svg><div><div class="lbl">Part 4 · Activity 1 of 2 · Sections 5.3.5–5.3.6, Figure 5.15, Table 5.1 · Any x̄ chart</div><h2>Western Electric zone rules</h2><p>Zones C, B and A sit 1, 2 and 3 sigma from the center line. Rule 1: one point beyond 3σ. Rule 2: two of three beyond 2σ. Rule 3: four of five beyond 1σ. Rule 4: eight in a row on one side. Rules 2 to 4 count one side at a time.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>What is going on in the process?</h3>
+    <div class="row" id="rBtns"><button class="btn alt" data-p="none">In control</button><button class="btn alt" data-p="shift">Small shift (+1σ)</button><button class="btn alt" data-p="trend">Slow drift up</button><button class="btn alt" data-p="cycle">Cycles</button><button class="btn alt" data-p="book">Figure 5.15 data</button></div>
+    <div class="row" style="margin-top:8px"><button class="btn" id="rNew">New 25 samples</button></div>
+    <div id="rTags" style="margin-top:10px" aria-live="polite"></div>
+    <p class="why" id="rMsg"></p>
+   </div>
+   <div class="panel"><h3>x̄ chart with zones (values in sigma units)</h3><canvas id="rCanvas" width="760" height="400" aria-label="Control chart with zones A, B and C and points flagged by Western Electric rules"></canvas></div>
+  </div>
+ </div>
+</section>
+
+<section class="station" id="alarms">
+ <div class="scene"><svg class="ico"><use href="#i-siren"/></svg><div><div class="lbl">Part 4 · Activity 2 of 2 · Section 5.3.6, Equation 5.4 · Champ and Woodall (1987)</div><h2>More rules, more false alarms</h2><p>Each extra rule makes the chart more sensitive to small shifts, but every rule can also fire by chance. With k independent rules, the overall false alarm probability is α = 1 − Π(1 − αᵢ).</p></div></div>
+ <div class="body">
+  <div class="grid2">
+   <div class="panel"><h3>Equation 5.4 calculator</h3>
+    <div class="checks" id="alChecks"></div>
+    <div class="stats"><div class="stat"><b id="alA"></b><small>overall α</small></div><div class="stat"><b id="alR"></b><small>ARL₀ ≈ 1/α</small></div><div class="stat"><b id="alK"></b><small>rules used</small></div></div>
+    <p class="why" id="alMsg"></p>
+   </div>
+   <div class="panel"><h3>Simulate an in-control process</h3>
+    <p class="why" style="margin:0">Plot points from a process with no assignable cause until the chart signals. Repeat 1,000 times and average the run length.</p>
+    <div class="row" style="margin-top:8px"><button class="btn" id="alSim1">3σ limits only</button><button class="btn" id="alSim4">All four Western Electric rules</button></div>
+    <div class="stats"><div class="stat"><b id="alS1">–</b><small>ARL₀, 3σ only (theory 370)</small></div><div class="stat"><b id="alS4">–</b><small>ARL₀, four rules (theory 91.25)</small></div><div class="stat"><b id="alRatio">–</b><small>alarms per 1,000 samples (4 rules)</small></div></div>
+    <p class="why" id="alSimMsg"></p>
+   </div>
+  </div>
+ </div>
+</section>
+</div>
+
+<!-- Part 5: The other six tools -->
+<div class="part" id="part5" style="--pc:#7A5AF8">
+ <div class="parthead"><span class="pnum">Part 5</span><div><h2>The other six tools</h2><p>Sections 5.4–5.6 · 2 activities</p></div></div>
+<section class="station" id="pareto">
+ <div class="scene"><svg class="ico"><use href="#i-bars"/></svg><div><div class="lbl">Part 5 · Activity 1 of 2 · Section 5.4, Figures 5.16–5.17 · Aerospace tank shop</div><h2>Turn a check sheet into a Pareto chart</h2><p>An engineer tallied 166 defects on aerospace tanks over 17 months (Figure 5.16). Sort the categories by count and add the cumulative percentage line: a few categories make up most of the defects.</p></div></div>
+ <div class="body">
+  <div class="row"><button class="btn alt" id="pSort">Sort into a Pareto chart</button><button class="btn alt" id="pCum">Show cumulative %</button><button class="btn alt" id="pCost">Weight by cost (teaching figures)</button></div>
+  <div class="grid2 wide">
+   <div class="panel"><h3>What the chart says</h3>
+    <div class="stats"><div class="stat"><b id="pTop3"></b><small>share of top 3</small></div><div class="stat"><b id="pTop5"></b><small>share of top 5</small></div><div class="stat"><b id="pVoid"></b><small>voids in casting</small></div></div>
+    <p class="why" id="pMsg" style="margin-top:10px"></p>
+   </div>
+   <div class="panel"><h3 id="pTitle">Defect counts (check sheet order)</h3><canvas id="pCanvas" width="760" height="420" aria-label="Bar chart of tank defect categories"></canvas></div>
+  </div>
+ </div>
+</section>
+
+<section class="station" id="scatter">
+ <div class="scene"><svg class="ico"><use href="#i-dots"/></svg><div><div class="lbl">Part 5 · Activity 2 of 2 · Section 5.4, Figure 5.22 · Magnesium smelter</div><h2>Correlation is not causation</h2><p>More reclaim flux goes with higher metal recovery. But both could rise with the metal temperature. Color the points by temperature, then run a designed experiment that holds temperature fixed.</p></div></div>
+ <div class="body">
+  <div class="row" id="sBtns"><button class="btn alt on" data-s="raw">Scatter diagram</button><button class="btn alt" data-s="temp">Color by temperature</button><button class="btn alt" data-s="doe">Experiment: fix temperature, change flux</button></div>
+  <div class="grid2 wide">
+   <div class="panel"><h3>Reading the plot</h3>
+    <div class="stats"><div class="stat"><b id="sR"></b><small>correlation r</small></div><div class="stat"><b id="sSlope"></b><small>% per lb of flux</small></div><div class="stat"><b id="sN"></b><small>points</small></div></div>
+    <p class="why" id="sMsg" style="margin-top:10px"></p>
+   </div>
+   <div class="panel"><h3>Metal recovery (%) vs reclaim flux (lb)</h3><canvas id="sCanvas" width="760" height="400" aria-label="Scatter diagram of metal recovery against reclaim flux"></canvas></div>
+  </div>
+ </div>
+</section>
+</div>
+
+<section class="station" id="quiz">
+ <div class="scene" style="background:var(--gold)"><svg class="ico"><use href="#i-star"/></svg><div><div class="lbl">Self-check · Whole chapter</div><h2>Star quiz</h2><p>Ten quick questions. Each right answer lights a star.</p></div></div>
+ <div class="body">
+  <div class="stars" id="qStars" aria-live="polite"></div>
+  <div class="quiz" id="qBox"></div>
+  <div class="row"><button class="btn" id="qNext" hidden>Next question</button><button class="btn alt" id="qAgain" hidden>Try the quiz again</button></div>
+ </div>
+</section>
+
+<footer>Activities built on Montgomery, <i>Introduction to Statistical Quality Control</i>, 8th ed., Wiley, Chapter 5. The hard-bake process numbers (Section 5.3), the operating-characteristic curves of Figure 5.9, the Figure 5.15 pattern, the Champ and Woodall (1987) ARL of 91.25 and the tank defect counts (Figure 5.16) are from the book; the cost weights, scatter points, all other examples and the quiz are teaching examples. Prepared for IE454 by Dr. Aseel Khanfar, Department of Industrial Engineering, Yarmouk University.<br><b>© 2026 Dr. Aseel Khanfar, Yarmouk University. All rights reserved.</b> No part of this page may be copied, adapted or republished without written permission.</footer>
+</main>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const erf=x=>{const s=Math.sign(x);x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y};
+const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
+/* tail probability with better accuracy far out (for alpha at 3 to 4 sigma) */
+const upper=z=>{if(z<5){const t=1/(1+0.2316419*z);const d=Math.exp(-z*z/2)/Math.sqrt(2*Math.PI);return d*t*(0.319381530+t*(-0.356563782+t*(1.781477937+t*(-1.821255978+t*1.330274429))))}return 0};
+const f4=v=>v.toFixed(4);
+function rng(seed){let s=seed>>>0||1;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+function gauss(r){let u=0,v=0;while(!u)u=r();v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+const redraws=[];
+function onTheme(f){redraws.push(f)}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>redraws.forEach(f=>f()));
+new MutationObserver(()=>redraws.forEach(f=>f())).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+/* shared chart frame */
+function frame(cv,{xmin,xmax,ymin=0,ymax,L=62,R=20,T=18,B=48,xt=[],yt=[],xl='',yl='',yfmt=v=>v,xfmt=v=>v}){
+  const g=cv.getContext('2d'),W=cv.width,H=cv.height;g.clearRect(0,0,W,H);g.fillStyle=css('--surface');g.fillRect(0,0,W,H);
+  const X=v=>L+(v-xmin)/(xmax-xmin)*(W-L-R),Y=v=>H-B-(v-ymin)/(ymax-ymin)*(H-T-B);
+  g.strokeStyle=css('--line');g.lineWidth=1;g.fillStyle=css('--muted');g.font='600 17px "Source Sans 3",sans-serif';
+  g.textAlign='right';yt.forEach(v=>{const y=Y(v);g.beginPath();g.moveTo(L,y);g.lineTo(W-R,y);g.stroke();g.fillText(yfmt(v),L-8,y+6)});
+  g.textAlign='center';xt.forEach(v=>g.fillText(xfmt(v),X(v),H-B+22));
+  g.strokeStyle=css('--fg');g.lineWidth=2;g.beginPath();g.moveTo(L,H-B);g.lineTo(W-R,H-B);g.stroke();
+  if(xl){g.font='800 16px Nunito,sans-serif';g.fillStyle=css('--muted');g.fillText(xl,(L+W-R)/2,H-4)}
+  return {g,X,Y,W,H,L,R,T,B};
+}
+const ticks=(a,b,n)=>{const st=Math.pow(10,Math.floor(Math.log10((b-a)/n)));const m=[1,2,2.5,5,10].map(k=>k*st).find(s=>(b-a)/s<=n)||st*10;const r=[];for(let v=Math.ceil(a/m)*m;v<=b+1e-9;v+=m)r.push(+v.toFixed(6));return r};
+function hline(F,y,color,dash,label,side){const g=F.g;g.strokeStyle=color;g.lineWidth=2.5;g.setLineDash(dash||[]);g.beginPath();g.moveTo(F.L,F.Y(y));g.lineTo(F.W-F.R,F.Y(y));g.stroke();g.setLineDash([]);
+  if(label){g.fillStyle=css('--fg');g.font='800 14px Nunito,sans-serif';g.textAlign=side==='l'?'left':'right';g.fillText(label,side==='l'?F.L+6:F.W-F.R-4,F.Y(y)-6)}}
+function dot(F,x,y,color,r){F.g.fillStyle=color;F.g.beginPath();F.g.arc(F.X(x),F.Y(y),r||6,0,7);F.g.fill()}
+
+/* multiple-choice card set (same as earlier labs) */
+function mcSet(boxId,scoreId,items,choices){
+  const box=$(boxId);let right=0,done=0;
+  items.forEach(it=>{const c=document.createElement('div');c.className='qcard';c.innerHTML='<div class="tx"></div><div class="opts"></div><div class="why" hidden></div>';
+    c.querySelector('.tx').textContent=it.q;const o=c.querySelector('.opts'),w=c.querySelector('.why');
+    choices.forEach(ch=>{const b=document.createElement('button');b.className='opt';b.type='button';b.textContent=ch;
+      b.onclick=()=>{if(c.dataset.done)return;c.dataset.done=1;done++;
+        if(ch===it.a){b.classList.add('right');right++}else{b.classList.add('wrong');[...o.children].find(x=>x.textContent===it.a).classList.add('right')}
+        w.hidden=false;w.textContent=it.why;$(scoreId).textContent=right+' of '+items.length+' correct'+(done===items.length?(right===items.length?'. Perfect!':'. Nice work.'):'')};o.appendChild(b)});
+    box.appendChild(c)});
+}
+
+/* 1. chance or assignable */
+mcSet('caCards','caScore',shuffle([
+ {q:'Fill weights of cereal boxes vary by a gram or two from box to box, all day long, with no pattern.',a:'Chance cause',why:'Many small, unavoidable effects added together: the "stable system of chance causes".'},
+ {q:'After 8 hours a cutting tool is worn, and shaft diameters creep upward.',a:'Assignable cause',why:'A machine problem you can find and fix (replace the tool). The book lists improperly adjusted or controlled machines first.'},
+ {q:'A new lot of resin from a different supplier arrives, and part strength drops sharply.',a:'Assignable cause',why:'Defective or different raw material is one of the three typical sources of assignable causes.'},
+ {q:'A new operator on night shift sets the oven 10 °C too hot.',a:'Assignable cause',why:'Operator error: large compared with the background noise, and it can be corrected.'},
+ {q:'Tiny vibrations from the building make readings on a precision scale jitter in the last digit.',a:'Chance cause',why:'Background noise that is part of the process as it is designed today.'},
+ {q:'Flow width on the hard-bake line moves within the control limits with no pattern for weeks.',a:'Chance cause',why:'Only chance causes are present: the process is in statistical control.'},
+ {q:'A hotplate drifts out of calibration, and the x̄ chart shows points above the UCL.',a:'Assignable cause',why:'This is a checkpoint in the hard-bake OCAP (Figure 5.6): "Is hotplate in calibration?"'},
+ {q:'Coffee strength from the office machine varies slightly cup to cup with the same settings.',a:'Chance cause',why:'Natural variation of a stable process. Adjusting after every cup would only add variation.'}
+]),['Chance cause','Assignable cause']);
+
+/* 2. control limits builder */
+let lSeed=7,lShifted=false;
+function limits(){
+  const m=+$('lm').value,s=+$('ls').value,n=+$('ln').value,L=+$('lL').value;
+  $('lmV').textContent=m.toFixed(2);$('lsV').textContent=s.toFixed(2);$('lnV').textContent=n;$('lLV').textContent=L.toFixed(2);
+  const sx=s/Math.sqrt(n),U=m+L*sx,Lo=m-L*sx;
+  $('lSx').textContent=sx.toFixed(4);$('lU').textContent=U.toFixed(4);$('lL2').textContent=Lo.toFixed(4);
+  const r=rng(lSeed),pts=[];
+  for(let i=1;i<=20;i++){const mu=(lShifted&&i>=13)?m+1.5*s:m;let t=0;for(let j=0;j<n;j++)t+=mu+s*gauss(r);pts.push(t/n)}
+  const out=pts.filter(v=>v>U||v<Lo).length;$('lOut').textContent=out;
+  const lo=Math.min(m-4.2*sx,...pts),hi=Math.max(m+4.2*sx,...pts);
+  const F=frame($('lCanvas'),{xmin:0.5,xmax:20.5,ymin:lo,ymax:hi,yt:ticks(lo,hi,6),xt:[1,4,8,12,16,20],xl:'Sample number (hours)',yfmt:v=>v.toFixed(2)});
+  if(lShifted){F.g.fillStyle=css('--sky');F.g.fillRect(F.X(12.5),F.T,F.X(20.5)-F.X(12.5),F.Y(lo)-F.T)}
+  hline(F,U,css('--coral'),[8,6],'UCL = '+U.toFixed(4));hline(F,m,css('--fg'),[],'CL = '+m.toFixed(2));hline(F,Lo,css('--coral'),[8,6],'LCL = '+Lo.toFixed(4));
+  F.g.strokeStyle=css('--blue');F.g.lineWidth=3;F.g.beginPath();pts.forEach((v,i)=>{const X=F.X(i+1),Y=F.Y(v);i?F.g.lineTo(X,Y):F.g.moveTo(X,Y)});F.g.stroke();
+  pts.forEach((v,i)=>{const o=v>U||v<Lo;dot(F,i+1,v,o?css('--sun'):css('--blue'),o?9:6);if(o){F.g.strokeStyle=css('--fg');F.g.lineWidth=2;F.g.beginPath();F.g.arc(F.X(i+1),F.Y(v),9,0,7);F.g.stroke()}});
+  const book=Math.abs(m-1.5)<1e-9&&Math.abs(s-0.15)<1e-9&&n===5&&Math.abs(L-3)<1e-9;
+  $('lMsg').textContent=`σx̄ = ${s.toFixed(2)}/√${n} = ${sx.toFixed(4)}, so UCL = ${m.toFixed(2)} + ${L.toFixed(2)}(${sx.toFixed(4)}) = ${U.toFixed(4)} and LCL = ${Lo.toFixed(4)}. `+(book?'The book rounds σx̄ to 0.0671 and gets 1.7013 and 1.2987, its three-sigma limits. ':'')+(lShifted?`From sample 13 the mean moved up by 1.5σ to ${(m+1.5*s).toFixed(3)} (shaded). `+(pts.slice(12).some(v=>v>U)?'The chart caught it: a point plotted above the UCL. Now follow the OCAP and find the cause.':'No point is outside yet. Try a larger n or press New samples.'):(out?'A point is outside even with no assignable cause: a false alarm. With 3σ limits that happens about once in 370 samples.':'All points plot inside the limits with no pattern, so the process is considered in control.'));
+}
+['lm','ls','ln','lL'].forEach(id=>$(id).addEventListener('input',limits));
+$('lShift').onclick=()=>{lShifted=!lShifted;$('lShift').classList.toggle('on',lShifted);$('lShift').textContent=lShifted?'Remove the shift':'Add a shift at sample 13';limits()};
+$('lNew').onclick=()=>{lSeed=Math.floor(Math.random()*1e9);limits()};limits();onTheme(limits);
+
+/* 3. ARL0 */
+let aRuns=[];
+function arl(){
+  const L=+$('aL').value,h=+$('ah').value;$('aLV').textContent=L.toFixed(2);$('ahV').textContent=h;
+  const a=2*upper(L),R=1/a,p10=Math.floor(Math.log(0.9)/Math.log(1-a)),p50=Math.floor(Math.log(0.5)/Math.log(1-a));
+  $('aA').textContent=a<0.001?a.toFixed(5):a.toFixed(4);$('aR').textContent=R<100?R.toFixed(1):Math.round(R).toLocaleString();
+  const ats=R*h;$('aT').textContent=ats<48?ats.toFixed(1)+' h':(ats/24).toFixed(1)+' days';$('aP').textContent=p10+' / '+p50;
+  const F=frame($('aCanvas'),{xmin:0.5,xmax:40.5,ymax:Math.max(R*2.2,...aRuns.length?aRuns:[1])*1.05,yt:ticks(0,Math.max(R*2.2,...aRuns.length?aRuns:[1]),5),xt:[1,10,20,30,40],xl:'Simulated run number',yfmt:v=>Math.round(v)});
+  if(aRuns.length){const w=(F.X(1)-F.X(0))*0.7;aRuns.forEach((v,i)=>{const y=F.Y(v);F.g.fillStyle=css('--violet');F.g.fillRect(F.X(i+1)-w/2,y,w,F.Y(0)-y)});
+    const mean=aRuns.reduce((x,y)=>x+y,0)/aRuns.length;hline(F,mean,css('--sun'),[8,6],'average of these 40 = '+Math.round(mean))}
+  hline(F,R,css('--fg'),[3,4],'ARL₀ = '+(R<100?R.toFixed(1):Math.round(R)),'l');
+  $('aMsg').textContent=`With ${L.toFixed(2)}σ limits, α = ${a.toFixed(4)}, so on average one false alarm every ${R<100?R.toFixed(1):Math.round(R)} samples`+(h?`, that is every ${ats<48?ats.toFixed(1)+' hours':(ats/24).toFixed(1)+' days'} when sampling every ${h} h. `:'. ')+`The run length is geometric and very skewed: 10% of runs end by sample ${p10} and half by sample ${p50}. `+(Math.abs(L-3)<0.005?'The book: ARL₀ = 1/0.0027 = 370, percentiles 38 and 256.':'')+(aRuns.length?' The bars show how much single runs differ from the average.':' Press the button to see real runs.');
+}
+$('aSim').onclick=()=>{const L=+$('aL').value,r=rng(Math.floor(Math.random()*1e9));aRuns=[];for(let k=0;k<40;k++){let t=0;do{t++}while(Math.abs(gauss(r))<=L&&t<20000);aRuns.push(t)}arl()};
+$('aL').addEventListener('input',()=>{aRuns=[];arl()});$('ah').addEventListener('input',arl);
+document.querySelectorAll('#arl [data-L]').forEach(b=>b.onclick=()=>{$('aL').value=b.dataset.L;aRuns=[];arl()});arl();onTheme(arl);
+
+/* 4. OC curve and ARL1 */
+const betaOf=(mu1,n)=>{const d=(mu1-1.5)/0.15*Math.sqrt(n);return Phi(3-d)-Phi(-3-d)};
+function oc(){
+  const m1=+$('oM').value,n=+$('oN').value,h=+$('oH').value;$('oMV').textContent=m1.toFixed(3);$('oNV').textContent=n;$('oHV').textContent=h;
+  const b=betaOf(m1,n),p=1-b,A=1/p,T=A*h;
+  $('oB').textContent=b.toFixed(3);$('oP').textContent=p.toFixed(3);$('oA').textContent=A>1000?Math.round(A).toLocaleString():A.toFixed(2);$('oT').textContent=T>1000?Math.round(T).toLocaleString():T.toFixed(2);
+  const F=frame($('oCanvas'),{xmin:1.5,xmax:1.875,ymax:1.05,yt:[0,0.2,0.4,0.6,0.8,1],xt:[1.5,1.575,1.65,1.725,1.8,1.875],xl:'Process mean (microns)',yfmt:v=>v.toFixed(1),xfmt:v=>v.toFixed(3)});
+  const curve=(nn,col,w)=>{F.g.strokeStyle=col;F.g.lineWidth=w;F.g.beginPath();for(let x=1.5;x<=1.8751;x+=0.0025){const X=F.X(x),Y=F.Y(betaOf(x,nn));x===1.5?F.g.moveTo(X,Y):F.g.lineTo(X,Y)}F.g.stroke()};
+  [[5,'--teal',4.04],[10,'--violet',3],[15,'--gold',1.96]].forEach(([nn,c,k])=>{curve(nn,css(c),2.5);const xl=1.5+0.15*k/Math.sqrt(nn);F.g.fillStyle=css(c);F.g.font='800 14px Nunito,sans-serif';F.g.textAlign='left';F.g.fillText('n = '+nn,F.X(xl)+8,F.Y(betaOf(xl,nn))-4)});
+  if(![5,10,15].includes(n))curve(n,css('--blue'),4);
+  F.g.strokeStyle=css('--fg');F.g.setLineDash([5,5]);F.g.lineWidth=1.5;F.g.beginPath();F.g.moveTo(F.X(m1),F.T);F.g.lineTo(F.X(m1),F.Y(0));F.g.stroke();F.g.setLineDash([]);
+  dot(F,m1,b,css('--sun'),9);F.g.strokeStyle=css('--fg');F.g.lineWidth=2;F.g.beginPath();F.g.arc(F.X(m1),F.Y(b),9,0,7);F.g.stroke();
+  const d=(m1-1.5)/0.15;
+  $('oMsg').textContent=`A shift of ${d.toFixed(2)}σ with n = ${n}: β = Φ(3 − ${(d*Math.sqrt(n)).toFixed(2)}) − Φ(−3 − ${(d*Math.sqrt(n)).toFixed(2)}) = ${b.toFixed(3)}, so p = ${p.toFixed(3)}. On average the chart needs ${A.toFixed(2)} samples, about ${T.toFixed(2)} hours, to signal. `+(n===10&&Math.abs(m1-1.725)<1e-9?'The book reads β ≈ 0.1 off Figure 5.9 for n = 10 (ARL₁ = 1.11); the exact value is smaller.':'');
+}
+['oM','oN','oH'].forEach(id=>$(id).addEventListener('input',oc));
+document.querySelectorAll('#oc [data-d]').forEach(b=>b.onclick=()=>{const [n,h]=b.dataset.d.split(',');$('oN').value=n;$('oH').value=h;$('oM').value=1.725;oc()});oc();onTheme(oc);
+
+/* 5. Western Electric rules */
+function weFlags(z){
+  const f=z.map(()=>new Set());
+  for(let i=0;i<z.length;i++){
+    if(Math.abs(z[i])>3)f[i].add(1);
+    for(const sg of [1,-1]){
+      if(i>=2){const w=[i-2,i-1,i].filter(j=>sg*z[j]>2);if(w.length>=2&&sg*z[i]>2)w.forEach(j=>f[j].add(2))}
+      if(i>=4){const w=[i-4,i-3,i-2,i-1,i].filter(j=>sg*z[j]>1);if(w.length>=4&&sg*z[i]>1)w.forEach(j=>f[j].add(3))}
+      if(i>=7){let ok=true;for(let j=i-7;j<=i;j++)if(!(sg*z[j]>0)){ok=false;break}if(ok)for(let j=i-7;j<=i;j++)f[j].add(4)}
+    }
+  }
+  return f;
+}
+let rPat='none',rSeed=11;
+const BOOK515=[-2.2,1.3,1.1,-1.9,0.2,-1.5,-0.4,0.6,1.2,1.6,2.1,1.4];
+function rules(){
+  document.querySelectorAll('#rBtns .btn').forEach(b=>b.classList.toggle('on',b.dataset.p===rPat));
+  let z;
+  if(rPat==='book')z=BOOK515.slice();
+  else{const r=rng(rSeed);z=[];for(let i=0;i<25;i++){let mu=0;if(rPat==='shift'&&i>=10)mu=1;if(rPat==='trend')mu=i*0.09;if(rPat==='cycle')mu=1.6*Math.sin(i*2*Math.PI/8);z.push(mu+gauss(r))}}
+  const f=weFlags(z),n=z.length,ymax=Math.max(4,...z.map(Math.abs))+0.3;
+  const F=frame($('rCanvas'),{xmin:0.5,xmax:n+0.5,ymin:-ymax,ymax,yt:[-3,-2,-1,0,1,2,3],xt:n>12?[1,5,10,15,20,25]:[1,2,3,4,5,6,7,8,9,10,11,12],xl:'Sample number',yfmt:v=>v===0?'CL':(v>0?'+':'−')+Math.abs(v)+'σ'});
+  const band=(a,b,c)=>{F.g.fillStyle=c;F.g.globalAlpha=.35;F.g.fillRect(F.L,F.Y(b),F.W-F.R-F.L,F.Y(a)-F.Y(b));F.g.globalAlpha=1};
+  band(2,3,css('--coral'));band(-3,-2,css('--coral'));band(1,2,css('--sun'));band(-2,-1,css('--sun'));band(-1,1,css('--sky'));
+  F.g.fillStyle=css('--fg');F.g.font='800 13px Nunito,sans-serif';F.g.textAlign='right';
+  [['A',2.5],['B',1.5],['C',0.5],['C',-0.5],['B',-1.5],['A',-2.5]].forEach(([t,y])=>F.g.fillText('Zone '+t,F.W-F.R-6,F.Y(y)+5));
+  hline(F,3,css('--coral'),[8,6]);hline(F,-3,css('--coral'),[8,6]);hline(F,0,css('--fg'),[]);
+  F.g.strokeStyle=css('--blue');F.g.lineWidth=3;F.g.beginPath();z.forEach((v,i)=>{const X=F.X(i+1),Y=F.Y(v);i?F.g.lineTo(X,Y):F.g.moveTo(X,Y)});F.g.stroke();
+  const col={1:'--coral',2:'--violet',3:'--teal',4:'--gold'};
+  z.forEach((v,i)=>{const s=[...f[i]];if(s.length){dot(F,i+1,v,css(col[Math.min(...s)]),9);F.g.strokeStyle=css('--fg');F.g.lineWidth=2;F.g.beginPath();F.g.arc(F.X(i+1),F.Y(v),9,0,7);F.g.stroke()}else dot(F,i+1,v,css('--blue'),6)});
+  const fired=[1,2,3,4].filter(k=>f.some(s=>s.has(k)));
+  const names={1:'Rule 1: beyond 3σ',2:'Rule 2: 2 of 3 beyond 2σ',3:'Rule 3: 4 of 5 beyond 1σ',4:'Rule 4: 8 in a row on one side'};
+  $('rTags').innerHTML=fired.length?fired.map(k=>`<span class="tag r${k}">${names[k]}</span>`).join(''):'<span class="tag ok">No rule fired</span>';
+  const msgs={none:'An in-control process. Most of the time nothing fires; now and then a rule fires by chance. That is the price of sensitivity (see the next activity).',
+    shift:'From sample 11 the mean is 1σ higher. Rule 1 often misses a shift this small, but rules 3 and 4 tend to catch it.',
+    trend:'A slow upward drift, like tool wear. Watch rules 2 to 4 fire on the later points.',
+    cycle:'A cyclic pattern, like operator fatigue or temperature swings (Figure 5.13). Points can stay inside the limits but still form a clear pattern.',
+    book:'These 12 points follow the pattern of Figure 5.15. The last four sit at 1σ or beyond (zone B or farther out), so rule 3 fires: four of five consecutive points beyond one sigma.'};
+  $('rMsg').textContent=msgs[rPat];
+}
+document.querySelectorAll('#rBtns .btn').forEach(b=>b.onclick=()=>{rPat=b.dataset.p;rules()});
+$('rNew').onclick=()=>{if(rPat==='book')rPat='none';rSeed=Math.floor(Math.random()*1e9);rules()};rules();onTheme(rules);
+
+/* 6. equation 5.4 and simulation */
+const AL=[['Rule 1: one point beyond 3σ',0.0027,true],['Rule 2: 2 of 3 beyond 2σ (one side)',0.0030,false],['Rule 3: 4 of 5 beyond 1σ (one side)',0.0055,false],['Rule 4: 8 in a row on one side',0.0078,false]];
+$('alChecks').innerHTML=AL.map((r,i)=>`<label><input type="checkbox" id="alc${i}" ${r[2]?'checked':''}> ${r[0]}, αᵢ = <input type="number" id="ala${i}" step="0.0001" min="0" max="0.2" value="${r[1]}"></label>`).join('');
+function alarms(){
+  let prod=1,k=0;AL.forEach((_,i)=>{if($('alc'+i).checked){const a=Math.max(0,Math.min(0.5,parseFloat($('ala'+i).value)||0));prod*=1-a;k++}});
+  const a=1-prod;$('alA').textContent=a.toFixed(4);$('alR').textContent=a>0?Math.round(1/a).toLocaleString():'∞';$('alK').textContent=k;
+  $('alMsg').textContent=k?`α = 1 − ${AL.map((_,i)=>$('alc'+i).checked?'(1 − '+(parseFloat($('ala'+i).value)||0)+')':null).filter(Boolean).join('')} = ${a.toFixed(4)}. `+(k>1?'Each added rule raises the false alarm rate. The book warns that the rules are not independent, so Equation 5.4 is only an approximation; the simulation on the right counts alarms directly.':'One rule alone: the familiar 0.0027 and ARL₀ = 370.'):'Tick at least one rule.';
+}
+AL.forEach((_,i)=>{$('alc'+i).addEventListener('change',alarms);$('ala'+i).addEventListener('input',alarms)});alarms();
+function simARL(all){const r=rng(Math.floor(Math.random()*1e9));let tot=0;const N=1000;
+  for(let k=0;k<N;k++){const z=[];let t=0,stop=false;
+    while(!stop&&t<20000){const v=gauss(r);z.push(v);t++;const i=z.length-1;
+      if(Math.abs(v)>3)stop=true;
+      else if(all){for(const sg of [1,-1]){
+        if(i>=2&&sg*v>2&&[i-2,i-1,i].filter(j=>sg*z[j]>2).length>=2)stop=true;
+        if(i>=4&&sg*v>1&&[i-4,i-3,i-2,i-1,i].filter(j=>sg*z[j]>1).length>=4)stop=true;
+        if(i>=7){let ok=true;for(let j=i-7;j<=i;j++)if(!(sg*z[j]>0)){ok=false;break}if(ok)stop=true}}}
+      if(z.length>16)z.shift();}
+    tot+=t}
+  return tot/N}
+$('alSim1').onclick=()=>{const v=simARL(false);$('alS1').textContent=v.toFixed(0);$('alSimMsg').textContent=`Simulated ARL₀ with 3σ limits only: ${v.toFixed(0)}. Random runs, so expect a value near 370, give or take about 12.`};
+$('alSim4').onclick=()=>{const v=simARL(true);$('alS4').textContent=v.toFixed(1);$('alRatio').textContent=(1000/v).toFixed(1);$('alSimMsg').textContent=`With all four Western Electric rules: ARL₀ ≈ ${v.toFixed(1)}. Champ and Woodall (1987) found 91.25: about four times as many false alarms as 3σ limits alone. Good for phase I; in phase II the book suggests CUSUM or EWMA charts (Chapter 9) instead.`};
+
+/* 7. Pareto */
+const TANK=[['Parts damaged',34,300],['Machining problems',29,150],['Supplied parts rusted',13,80],['Masking insufficient',17,50],['Misaligned weld',2,900],['Processing out of order',4,60],['Wrong part issued',3,120],['Unfinished fairing',3,100],['Adhesive failure',6,400],['Powdery alodine',1,60],['Paint out of limits',2,70],['Paint damaged by etching',1,70],['Film on parts',5,40],['Primer cans damaged',1,20],['Voids in casting',2,8000],['Delaminated composite',2,1500],['Incorrect dimensions',36,200],['Improper test procedure',1,200],['Salt-spray failure',4,600]];
+let pSorted=false,pCumOn=false,pCostOn=false;
+function pareto(){
+  $('pSort').classList.toggle('on',pSorted);$('pCum').classList.toggle('on',pCumOn);$('pCost').classList.toggle('on',pCostOn);
+  let d=TANK.map(([n,c,w])=>({n,v:pCostOn?c*w:c,c}));if(pSorted)d.sort((a,b)=>b.v-a.v);
+  const tot=d.reduce((a,b)=>a+b.v,0),ymax=Math.max(...d.map(x=>x.v))*1.15;
+  $('pTitle').textContent=(pCostOn?'Defect cost ($)':'Defect counts')+(pSorted?' sorted, Pareto chart':' (check sheet order)');
+  const F=frame($('pCanvas'),{xmin:-0.5,xmax:d.length-0.5,ymax,yt:ticks(0,ymax,5),xt:[],B:150,L:70,R:pCumOn?52:20,yfmt:v=>pCostOn?(v>=1000?(v/1000)+'k':v):v});
+  const w=(F.X(1)-F.X(0))*0.72;
+  d.forEach((x,i)=>{const y=F.Y(x.v);F.g.fillStyle=x.n==='Voids in casting'?css('--coral'):css('--blue');F.g.fillRect(F.X(i)-w/2,y,w,F.Y(0)-y);
+    F.g.save();F.g.translate(F.X(i)+5,F.Y(0)+8);F.g.rotate(-Math.PI/2.6);F.g.fillStyle=css('--fg');F.g.font='600 14px "Source Sans 3",sans-serif';F.g.textAlign='right';F.g.fillText(x.n,0,0);F.g.restore();
+    if(!pCostOn){F.g.fillStyle=css('--fg');F.g.font='800 13px Nunito,sans-serif';F.g.textAlign='center';F.g.fillText(x.v,F.X(i),y-5)}});
+  if(pCumOn){let c=0;F.g.strokeStyle=css('--sun');F.g.lineWidth=3.5;F.g.beginPath();d.forEach((x,i)=>{c+=x.v;const Y=F.T+(1-c/tot)*(F.Y(0)-F.T);i?F.g.lineTo(F.X(i),Y):F.g.moveTo(F.X(i),Y)});F.g.stroke();
+    c=0;d.forEach((x,i)=>{c+=x.v;const Y=F.T+(1-c/tot)*(F.Y(0)-F.T);F.g.fillStyle=css('--sun');F.g.beginPath();F.g.arc(F.X(i),Y,4.5,0,7);F.g.fill()});
+    F.g.fillStyle=css('--muted');F.g.font='600 15px "Source Sans 3",sans-serif';F.g.textAlign='left';[0,50,100].forEach(p=>F.g.fillText(p+'%',F.W-F.R+6,F.T+(1-p/100)*(F.Y(0)-F.T)+5))}
+  const s=d.slice().sort((a,b)=>b.v-a.v),t3=s.slice(0,3).reduce((a,b)=>a+b.v,0)/tot,t5=s.slice(0,5).reduce((a,b)=>a+b.v,0)/tot,vo=d.find(x=>x.n==='Voids in casting').v/tot;
+  $('pTop3').textContent=(100*t3).toFixed(1)+'%';$('pTop5').textContent=(100*t5).toFixed(1)+'%';$('pVoid').textContent=(100*vo).toFixed(1)+'%';
+  $('pMsg').textContent=pCostOn?`Weighted by cost, voids in casting (red) jump to the top: only 2 defects, but each can scrap a tank. The book: a Pareto chart shows the most frequent defects, not always the most important, so pair it with a cost Pareto chart. Cost figures are for teaching only.`:
+    `166 defects in 19 categories. The top three (incorrect dimensions 36, parts damaged 34, machining 29) make up 99/166 = ${(100*t3).toFixed(1)}% of all defects: attack these first. Voids in casting are only 2/166 = 1.2% (red). Turn on cost weights to see why that can mislead.`;
+}
+$('pSort').onclick=()=>{pSorted=!pSorted;pareto()};$('pCum').onclick=()=>{pCumOn=!pCumOn;pareto()};$('pCost').onclick=()=>{pCostOn=!pCostOn;pareto()};pareto();onTheme(pareto);
+
+/* 8. scatter */
+const SR=rng(522),SD=[];for(let i=0;i<30;i++){const T=SR();const fl=4+26*T+2.2*gauss(SR);const rc=72+24*T+2.0*gauss(SR);SD.push({T,x:Math.max(1,Math.min(34,fl)),y:Math.max(66,Math.min(99,rc))})}
+const DOE=[];[[0.2],[0.5],[0.85]].forEach(([T])=>[8,18,28].forEach(x=>DOE.push({T,x,y:72+24*T+1.2*gauss(SR)})));
+let sMode='raw';
+function corr(d){const n=d.length,mx=d.reduce((a,b)=>a+b.x,0)/n,my=d.reduce((a,b)=>a+b.y,0)/n;let sxy=0,sxx=0,syy=0;d.forEach(p=>{sxy+=(p.x-mx)*(p.y-my);sxx+=(p.x-mx)**2;syy+=(p.y-my)**2});return {r:sxy/Math.sqrt(sxx*syy),b:sxy/sxx,mx,my}}
+function scatter(){
+  document.querySelectorAll('#sBtns .btn').forEach(b=>b.classList.toggle('on',b.dataset.s===sMode));
+  const d=sMode==='doe'?DOE:SD,c=corr(d);
+  const F=frame($('sCanvas'),{xmin:0,xmax:35,ymin:65,ymax:100,yt:[70,80,90,100],xt:[0,5,10,15,20,25,30,35],xl:'Reclaim flux (lb)'});
+  const tc=T=>T<0.4?css('--teal'):T<0.7?css('--sun'):css('--coral');
+  if(sMode!=='doe'){F.g.strokeStyle=css('--muted');F.g.lineWidth=2;F.g.setLineDash([6,6]);F.g.beginPath();F.g.moveTo(F.X(2),F.Y(c.my+c.b*(2-c.mx)));F.g.lineTo(F.X(33),F.Y(c.my+c.b*(33-c.mx)));F.g.stroke();F.g.setLineDash([])}
+  else{[0.2,0.5,0.85].forEach(T=>{const g=DOE.filter(p=>p.T===T),m=g.reduce((a,b)=>a+b.y,0)/g.length;F.g.strokeStyle=tc(T);F.g.lineWidth=3;F.g.beginPath();F.g.moveTo(F.X(6),F.Y(m));F.g.lineTo(F.X(30),F.Y(m));F.g.stroke()})}
+  d.forEach(p=>dot(F,p.x,p.y,sMode==='raw'?css('--blue'):tc(p.T),7));
+  if(sMode!=='raw'){F.g.font='800 14px Nunito,sans-serif';F.g.textAlign='left';[['low temperature','--teal'],['medium','--sun'],['high temperature','--coral']].forEach(([t,k],i)=>{F.g.fillStyle=css(k);F.g.fillRect(F.L+10,F.T+6+i*22,14,14);F.g.fillStyle=css('--fg');F.g.fillText(t,F.L+30,F.T+18+i*22)})}
+  let within=null;if(sMode==='doe'){within=[0.2,0.5,0.85].map(T=>corr(DOE.filter(p=>p.T===T)).b)}
+  $('sR').textContent=c.r.toFixed(2);$('sSlope').textContent=(sMode==='doe'?(within.reduce((a,b)=>a+b,0)/3):c.b).toFixed(2);$('sN').textContent=d.length;
+  $('sMsg').textContent=sMode==='raw'?`Strong positive correlation (r = ${c.r.toFixed(2)}): as flux goes up, recovery goes up, about ${c.b.toFixed(2)}% per lb. Tempting to say "add flux to raise recovery". The book warns that correlation does not necessarily imply causality.`:
+    sMode==='temp'?'Colored by metal temperature: hot pours (red) get more flux and also recover more metal. Temperature could be driving both. Inside one color the flux effect is much weaker.':
+    `A designed experiment: at each fixed temperature, flux is set to 8, 18 and 28 lb. Recovery barely changes with flux (average slope ${(within.reduce((a,b)=>a+b,0)/3).toFixed(2)}% per lb) but moves a lot with temperature. In these teaching data, flux does not cause the higher recovery. Only an experiment can show cause and effect.`;
+}
+document.querySelectorAll('#sBtns .btn').forEach(b=>b.onclick=()=>{sMode=b.dataset.s;scatter()});scatter();onTheme(scatter);
+
+/* quiz */
+const Q=[
+ ['Shewhart called the natural background variability of a process a "stable system of…"',['assignable causes','chance causes','special causes','control limits'],1,'Chance causes (today often called common causes). A process with only chance causes is in statistical control.'],
+ ['With three-sigma limits and normal data, the probability of a false alarm on one sample is…',['0.0013','0.0027','0.05','0.27'],1,'α = 2 × 0.00135 = 0.0027: about 27 false alarms in 10,000 points.'],
+ ['The in-control ARL of a Shewhart chart with three-sigma limits is about…',['27','100','370','1,000'],2,'ARL₀ = 1/p = 1/0.0027 ≈ 370 samples.'],
+ ['After a shift, each sample signals with probability p = 0.5. What is ARL₁?',['0.5','1','2','5'],2,'ARL₁ = 1/p = 1/0.5 = 2 samples.'],
+ ['Moving the control limits farther from the center line…',['raises type I and type II risk','lowers type I risk but raises type II risk','raises type I risk but lowers type II risk','changes nothing'],1,'Wider limits mean fewer false alarms but more missed shifts (Section 5.3.2).'],
+ ['Rational subgroups should be chosen so that differences due to assignable causes are…',['maximized within and minimized between subgroups','minimized within and maximized between subgroups','equal within and between','ignored'],1,'Section 5.3.4: maximize the chance for differences between subgroups, minimize it within.'],
+ ['Four of five consecutive points beyond one sigma on the same side breaks which Western Electric rule?',['Rule 1','Rule 2','Rule 3','Rule 4'],2,'Rule 3. Figure 5.15 shows this violation in its last four points.'],
+ ['Using all four Western Electric rules at once makes the in-control ARL about…',['370','200','91','1,000'],2,'Champ and Woodall (1987): 91.25, so about four times as many false alarms.'],
+ ['In phase I of control chart use, you mainly…',['monitor a stable process for small shifts','analyze past data to set trial limits and bring the process into control','compute process capability only','apply CUSUM charts'],1,'Phase I is a retrospective analysis; phase II monitors the process with the limits found.'],
+ ['A scatter diagram shows a strong positive correlation between flux and recovery. What can you conclude?',['Flux causes higher recovery','There may be a relationship; a designed experiment is needed to show cause','The data are wrong','Recovery causes flux'],1,'Correlation does not necessarily imply causality (Section 5.4, Figure 5.22).']
+];
+let qi=0,qs=0;
+function stars(){$('qStars').innerHTML=Q.map((_,i)=>'<span'+(i<qs?' class="on"':'')+'>★</span>').join('')}
+function qShow(){stars();$('qNext').hidden=true;$('qAgain').hidden=true;const box=$('qBox');box.innerHTML='';
+  if(qi>=Q.length){const f=document.createElement('div');f.className='feedback';f.textContent=`You earned ${qs} of ${Q.length} stars. `+(qs>=9?'Excellent, you own Chapter 5.':qs>=7?'Strong work. Review the ones you missed.':'Revisit the activities above, then try again.');box.appendChild(f);$('qAgain').hidden=false;return}
+  const [q,o,a,w]=Q[qi];const h=document.createElement('div');h.className='qcard';h.innerHTML='<div class="sec"></div><div class="tx"></div><div class="opts"></div><div class="why" hidden></div>';
+  h.querySelector('.sec').textContent='Question '+(qi+1)+' of '+Q.length;h.querySelector('.tx').textContent=q;
+  o.forEach((t,i)=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=t;b.onclick=()=>{if(h.dataset.done)return;h.dataset.done=1;
+    if(i===a){b.classList.add('right');qs++}else{b.classList.add('wrong');h.querySelectorAll('.opt')[a].classList.add('right')}
+    const wy=h.querySelector('.why');wy.hidden=false;wy.textContent=w;stars();qi++;$('qNext').hidden=false;$('qNext').textContent=qi>=Q.length?'See my stars':'Next question'};h.querySelector('.opts').appendChild(b)});
+  box.appendChild(h)}
+$('qNext').onclick=qShow;$('qAgain').onclick=()=>{qi=0;qs=0;qShow()};qShow();
+
+function jump(){const id=location.hash.slice(1);const el=id&&document.getElementById(id);if(el&&el.classList.contains('station')){el.scrollIntoView({behavior:'smooth',block:'start'});el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}}
+addEventListener('hashchange',jump);setTimeout(jump,300);
+})();
+</script>
+
+
+</body></html>

@@ -1,0 +1,426 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>IE454 Chapter 1 Quality Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: sticky header, hero with part chips, then one rounded "station" per activity (scene banner + interactive body), star quiz last */
+:root{
+  --bg:#F3F8FE; --surface:#FFFFFF; --soft:#E8F2FC; --fg:#15233A; --muted:#55657E; --line:#D5E3F2;
+  --blue:#0070C0; --blue-ink:#FFFFFF; --sky:#DCEBFA; --sun:#FFC83D; --sun-ink:#3A2B00;
+  --coral:#FF6B5B; --mint:#1FA874; --violet:#7C5CFF; --teal:#12A5B8;
+  --ok-bg:#DDF6EA; --ok-fg:#0F6B47; --bad-bg:#FFE3DF; --bad-fg:#A3271B;
+  --display:"Nunito",ui-rounded,system-ui,sans-serif; --body:"Source Sans 3",system-ui,sans-serif;
+  --r:22px; --shadow:0 6px 22px rgba(0,60,120,.10);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1626; --surface:#162238; --soft:#1C2C47; --fg:#EAF1FB; --muted:#A7B6CC; --line:#2A3C5C;
+  --blue:#3FA2F0; --blue-ink:#06192C; --sky:#1D3352; --sun:#FFD15C; --sun-ink:#2E2200;
+  --coral:#FF8576; --mint:#3CCB93; --violet:#9C84FF; --teal:#3CC4D6;
+  --ok-bg:#123D2E; --ok-fg:#7FE3B5; --bad-bg:#4A1E1A; --bad-fg:#FFB0A5; --shadow:0 6px 22px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1626; --surface:#162238; --soft:#1C2C47; --fg:#EAF1FB; --muted:#A7B6CC; --line:#2A3C5C;
+  --blue:#3FA2F0; --blue-ink:#06192C; --sky:#1D3352; --sun:#FFD15C; --sun-ink:#2E2200;
+  --coral:#FF8576; --mint:#3CCB93; --violet:#9C84FF; --teal:#3CC4D6;
+  --ok-bg:#123D2E; --ok-fg:#7FE3B5; --bad-bg:#4A1E1A; --bad-fg:#FFB0A5; --shadow:0 6px 22px rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.55}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--blue);color:var(--blue-ink);padding:10px 16px}
+.top p{margin:0 auto;max-width:1120px;font-family:var(--display);font-weight:800;font-size:clamp(13px,1.7vw,16px)}
+.top .dot{opacity:.7;margin:0 .35em}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:24px 70px;display:flex;flex-direction:column;gap:28px}
+.hero{background:var(--surface);border-radius:32px;padding:clamp(20px,4vw,40px);box-shadow:var(--shadow);display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:center}
+@media (max-width:820px){.hero{grid-template-columns:1fr}}
+.hero h1{font-size:clamp(28px,4.4vw,46px);font-weight:900;color:var(--blue)}
+.hero .big{font-size:clamp(17px,2vw,20px);margin:12px 0 0;max-width:56ch}
+.hero .quote{margin-top:14px;padding:14px 18px;background:var(--sky);border-radius:18px;font-style:italic}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{display:inline-flex;gap:6px;align-items:center;padding:7px 14px;border-radius:99px;font-family:var(--display);font-weight:800;font-size:14px;text-decoration:none;color:var(--fg);background:var(--soft);border:2px solid transparent}
+.chip:hover{border-color:var(--blue)}
+.chip i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.heroart{width:100%;max-width:420px;justify-self:center}
+.station{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;scroll-margin-top:70px}
+.station.flash{animation:flash 1.6s ease-out 1}
+@keyframes flash{0%{box-shadow:0 0 0 6px var(--sun)}100%{box-shadow:var(--shadow)}}
+.scene{display:flex;gap:18px;align-items:center;padding:18px 22px;color:#fff}
+.scene svg.ico{width:64px;height:64px;flex:none;background:rgba(255,255,255,.22);border-radius:20px;padding:10px}
+.scene .lbl{font-family:var(--display);font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
+.scene h2{font-size:clamp(21px,2.6vw,28px);font-weight:900;color:#fff}
+.scene p{margin:2px 0 0;font-size:15px;opacity:.95}
+.body{padding:20px 22px 24px;display:flex;flex-direction:column;gap:14px}
+.body > p{margin:0;max-width:75ch}
+.sec{font-size:13px;color:var(--muted);font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.panel{background:var(--soft);border-radius:18px;padding:14px 16px;min-width:0}
+.panel h3{font-size:17px;font-weight:800;margin-bottom:8px}
+label.sl{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:600;margin-top:6px}
+input[type=range]{width:100%;accent-color:var(--blue)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.stat{background:var(--surface);border-radius:14px;padding:8px 10px}
+.stat b{display:block;font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
+.stat small{font-size:12px;color:var(--muted)}
+canvas{width:100%;height:auto;display:block;border-radius:16px;background:var(--surface)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.qcard{background:var(--soft);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.qcard .tx{font-weight:600}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{border:2px solid var(--line);background:var(--surface);color:var(--fg);border-radius:99px;padding:5px 12px;font-size:14px;font-weight:700}
+.opt:hover{border-color:var(--blue)}
+.opt.right{background:var(--ok-bg);color:var(--ok-fg);border-color:var(--ok-fg)}
+.opt.wrong{background:var(--bad-bg);color:var(--bad-fg);border-color:var(--bad-fg)}
+.why{font-size:14px;color:var(--muted)}
+.score{font-family:var(--display);font-weight:800;padding:8px 14px;border-radius:99px;background:var(--sky);align-self:flex-start}
+.btn{border:0;border-radius:99px;padding:9px 18px;font-family:var(--display);font-weight:800;background:var(--blue);color:var(--blue-ink)}
+.btn.alt{background:var(--soft);color:var(--fg)}
+.panel .btn.alt{background:var(--surface);border:2px solid var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.bars{display:flex;flex-direction:column;gap:8px}
+.bar{display:grid;grid-template-columns:150px 1fr 70px;gap:10px;align-items:center;font-size:14px}
+@media (max-width:520px){.bar{grid-template-columns:100px 1fr 60px}}
+.track{height:22px;border-radius:99px;background:var(--surface);overflow:hidden}
+.fill{height:100%;border-radius:99px;transition:width .4s}
+.num{font-family:var(--display);font-weight:800;font-variant-numeric:tabular-nums;text-align:right}
+.bins{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:760px){.bins{grid-template-columns:1fr 1fr}}
+.bin{border-radius:18px;padding:10px;min-height:120px;border:3px dashed transparent;display:flex;flex-direction:column;gap:6px;text-align:left;color:var(--fg)}
+.bin h3{font-size:15px}
+.bin.ready{border-color:var(--fg)}
+.pool{display:flex;flex-wrap:wrap;gap:8px}
+.tile{border:2px solid var(--line);background:var(--surface);color:var(--fg);border-radius:14px;padding:6px 12px;font-size:14px;font-weight:700}
+.tile.sel{border-color:var(--blue);background:var(--sky)}
+.tile.ok{border-color:var(--ok-fg);background:var(--ok-bg);color:var(--ok-fg)}
+.tile.no{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.steps{display:flex;flex-direction:column;gap:8px;counter-reset:s}
+.step{display:flex;gap:10px;align-items:center;background:var(--soft);border-radius:16px;padding:10px 14px;font-weight:600}
+.step .n{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:900;color:#fff}
+.stars{font-size:30px;letter-spacing:3px;color:var(--line)}
+.stars .on{color:var(--sun)}
+.quiz{display:flex;flex-direction:column;gap:12px}
+.feedback{font-family:var(--display);font-weight:800;font-size:18px}
+footer{color:var(--muted);font-size:13px;text-align:center}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Activities grouped by part: each part gets the accent color of its column on the slides' roadmap */
+.chips{flex-direction:column;align-items:flex-start;gap:8px}
+.chiprow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chiplbl{display:inline-block;min-width:64px;text-align:center;padding:7px 12px;border-radius:99px;background:var(--pc);color:#fff;font-family:var(--display);font-weight:900;font-size:13px;letter-spacing:.04em;text-transform:uppercase;text-decoration:none}
+.part{display:flex;flex-direction:column;gap:18px;border-left:7px solid var(--pc);padding-left:clamp(10px,2vw,20px);scroll-margin-top:70px}
+.parthead{display:flex;gap:14px;align-items:center}
+.parthead .pnum{flex:none;background:var(--pc);color:#fff;border-radius:16px;padding:10px 16px;font-family:var(--display);font-weight:900;font-size:clamp(16px,2vw,20px);letter-spacing:.04em;text-transform:uppercase}
+.parthead h2{font-size:clamp(22px,3vw,30px);font-weight:900;color:var(--fg)}
+.parthead p{margin:2px 0 0;color:var(--muted);font-weight:700;font-size:15px}
+.part .scene{background:var(--pc)}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <symbol id="i-gear" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M10.3 2h3.4l.5 2.6 1.9.8 2.2-1.5 2.4 2.4-1.5 2.2.8 1.9 2.6.5v3.4l-2.6.5-.8 1.9 1.5 2.2-2.4 2.4-2.2-1.5-1.9.8-.5 2.6h-3.4l-.5-2.6-1.9-.8-2.2 1.5-2.4-2.4 1.5-2.2-.8-1.9L2 13.7v-3.4l2.6-.5.8-1.9-1.5-2.2 2.4-2.4 2.2 1.5 1.9-.8z"/><circle cx="12" cy="12" r="3.4" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-lens" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M7 10l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 4v16h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M5 9h15M5 16h15" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 2"/><path d="M6 13l3-2 3 3 3-4 3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-burger" viewBox="0 0 24 24"><path d="M4 10a8 5 0 0 1 16 0z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3 13h18M4 16h16a0 0 0 0 1 0 0 3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3 13c2 1.6 4 1.6 6 0s4-1.6 6 0 4 1.6 6 0" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="i-coins" viewBox="0 0 24 24"><ellipse cx="9" cy="6" rx="6" ry="2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 6v4c0 1.4 2.7 2.6 6 2.6s6-1.2 6-2.6V6M3 10v4c0 1.4 2.7 2.6 6 2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><ellipse cx="16" cy="15" rx="5" ry="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M11 15v3.5c0 1.2 2.2 2.2 5 2.2s5-1 5-2.2V15" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-cycle" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-14 5.3M4 12a8 8 0 0 1 14-5.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18 2.5v4.2h-4.2M6 21.5v-4.2h4.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M3 15v-3l2.2-5h13.6L21 12v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3.5 12h17" stroke="currentColor" stroke-width="1.6"/><circle cx="7" cy="17" r="2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17" cy="17" r="2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+ </defs>
+</svg>
+
+<header class="top"><p><a href="../" style="color:inherit;text-decoration:none" title="All chapters">&larr; IE454 Quality Control</a><span class="dot">·</span>Chapter 1: Quality Improvement in the Modern Business Environment<span class="dot">·</span>Dr. Aseel Khanfar<span class="dot">·</span>Yarmouk University</p></header>
+
+<main class="wrap">
+<section class="hero">
+ <div>
+  <h1>Quality is the enemy of variability</h1>
+  <p class="big">Two factories can make the same part, both inside the specification, and one of them still loses far more money on repairs. This page lets you play with the ideas from Chapter 1 until that makes sense.</p>
+  <p class="quote">"Your customers don't see the mean of your process. They only see the variability around that target that you have not removed." Jack Welch, quoted in Montgomery, Section 1.1</p>
+  <nav class="chips" aria-label="Activities by part">
+  <div class="chiprow" style="--pc:#0070C0"><a class="chiplbl" href="#part1">Part 1</a><a class="chip" href="#dimensions"><i style="background:#0070C0"></i>8 dimensions</a><a class="chip" href="#gearbox"><i style="background:#0070C0"></i>Gearbox lab</a><a class="chip" href="#defects"><i style="background:#0070C0"></i>Defect or not?</a></div>
+  <div class="chiprow" style="--pc:#E8503F"><a class="chiplbl" href="#part3">Part 3</a><a class="chip" href="#tools"><i style="background:#E8503F"></i>Pick the tool</a></div>
+  <div class="chiprow" style="--pc:#7A5AF8"><a class="chiplbl" href="#part4">Part 4</a><a class="chip" href="#ninetynine"><i style="background:#7A5AF8"></i>Is 99% enough?</a><a class="chip" href="#costs"><i style="background:#7A5AF8"></i>Quality costs</a><a class="chip" href="#dmaic"><i style="background:#7A5AF8"></i>DMAIC order</a></div>
+  <div class="chiprow"><span class="chiplbl" style="background:var(--sun);color:var(--sun-ink)">Review</span><a class="chip" href="#quiz"><i style="background:var(--sun)"></i>Star quiz</a></div>
+  </nav>
+ </div>
+ <svg class="heroart" viewBox="0 0 400 260" role="img" aria-label="Two bell curves between LSL and USL: a wide one and a narrow one">
+  <rect x="0" y="0" width="400" height="260" rx="28" fill="var(--sky)"/>
+  <line x1="60" y1="40" x2="60" y2="215" stroke="var(--coral)" stroke-width="3" stroke-dasharray="6 5"/>
+  <line x1="340" y1="40" x2="340" y2="215" stroke="var(--coral)" stroke-width="3" stroke-dasharray="6 5"/>
+  <line x1="200" y1="30" x2="200" y2="215" stroke="var(--muted)" stroke-width="2" stroke-dasharray="3 4"/>
+  <path d="M40 215 C120 213 150 120 200 120 C250 120 280 213 360 215" fill="none" stroke="var(--blue)" stroke-width="5" stroke-linecap="round"/>
+  <path d="M140 215 C180 214 185 45 200 45 C215 45 220 214 260 215" fill="var(--sun)" fill-opacity=".55" stroke="var(--sun-ink)" stroke-width="3"/>
+  <line x1="30" y1="215" x2="370" y2="215" stroke="var(--fg)" stroke-width="2"/>
+  <text x="60" y="240" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="16" fill="var(--fg)">LSL</text>
+  <text x="200" y="240" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="16" fill="var(--fg)">Target</text>
+  <text x="340" y="240" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="16" fill="var(--fg)">USL</text>
+  <text x="72" y="100" font-family="Nunito,sans-serif" font-weight="800" font-size="15" fill="var(--blue)">wide spread</text>
+  <text x="222" y="60" font-family="Nunito,sans-serif" font-weight="800" font-size="15" fill="var(--fg)">narrow spread</text>
+ </svg>
+</section>
+
+<!-- Part 1: What is quality? -->
+<div class="part" id="part1" style="--pc:#0070C0">
+ <div class="parthead"><span class="pnum">Part 1</span><div><h2>What is quality?</h2><p>Section 1.1 · 3 activities</p></div></div>
+<!-- 1. Dimensions -->
+<section class="station" id="dimensions">
+ <div class="scene"><svg class="ico"><use href="#i-car"/></svg><div><div class="lbl">Part 1 · Activity 1 of 3 · Section 1.1.1 · Showroom scene</div><h2>Match the customer's question to the dimension</h2><p>You are buying a new car. Each question you ask is really about one of Garvin's eight dimensions of quality.</p></div></div>
+ <div class="body">
+  <p>Pick the dimension each question is about. You get instant feedback.</p>
+  <div class="cards" id="dimCards"></div>
+  <div class="score" id="dimScore">0 of 8 correct</div>
+ </div>
+</section>
+
+<!-- 2. Gearbox -->
+<section class="station" id="gearbox">
+ <div class="scene"><svg class="ico"><use href="#i-gear"/></svg><div><div class="lbl">Part 1 · Activity 2 of 3 · Section 1.1 · Transmission plant</div><h2>Gearbox tolerance lab</h2><p>A transmission shaft must be 25.00 mm, with limits 24.95 to 25.05 mm. Two plants make it. Both are "in spec". Who saves more money?</p></div></div>
+ <div class="body">
+  <p>Move the sliders. Spread is shown as 6σ, the width that holds almost all the shafts a plant makes. The warranty cost index uses a quadratic loss: cost grows with the square of the distance from target, so every bit of spread costs money even inside the limits.</p>
+  <canvas id="gbCanvas" width="1000" height="360" aria-label="Distributions of shaft diameter for two plants"></canvas>
+  <div class="grid2">
+   <div class="panel"><h3 style="color:var(--blue)">Plant A (wide spread)</h3>
+    <label class="sl" for="aSig">Spread (6σ) <span id="aSigV"></span></label><input type="range" id="aSig" min="0.01" max="0.16" step="0.005" value="0.075">
+    <label class="sl" for="aMu">Mean shift <span id="aMuV"></span></label><input type="range" id="aMu" min="-0.04" max="0.04" step="0.002" value="0">
+    <div class="stats"><div class="stat"><b id="aPct"></b><small>of tolerance used</small></div><div class="stat"><b id="aOut"></b><small>out of spec (ppm)</small></div><div class="stat"><b id="aLoss"></b><small>warranty cost index</small></div></div>
+   </div>
+   <div class="panel"><h3 style="color:var(--coral)">Plant B (narrow spread)</h3>
+    <label class="sl" for="bSig">Spread (6σ) <span id="bSigV"></span></label><input type="range" id="bSig" min="0.01" max="0.16" step="0.005" value="0.025">
+    <label class="sl" for="bMu">Mean shift <span id="bMuV"></span></label><input type="range" id="bMu" min="-0.04" max="0.04" step="0.002" value="0">
+    <div class="stats"><div class="stat"><b id="bPct"></b><small>of tolerance used</small></div><div class="stat"><b id="bOut"></b><small>out of spec (ppm)</small></div><div class="stat"><b id="bLoss"></b><small>warranty cost index</small></div></div>
+   </div>
+  </div>
+  <div class="row"><button class="btn alt" id="gbBook">Reset to the book's case (75% vs 25%)</button><span class="why" id="gbMsg"></span></div>
+ </div>
+</section>
+
+<!-- 3. Defects -->
+<section class="station" id="defects">
+ <div class="scene"><svg class="ico"><use href="#i-lens"/></svg><div><div class="lbl">Part 1 · Activity 3 of 3 · Section 1.1.2 · Inspection bench</div><h2>Defect detective</h2><p>Not every nonconforming item is defective. Decide what each inspector found.</p></div></div>
+ <div class="body">
+  <p><b>Conforming</b> meets every specification. <b>Nonconforming</b> fails at least one specification but can still be used safely. <b>Defective</b> has a nonconformity serious enough to affect safe or effective use.</p>
+  <div class="cards" id="defCards"></div>
+  <div class="score" id="defScore">0 of 6 correct</div>
+ </div>
+</section>
+</div>
+
+<!-- Part 3: Statistical methods -->
+<div class="part" id="part3" style="--pc:#E8503F">
+ <div class="parthead"><span class="pnum">Part 3</span><div><h2>Statistical methods</h2><p>Section 1.3 · 1 activity</p></div></div>
+<!-- 4. Tools -->
+<section class="station" id="tools">
+ <div class="scene"><svg class="ico"><use href="#i-chart"/></svg><div><div class="lbl">Part 3 · Activity 1 of 1 · Section 1.3 · Plant floor</div><h2>Pick the right statistical tool</h2><p>SPC watches a running process, designed experiments find which inputs matter, acceptance sampling decides about a lot.</p></div></div>
+ <div class="body">
+  <div class="cards" id="toolCards"></div>
+  <div class="score" id="toolScore">0 of 6 correct</div>
+ </div>
+</section>
+</div>
+
+<!-- Part 4: Managing quality -->
+<div class="part" id="part4" style="--pc:#7A5AF8">
+ <div class="parthead"><span class="pnum">Part 4</span><div><h2>Managing quality</h2><p>Section 1.4 · 3 activities</p></div></div>
+<!-- 5. 99% -->
+<section class="station" id="ninetynine">
+ <div class="scene"><svg class="ico"><use href="#i-burger"/></svg><div><div class="lbl">Part 4 · Activity 1 of 3 · Six Sigma · Fast-food counter</div><h2>Is 99% good enough?</h2><p>A meal has 10 parts. Each part is right 99% of the time. How often is the whole experience right?</p></div></div>
+ <div class="body">
+  <div class="grid2">
+   <div class="panel"><h3>Set up the scene</h3>
+    <label class="sl" for="nComp">Parts per meal <span id="nCompV"></span></label><input type="range" id="nComp" min="1" max="50" step="1" value="10">
+    <label class="sl" for="pGood">Chance each part is right <span id="pGoodV"></span></label><input type="range" id="pGood" min="0.95" max="0.9999" step="0.0001" value="0.99">
+    <label class="sl" for="fam">Meals per visit (family size) <span id="famV"></span></label><input type="range" id="fam" min="1" max="8" step="1" value="4">
+    <label class="sl" for="vis">Visits per year <span id="visV"></span></label><input type="range" id="vis" min="1" max="52" step="1" value="12">
+    <div class="row" style="margin-top:10px"><button class="btn alt" data-p="0.99">99%</button><button class="btn alt" data-p="0.999">99.9%</button><button class="btn alt" data-p="0.9999">99.99%</button></div>
+   </div>
+   <div class="panel"><h3>Chance everything is right</h3>
+    <div class="bars">
+     <div class="bar"><span>One meal</span><div class="track"><div class="fill" id="b1" style="background:var(--blue)"></div></div><span class="num" id="v1"></span></div>
+     <div class="bar"><span>One visit</span><div class="track"><div class="fill" id="b2" style="background:var(--teal)"></div></div><span class="num" id="v2"></span></div>
+     <div class="bar"><span>Whole year</span><div class="track"><div class="fill" id="b3" style="background:var(--coral)"></div></div><span class="num" id="v3"></span></div>
+    </div>
+    <p class="why" id="nnMsg" style="margin:12px 0 0"></p>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- 6. Costs -->
+<section class="station" id="costs">
+ <div class="scene"><svg class="ico"><use href="#i-coins"/></svg><div><div class="lbl">Part 4 · Activity 2 of 3 · Section 1.4.4 · Cost accounting office</div><h2>Sort the quality costs</h2><p>Tap a cost, then tap the bucket it belongs to (Table 1.5).</p></div></div>
+ <div class="body">
+  <div class="pool" id="costPool"></div>
+  <div class="bins" id="costBins"></div>
+  <div class="row"><div class="score" id="costScore">0 of 12 sorted</div><button class="btn alt" id="costReset">Start over</button></div>
+ </div>
+</section>
+
+<!-- 7. DMAIC -->
+<section class="station" id="dmaic">
+ <div class="scene"><svg class="ico"><use href="#i-cycle"/></svg><div><div class="lbl">Part 4 · Activity 3 of 3 · Six Sigma · Injection-molding line</div><h2>Put the DMAIC project in order</h2><p>A plastics plant in Irbid scraps 6% of its bottle caps. A Black Belt runs a DMAIC project. Tap the steps in the order they happen.</p></div></div>
+ <div class="body">
+  <div class="pool" id="dmPool"></div>
+  <div class="steps" id="dmSteps"></div>
+  <div class="row"><div class="score" id="dmScore">Tap the first step</div><button class="btn alt" id="dmReset">Shuffle again</button></div>
+ </div>
+</section>
+</div>
+
+<!-- Quiz -->
+<section class="station" id="quiz">
+ <div class="scene" style="background:#E0A100"><svg class="ico"><use href="#i-star"/></svg><div><div class="lbl">Self-check · Whole chapter</div><h2>Star quiz</h2><p>Ten quick questions. Each right answer lights a star.</p></div></div>
+ <div class="body">
+  <div class="stars" id="qStars" aria-live="polite"></div>
+  <div class="quiz" id="qBox"></div>
+  <div class="row"><button class="btn" id="qNext" hidden>Next question</button><button class="btn alt" id="qAgain" hidden>Try the quiz again</button></div>
+ </div>
+</section>
+
+<footer>Activities built on Montgomery, <i>Introduction to Statistical Quality Control</i>, 8th ed., Wiley, Chapter 1. The transmission example (Figures 1.1–1.2), Garvin's eight dimensions of quality, the detergent example of Section 1.1.2 and the quality-cost categories of Table 1.5 are from the book; all other examples and the quiz are teaching examples. Prepared for IE454 by Dr. Aseel Khanfar, Department of Industrial Engineering, Yarmouk University.<br><b>© 2026 Dr. Aseel Khanfar, Yarmouk University. All rights reserved.</b> No part of this page may be copied, adapted or republished without written permission.</footer>
+</main>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+/* generic multiple-choice card set */
+function mcSet(boxId,scoreId,items,choices,unit){
+  const box=$(boxId);let right=0,done=0;
+  items.forEach(it=>{
+    const c=document.createElement('div');c.className='qcard';
+    c.innerHTML='<div class="tx"></div><div class="opts"></div><div class="why" hidden></div>';
+    c.querySelector('.tx').textContent=it.q;
+    const o=c.querySelector('.opts'),w=c.querySelector('.why');
+    (it.choices||choices).forEach(ch=>{const b=document.createElement('button');b.className='opt';b.type='button';b.textContent=ch;
+      b.onclick=()=>{if(c.dataset.done)return;c.dataset.done=1;done++;
+        if(ch===it.a){b.classList.add('right');right++}else{b.classList.add('wrong');[...o.children].find(x=>x.textContent===it.a).classList.add('right')}
+        w.hidden=false;w.textContent=it.why;$(scoreId).textContent=right+' of '+items.length+' correct'+(done===items.length?(right===items.length?'. Perfect!':'. Nice work.'):'');};
+      o.appendChild(b)});
+    box.appendChild(c)});
+}
+
+/* 1. dimensions */
+const DIM=['Performance','Reliability','Durability','Serviceability','Aesthetics','Features','Perceived quality','Conformance'];
+mcSet('dimCards','dimScore',shuffle([
+ {q:'"How fast does it go from 0 to 100 km/h?"',a:'Performance',why:'Will the product do the intended job, and how well?'},
+ {q:'"How often will it break down in the first three years?"',a:'Reliability',why:'Reliability asks how often the product fails.'},
+ {q:'"Will it still run well after 300,000 km?"',a:'Durability',why:'Durability is the effective service life.'},
+ {q:'"How long and how costly is a routine service at the dealer?"',a:'Serviceability',why:'How quickly and cheaply can it be repaired or maintained?'},
+ {q:'"Does the color and shape look good to me?"',a:'Aesthetics',why:'Visual appeal: style, color, shape, packaging.'},
+ {q:'"Does it come with a reversing camera and lane assist?"',a:'Features',why:'Extras beyond the basic performance of competitors.'},
+ {q:'"My uncle says this brand never gives trouble."',a:'Perceived quality',why:'Reputation of the company and its products.'},
+ {q:'"Is the gap between the hood and fender the same on both sides?"',a:'Conformance',why:'Is the product made exactly as the designer intended? (Montgomery\'s own hood example.)'}
+]),DIM);
+
+/* 2. gearbox */
+const T=25,LSL=24.95,USL=25.05,TOL=USL-LSL;
+const erf=x=>{const s=Math.sign(x);x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y};
+const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
+const sigA0=0.075/6;const loss0=sigA0*sigA0;
+function plant(p){const six=+$(p+'Sig').value,mu=T+ +$(p+'Mu').value,s=six/6;
+  const out=(Phi((LSL-mu)/s)+1-Phi((USL-mu)/s))*1e6;const loss=(s*s+(mu-T)**2)/loss0*100;
+  $(p+'SigV').textContent=six.toFixed(3)+' mm';$(p+'MuV').textContent=(mu-T>=0?'+':'')+(mu-T).toFixed(3)+' mm';
+  $(p+'Pct').textContent=Math.round(six/TOL*100)+'%';$(p+'Out').textContent=out<1?'< 1':out>=1e5?Math.round(out/1000)+'k':Math.round(out).toLocaleString();
+  $(p+'Loss').textContent=Math.round(loss);return {mu,s,loss}}
+function drawGB(){const A=plant('a'),B=plant('b');const cv=$('gbCanvas'),g=cv.getContext('2d');const W=cv.width,H=cv.height;g.clearRect(0,0,W,H);
+  g.fillStyle=css('--surface');g.fillRect(0,0,W,H);
+  const x0=24.90,x1=25.10,X=v=>40+(v-x0)/(x1-x0)*(W-80),base=H-50;
+  const pdf=(x,m,s)=>Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
+  const peak=Math.max(pdf(A.mu,A.mu,A.s),pdf(B.mu,B.mu,B.s));const Y=v=>base-v/peak*(H-90);
+  g.fillStyle=css('--bad-bg');g.fillRect(X(x0),20,X(LSL)-X(x0),base-20);g.fillRect(X(USL),20,X(x1)-X(USL),base-20);
+  [[LSL,'LSL 24.95'],[T,'Target 25.00'],[USL,'USL 25.05']].forEach(([v,l],i)=>{g.strokeStyle=i===1?css('--muted'):css('--coral');g.setLineDash(i===1?[4,6]:[10,8]);g.lineWidth=3;g.beginPath();g.moveTo(X(v),20);g.lineTo(X(v),base);g.stroke();g.setLineDash([]);
+    g.fillStyle=css('--fg');g.font='700 22px Nunito, sans-serif';g.textAlign='center';g.fillText(l,X(v),H-14)});
+  [[A,css('--blue')],[B,css('--coral')]].forEach(([P,c])=>{g.beginPath();for(let i=0;i<=400;i++){const x=x0+(x1-x0)*i/400;const y=Y(pdf(x,P.mu,P.s));i?g.lineTo(X(x),y):g.moveTo(X(x),y)}
+    g.lineWidth=5;g.strokeStyle=c;g.stroke();g.lineTo(X(x1),base);g.lineTo(X(x0),base);g.closePath();g.globalAlpha=.16;g.fillStyle=c;g.fill();g.globalAlpha=1});
+  g.strokeStyle=css('--fg');g.lineWidth=2;g.beginPath();g.moveTo(30,base);g.lineTo(W-30,base);g.stroke();
+  const r=A.loss/B.loss;$('gbMsg').textContent=r>1.05?`Plant B's warranty cost index is about ${r.toFixed(1)} times lower, even though both plants are inside the limits.`:r<0.95?`Now Plant A is the cheaper plant, by about ${(1/r).toFixed(1)} times.`:'The two plants cost about the same now.';}
+['aSig','aMu','bSig','bMu'].forEach(id=>$(id).addEventListener('input',drawGB));
+$('gbBook').onclick=()=>{$('aSig').value=0.075;$('bSig').value=0.025;$('aMu').value=0;$('bMu').value=0;drawGB()};
+drawGB();matchMedia('(prefers-color-scheme: dark)').addEventListener('change',drawGB);
+new MutationObserver(drawGB).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+/* 3. defects */
+mcSet('defCards','defScore',shuffle([
+ {q:'Detergent: active ingredient is slightly below the LSL. Customers just use a little more and it cleans fine.',a:'Nonconforming',why:'Fails a spec but is still fit for use. Montgomery uses this exact example.'},
+ {q:'Brake pad: friction lining is 30% thinner than the LSL. Stopping distance gets longer.',a:'Defective',why:'The nonconformity affects safe use, so it is a defect.'},
+ {q:'Olive-oil bottle: fill volume is 1.003 L, limits are 0.995 to 1.010 L.',a:'Conforming',why:'Inside both limits. A small distance from target is still conforming.'},
+ {q:'Shaft diameter is 25.06 mm (USL 25.05). It will not fit into the mating bearing.',a:'Defective',why:'Too big to fit means the part cannot do its job.'},
+ {q:'Phone case: the logo is printed 0.4 mm off center (limit ±0.3 mm). Nobody can see it.',a:'Nonconforming',why:'Out of spec, yet the case still works and looks fine to the user.'},
+ {q:'Concrete cube strength: 32 MPa, with only a lower limit of 30 MPa.',a:'Conforming',why:'One-sided spec (like the bumper example). 32 is above the LSL.'}
+]),['Conforming','Nonconforming','Defective']);
+
+/* 4. tools */
+mcSet('toolCards','toolScore',shuffle([
+ {q:'Watch the fill weight of 1-L olive-oil bottles every hour and catch a drifting filler early.',a:'SPC',why:'Monitoring a running process on-line is the job of control charts.'},
+ {q:'A bakery wants to know which of oven temperature, proofing time and yeast amount affect loaf volume.',a:'Designed experiment',why:'Finding key factors is an off-line designed experiment.'},
+ {q:'A truck delivers 5,000 bolts from a new supplier. Accept or reject the lot?',a:'Acceptance sampling',why:'Inspect a sample and decide about the whole lot.'},
+ {q:'Detect when the cutting tool on a CNC lathe starts to wear and diameters creep up.',a:'SPC',why:'Spotting an assignable cause as it happens is SPC.'},
+ {q:'Choose the injection pressure, melt temperature and cooling time that minimize warping.',a:'Designed experiment',why:'Process optimization by changing factors deliberately.'},
+ {q:'A hospital receives a carton of 2,000 syringes and checks 80 of them before use.',a:'Acceptance sampling',why:'Sampling a received lot to decide its disposition.'}
+]),['SPC','Designed experiment','Acceptance sampling']);
+
+/* 5. 99% */
+function nn(){const n=+$('nComp').value,p=+$('pGood').value,f=+$('fam').value,v=+$('vis').value;
+  $('nCompV').textContent=n;$('pGoodV').textContent=(p*100).toFixed(2)+'%';$('famV').textContent=f;$('visV').textContent=v;
+  const m=p**n,vi=m**f,y=vi**v;
+  [[m,'b1','v1'],[vi,'b2','v2'],[y,'b3','v3']].forEach(([x,b,t])=>{$(b).style.width=(x*100).toFixed(1)+'%';$(t).textContent=x.toFixed(4)});
+  $('nnMsg').textContent=`P(meal) = ${p}^${n} = ${m.toFixed(4)}. P(visit) = ${m.toFixed(4)}^${f} = ${vi.toFixed(4)}. P(year) = ${vi.toFixed(4)}^${v} = ${y.toFixed(4)}. `+(y<0.5?'Most years, at least one meal goes wrong.':'Most years go perfectly.');}
+['nComp','pGood','fam','vis'].forEach(id=>$(id).addEventListener('input',nn));
+document.querySelectorAll('#ninetynine [data-p]').forEach(b=>b.onclick=()=>{$('pGood').value=b.dataset.p;nn()});nn();
+
+/* 6. costs */
+const BINS=[['Prevention','var(--blue)'],['Appraisal','var(--teal)'],['Internal failure','var(--sun)'],['External failure','var(--coral)']];
+const COSTS=[['Quality planning and engineering',0],['Training operators',0],['Process control',0],['Inspecting incoming material',1],['Final product test',1],['Calibrating gauges',1],['Scrap',2],['Rework',2],['Downtime from quality problems',2],['Warranty charges',3],['Returned product',3],['Complaint handling',3]];
+let sel=null,sorted=0;
+function costInit(){sel=null;sorted=0;$('costScore').textContent='0 of 12 sorted';const pool=$('costPool'),bins=$('costBins');pool.innerHTML='';bins.innerHTML='';
+  shuffle(COSTS).forEach(([t,k])=>{const b=document.createElement('button');b.type='button';b.className='tile';b.textContent=t;b.dataset.k=k;
+    b.onclick=()=>{if(b.classList.contains('ok'))return;pool.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sel=b;bins.querySelectorAll('.bin').forEach(x=>x.classList.add('ready'))};pool.appendChild(b)});
+  BINS.forEach(([n,c],i)=>{const d=document.createElement('button');d.type='button';d.className='bin';d.style.background='color-mix(in srgb, '+c+' 22%, var(--surface))';d.innerHTML='<h3></h3>';d.querySelector('h3').textContent=n;
+    d.onclick=()=>{if(!sel)return;if(+sel.dataset.k===i){sel.classList.remove('sel');sel.classList.add('ok');d.appendChild(sel);sorted++;$('costScore').textContent=sorted+' of 12 sorted'+(sorted===12?'. All sorted!':'');sel=null;bins.querySelectorAll('.bin').forEach(x=>x.classList.remove('ready'))}
+      else{const s=sel;s.classList.remove('no');void s.offsetWidth;s.classList.add('no')}};bins.appendChild(d)});}
+$('costReset').onclick=costInit;costInit();
+
+/* 7. dmaic */
+const DM=[['Define','Write the charter: reduce cap scrap from 6% to below 1%, saving about 40,000 JD a year.','var(--blue)'],['Measure','Check the gauge, then record scrap by shift, mold cavity and defect type for two weeks.','var(--teal)'],['Analyze','Find that short shots come mostly from cavity 7 when melt temperature drops.','var(--sun)'],['Improve','Run a designed experiment and set new melt temperature and hold pressure; scrap falls to 0.8%.','var(--mint)'],['Control','Put an x̄ and R chart on cap weight and update the work instructions so the gain sticks.','var(--coral)']];
+let dmNext=0;
+function dmInit(){dmNext=0;const pool=$('dmPool'),st=$('dmSteps');pool.innerHTML='';st.innerHTML='';$('dmScore').textContent='Tap the first step';
+  shuffle(DM.map((d,i)=>[...d,i])).forEach(([n,t,c,i])=>{const b=document.createElement('button');b.type='button';b.className='tile';b.textContent=t;
+    b.onclick=()=>{if(i===dmNext){b.remove();const s=document.createElement('div');s.className='step';s.innerHTML='<span class="n"></span><span><b></b> · <span></span></span>';s.querySelector('.n').style.background=c;s.querySelector('.n').textContent=n[0];s.querySelector('b').textContent=n;s.querySelector('span span').textContent=t;st.appendChild(s);dmNext++;
+      $('dmScore').textContent=dmNext===5?'D, M, A, I, C. Project closed!':'Good. Now the next step.'}else{b.classList.remove('no');void b.offsetWidth;b.classList.add('no');$('dmScore').textContent='Not yet. Which step comes before that?'}};pool.appendChild(b)});}
+$('dmReset').onclick=dmInit;dmInit();
+
+/* quiz */
+const Q=[
+ ['The modern definition says quality is inversely proportional to…',['cost','variability','price','features'],1,'Section 1.1: reduce variability and quality goes up.'],
+ ['"How long does the product last?" describes which dimension?',['Reliability','Durability','Serviceability','Performance'],1,'Durability is the effective service life. Reliability is how often it fails.'],
+ ['A detergent below its LSL that still cleans well is…',['defective','nonconforming but not defective','conforming','scrap'],1,'Nonconforming items are not always unfit for use.'],
+ ['Who introduced the control chart in 1924?',['W. E. Deming','J. M. Juran','W. A. Shewhart','G. Taguchi'],2,'Walter Shewhart, Bell Labs technical memorandum, 1924.'],
+ ['Which method is an off-line technique?',['Control charts','Designed experiments','100% inspection','Acceptance sampling'],1,'DOX is used off-line, during development or troubleshooting.'],
+ ['Training operators in SPC is which quality cost?',['Prevention','Appraisal','Internal failure','External failure'],0,'Money spent to stop defects from happening is prevention.'],
+ ['Warranty charges belong to…',['appraisal costs','internal failure costs','external failure costs','prevention costs'],2,'Failures found after the product reaches the customer.'],
+ ['In DMAIC, the "C" stands for…',['Check','Correct','Control','Customer'],2,'Control keeps the improvement in place.'],
+ ['A product has 10 parts, each 99% good. P(all good) is about…',['0.99','0.95','0.90','0.67'],2,'0.99^10 = 0.904.'],
+ ['ISO 9000 certification is criticized for focusing mostly on…',['quality planning','quality assurance','designed experiments','customer surveys'],1,'It weighs quality assurance heavily, with less on planning and improvement.']
+];
+let qi=0,qs=0;
+function stars(){$('qStars').innerHTML=Q.map((_,i)=>'<span'+(i<qs?' class="on"':'')+'>★</span>').join('')}
+function qShow(){stars();$('qNext').hidden=true;$('qAgain').hidden=true;const box=$('qBox');box.innerHTML='';
+  if(qi>=Q.length){const f=document.createElement('div');f.className='feedback';f.textContent=`You earned ${qs} of ${Q.length} stars. `+(qs>=9?'Excellent, you own Chapter 1.':qs>=7?'Strong work. Review the ones you missed.':'Revisit the activities above, then try again.');box.appendChild(f);$('qAgain').hidden=false;return}
+  const [q,o,a,w]=Q[qi];const h=document.createElement('div');h.className='qcard';h.innerHTML='<div class="sec"></div><div class="tx"></div><div class="opts"></div><div class="why" hidden></div>';
+  h.querySelector('.sec').textContent='Question '+(qi+1)+' of '+Q.length;h.querySelector('.tx').textContent=q;
+  o.forEach((t,i)=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=t;b.onclick=()=>{if(h.dataset.done)return;h.dataset.done=1;
+    if(i===a){b.classList.add('right');qs++}else{b.classList.add('wrong');h.querySelectorAll('.opt')[a].classList.add('right')}
+    const wy=h.querySelector('.why');wy.hidden=false;wy.textContent=w;stars();qi++;$('qNext').hidden=false;$('qNext').textContent=qi>=Q.length?'See my stars':'Next question'};h.querySelector('.opts').appendChild(b)});
+  box.appendChild(h)}
+$('qNext').onclick=qShow;$('qAgain').onclick=()=>{qi=0;qs=0;qShow()};qShow();
+
+/* deep links from the slides' Run it live buttons */
+function jump(){const id=location.hash.slice(1);const el=id&&document.getElementById(id);if(el&&el.classList.contains('station')){el.scrollIntoView({behavior:'smooth',block:'start'});el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}}
+addEventListener('hashchange',jump);setTimeout(jump,300);
+})();
+</script>
+
+
+</body></html>

@@ -1,0 +1,698 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>IE454 Chapter 8 Capability Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: same as the Chapter 1 to 5 labs. Sticky header, hero with part chips, one rounded "station" per activity (scene banner + interactive body), star quiz last */
+:root{
+  --bg:#F3F8FE; --surface:#FFFFFF; --soft:#E8F2FC; --fg:#15233A; --muted:#55657E; --line:#D5E3F2;
+  --blue:#0070C0; --blue-ink:#FFFFFF; --sky:#DCEBFA; --sun:#FFC83D; --sun-ink:#3A2B00;
+  --coral:#FF6B5B; --mint:#1FA874; --violet:#7C5CFF; --teal:#12A5B8; --gold:#E0A100;
+  --ok-bg:#DDF6EA; --ok-fg:#0F6B47; --bad-bg:#FFE3DF; --bad-fg:#A3271B;
+  --display:"Nunito",ui-rounded,system-ui,sans-serif; --body:"Source Sans 3",system-ui,sans-serif;
+  --r:22px; --shadow:0 6px 22px rgba(0,60,120,.10);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1626; --surface:#162238; --soft:#1C2C47; --fg:#EAF1FB; --muted:#A7B6CC; --line:#2A3C5C;
+  --blue:#3FA2F0; --blue-ink:#06192C; --sky:#1D3352; --sun:#FFD15C; --sun-ink:#2E2200;
+  --coral:#FF8576; --mint:#3CCB93; --violet:#9C84FF; --teal:#3CC4D6; --gold:#C98F00;
+  --ok-bg:#123D2E; --ok-fg:#7FE3B5; --bad-bg:#4A1E1A; --bad-fg:#FFB0A5; --shadow:0 6px 22px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1626; --surface:#162238; --soft:#1C2C47; --fg:#EAF1FB; --muted:#A7B6CC; --line:#2A3C5C;
+  --blue:#3FA2F0; --blue-ink:#06192C; --sky:#1D3352; --sun:#FFD15C; --sun-ink:#2E2200;
+  --coral:#FF8576; --mint:#3CCB93; --violet:#9C84FF; --teal:#3CC4D6; --gold:#C98F00;
+  --ok-bg:#123D2E; --ok-fg:#7FE3B5; --bad-bg:#4A1E1A; --bad-fg:#FFB0A5; --shadow:0 6px 22px rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.55}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--blue);color:var(--blue-ink);padding:10px 16px}
+.top p{margin:0 auto;max-width:1120px;font-family:var(--display);font-weight:800;font-size:clamp(13px,1.7vw,16px)}
+.top .dot{opacity:.7;margin:0 .35em}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:24px 70px;display:flex;flex-direction:column;gap:28px}
+.hero{background:var(--surface);border-radius:32px;padding:clamp(20px,4vw,40px);box-shadow:var(--shadow);display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:center}
+@media (max-width:820px){.hero{grid-template-columns:1fr}}
+.hero h1{font-size:clamp(28px,4.4vw,46px);font-weight:900;color:var(--blue)}
+.hero .big{font-size:clamp(17px,2vw,20px);margin:12px 0 0;max-width:56ch}
+.hero .quote{margin-top:14px;padding:14px 18px;background:var(--sky);border-radius:18px;font-style:italic}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{display:inline-flex;gap:6px;align-items:center;padding:7px 14px;border-radius:99px;font-family:var(--display);font-weight:800;font-size:14px;text-decoration:none;color:var(--fg);background:var(--soft);border:2px solid transparent}
+.chip:hover{border-color:var(--blue)}
+.chip i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.heroart{width:100%;max-width:440px;justify-self:center}
+.station{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;scroll-margin-top:70px}
+.station.flash{animation:flash 1.6s ease-out 1}
+@keyframes flash{0%{box-shadow:0 0 0 6px var(--sun)}100%{box-shadow:var(--shadow)}}
+.scene{display:flex;gap:18px;align-items:center;padding:18px 22px;color:#fff}
+.scene svg.ico{width:64px;height:64px;flex:none;background:rgba(255,255,255,.22);border-radius:20px;padding:10px}
+.scene .lbl{font-family:var(--display);font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
+.scene h2{font-size:clamp(21px,2.6vw,28px);font-weight:900;color:#fff}
+.scene p{margin:2px 0 0;font-size:15px;opacity:.95}
+@media (max-width:520px){.scene{flex-direction:column;align-items:flex-start}}
+.body{padding:20px 22px 24px;display:flex;flex-direction:column;gap:14px}
+.body > p{margin:0;max-width:75ch}
+.sec{font-size:13px;color:var(--muted);font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid2.wide{grid-template-columns:1fr 1.4fr}
+@media (max-width:760px){.grid2,.grid2.wide{grid-template-columns:1fr}}
+.panel{background:var(--soft);border-radius:18px;padding:14px 16px;min-width:0}
+.panel h3{font-size:17px;font-weight:800;margin-bottom:8px}
+label.sl{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:600;margin-top:6px}
+label.sl span{font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--blue)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.stats.four{grid-template-columns:repeat(4,1fr)}
+@media (max-width:520px){.stats.four{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--surface);border-radius:14px;padding:8px 10px;min-width:0}
+.stat b{display:block;font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
+.stat small{font-size:12px;color:var(--muted)}
+canvas{width:100%;height:auto;display:block;border-radius:16px;background:var(--surface)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.qcard{background:var(--soft);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.qcard .tx{font-weight:600}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{border:2px solid var(--line);background:var(--surface);color:var(--fg);border-radius:99px;padding:5px 12px;font-size:14px;font-weight:700}
+.opt:hover{border-color:var(--blue)}
+.opt.right{background:var(--ok-bg);color:var(--ok-fg);border-color:var(--ok-fg)}
+.opt.wrong{background:var(--bad-bg);color:var(--bad-fg);border-color:var(--bad-fg)}
+.why{font-size:14px;color:var(--muted)}
+.score{font-family:var(--display);font-weight:800;padding:8px 14px;border-radius:99px;background:var(--sky);align-self:flex-start}
+.btn{border:0;border-radius:99px;padding:9px 18px;font-family:var(--display);font-weight:800;background:var(--blue);color:var(--blue-ink)}
+.btn.alt{background:var(--soft);color:var(--fg)}
+.panel .btn.alt{background:var(--surface);border:2px solid var(--line)}
+.btn.on{background:var(--sun);color:var(--sun-ink);border-color:var(--sun)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.stars{font-size:30px;letter-spacing:3px;color:var(--line)}
+.stars .on{color:var(--sun)}
+.quiz{display:flex;flex-direction:column;gap:12px}
+.feedback{font-family:var(--display);font-weight:800;font-size:18px}
+.note{background:var(--sky);border-radius:14px;padding:10px 14px;font-size:15px}
+.note b{font-family:var(--display)}
+.tag{display:inline-block;padding:2px 10px;border-radius:99px;font-family:var(--display);font-weight:800;font-size:13px;margin:2px 4px 2px 0}
+.tag.r1{background:var(--coral);color:#fff}.tag.r2{background:var(--violet);color:#fff}.tag.r3{background:var(--teal);color:#fff}.tag.r4{background:var(--gold);color:#fff}.tag.ok{background:var(--ok-bg);color:var(--ok-fg)}
+.checks{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.checks label{display:flex;gap:8px;align-items:center;font-size:15px;font-weight:600}
+.checks input[type=number]{font:inherit;width:6.5em;border:2px solid var(--line);background:var(--surface);color:var(--fg);border-radius:10px;padding:3px 6px}
+footer{color:var(--muted);font-size:13px;text-align:center}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Activities grouped by part: each part gets the accent color of its column on the slides' roadmap */
+.chips{flex-direction:column;align-items:flex-start;gap:8px}
+.chiprow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chiplbl{display:inline-block;min-width:64px;text-align:center;padding:7px 12px;border-radius:99px;background:var(--pc);color:#fff;font-family:var(--display);font-weight:900;font-size:13px;letter-spacing:.04em;text-transform:uppercase;text-decoration:none}
+.part{display:flex;flex-direction:column;gap:18px;border-left:7px solid var(--pc);padding-left:clamp(10px,2vw,20px);scroll-margin-top:70px}
+.parthead{display:flex;gap:14px;align-items:center}
+.parthead .pnum{flex:none;background:var(--pc);color:#fff;border-radius:16px;padding:10px 16px;font-family:var(--display);font-weight:900;font-size:clamp(16px,2vw,20px);letter-spacing:.04em;text-transform:uppercase}
+.parthead h2{font-size:clamp(22px,3vw,30px);font-weight:900;color:var(--fg)}
+.parthead p{margin:2px 0 0;color:var(--muted);font-weight:700;font-size:15px}
+.part .scene{background:var(--pc)}
+</style>
+<style>
+/* Chapter 8 additions: number fields, small toggles and a stacked bar */
+.fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:6px}
+.fields label{display:flex;flex-direction:column;gap:2px;font-size:13px;font-weight:700;color:var(--muted)}
+.fields input,.fields select{font:inherit;font-size:16px;color:var(--fg);background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:4px 8px;min-width:0;font-variant-numeric:tabular-nums}
+.verdict{display:inline-block;padding:4px 12px;border-radius:99px;font-family:var(--display);font-weight:800;font-size:14px}
+.verdict.ok{background:var(--ok-bg);color:var(--ok-fg)}.verdict.bad{background:var(--bad-bg);color:var(--bad-fg)}
+.stack{display:flex;height:42px;border-radius:12px;overflow:hidden;margin-top:10px}
+.stack div{display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--display);font-weight:800;font-size:13px;min-width:0;white-space:nowrap;overflow:hidden}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M2 19h20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3 19c3 0 4-13 9-13s6 13 9 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M5 6v13M19 6v13" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 2"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-hist" viewBox="0 0 24 24"><path d="M3 21h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="4" y="15" width="3" height="6" fill="currentColor"/><rect x="7.5" y="9" width="3" height="12" fill="currentColor"/><rect x="11" y="4" width="3" height="17" fill="currentColor"/><rect x="14.5" y="10" width="3" height="11" fill="currentColor"/><rect x="18" y="16" width="3" height="5" fill="currentColor"/></symbol>
+  <symbol id="i-line" viewBox="0 0 24 24"><path d="M3 3v18h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M5 19L20 5" stroke="currentColor" stroke-width="1.6"/><circle cx="7" cy="16" r="1.4" fill="currentColor"/><circle cx="10" cy="14.5" r="1.4" fill="currentColor"/><circle cx="12.5" cy="11" r="1.4" fill="currentColor"/><circle cx="15" cy="9.5" r="1.4" fill="currentColor"/><circle cx="18" cy="6" r="1.4" fill="currentColor"/></symbol>
+  <symbol id="i-ruler" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6 8v4M10 8v3M14 8v4M18 8v3" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="i-floor" viewBox="0 0 24 24"><path d="M6 3v18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 19c2 0 3-12 7-12s5 12 7 12" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="15" cy="10" r="1.8" fill="currentColor"/></symbol>
+  <symbol id="i-range" viewBox="0 0 24 24"><path d="M3 12h18" stroke="currentColor" stroke-width="1.6"/><path d="M6 8v8M18 8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="2.6" fill="currentColor"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M2 5h20M2 19h20" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 2"/><path d="M2 12h20" stroke="currentColor" stroke-width="1"/><path d="M3 13l3-4 3 5 3-3 3 4 3-5 3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-bottle" viewBox="0 0 24 24"><path d="M10 2h4v4l2 3v12a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V9l2-3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 13h8" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 10h7M9 14h7M9 18h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+ </defs>
+</svg>
+
+<header class="top"><p><a href="../" style="color:inherit;text-decoration:none" title="All chapters">&larr; IE454 Quality Control</a><span class="dot">·</span>Chapter 8: Process and Measurement System Capability Analysis<span class="dot">·</span>Dr. Aseel Khanfar<span class="dot">·</span>Yarmouk University</p></header>
+
+<main class="wrap">
+<section class="hero">
+ <div>
+  <h1>In control is not the same as capable</h1>
+  <p class="big">A process can be perfectly stable and still make parts outside the specifications. Process capability compares the natural spread of the process (μ ± 3σ) with the specification band. Estimate it from a histogram, a probability plot or a control chart, sum it up as Cp and Cpk, and learn how far to trust the number.</p>
+  <p class="quote">The control chart should be regarded as the primary technique of process capability analysis. Montgomery, Section 8.4</p>
+  <nav class="chips" aria-label="Activities by part">
+  <div class="chiprow" style="--pc:#0070C0"><a class="chiplbl" href="#part1">Part 1</a><a class="chip" href="#ntl"><i style="background:#0070C0"></i>Natural tolerance limits</a><a class="chip" href="#study"><i style="background:#0070C0"></i>Study or characterization?</a></div>
+  <div class="chiprow" style="--pc:#12A5B8"><a class="chiplbl" href="#part2">Part 2</a><a class="chip" href="#histogram"><i style="background:#12A5B8"></i>Histogram</a><a class="chip" href="#probplot"><i style="background:#12A5B8"></i>Probability plot</a></div>
+  <div class="chiprow" style="--pc:#1A9467"><a class="chiplbl" href="#part3">Part 3</a><a class="chip" href="#cp"><i style="background:#1A9467"></i>Cp and P</a><a class="chip" href="#onesided"><i style="background:#1A9467"></i>One-sided PCR</a></div>
+  <div class="chiprow" style="--pc:#E8503F"><a class="chiplbl" href="#part4">Part 4</a><a class="chip" href="#cpk"><i style="background:#E8503F"></i>Cp, Cpk and Cpm</a><a class="chip" href="#ci"><i style="background:#E8503F"></i>How sure is Ĉp?</a></div>
+  <div class="chiprow" style="--pc:#7A5AF8"><a class="chiplbl" href="#part5">Part 5</a><a class="chip" href="#chart"><i style="background:#7A5AF8"></i>Capability from a chart</a><a class="chip" href="#brix"><i style="background:#7A5AF8"></i>Sources of variability</a><a class="chip" href="#dpmo"><i style="background:#7A5AF8"></i>DPU and DPMO</a></div>
+  <div class="chiprow"><span class="chiplbl" style="background:var(--sun);color:var(--sun-ink)">Review</span><a class="chip" href="#quiz"><i style="background:var(--sun)"></i>Star quiz</a></div>
+  </nav>
+ </div>
+ <svg class="heroart" viewBox="0 0 440 240" role="img" aria-label="A normal curve inside the specification limits, with the natural tolerance limits at plus and minus three sigma marked inside LSL and USL">
+  <rect x="0" y="0" width="440" height="240" rx="28" fill="var(--sky)"/>
+  <rect x="60" y="36" width="320" height="156" fill="var(--surface)" opacity=".55"/>
+  <line x1="60" y1="30" x2="60" y2="196" stroke="var(--coral)" stroke-width="4"/>
+  <line x1="380" y1="30" x2="380" y2="196" stroke="var(--coral)" stroke-width="4"/>
+  <path d="M100 192 C150 192 170 50 220 50 C270 50 290 192 340 192" fill="none" stroke="var(--blue)" stroke-width="5"/>
+  <line x1="40" y1="192" x2="400" y2="192" stroke="var(--fg)" stroke-width="2.5"/>
+  <line x1="110" y1="120" x2="110" y2="196" stroke="var(--fg)" stroke-width="2" stroke-dasharray="5 5"/>
+  <line x1="330" y1="120" x2="330" y2="196" stroke="var(--fg)" stroke-width="2" stroke-dasharray="5 5"/>
+  <g font-family="Nunito,sans-serif" font-weight="800" font-size="14" fill="var(--fg)">
+   <text x="60" y="22" text-anchor="middle">LSL</text><text x="380" y="22" text-anchor="middle">USL</text>
+   <text x="110" y="214" text-anchor="middle">μ − 3σ</text><text x="330" y="214" text-anchor="middle">μ + 3σ</text>
+   <text x="220" y="232" text-anchor="middle" font-size="13">Cp = (USL − LSL) / 6σ</text>
+  </g>
+ </svg>
+</section>
+
+<!-- Part 1 -->
+<div class="part" id="part1" style="--pc:#0070C0">
+ <div class="parthead"><span class="pnum">Part 1</span><div><h2>Process capability and its uses</h2><p>Section 8.1 · 2 activities</p></div></div>
+<section class="station" id="ntl">
+ <div class="scene"><svg class="ico"><use href="#i-bell"/></svg><div><div class="lbl">Part 1 · Activity 1 of 2 · Section 8.1, Figure 8.1 · Glass container plant</div><h2>Natural tolerance limits</h2><p>The natural tolerance limits of a process are μ ± 3σ. For a normal process they hold 99.73% of the output, so 0.27% (2,700 parts per million) falls outside. If the output is skewed, that share can be very different.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>The process</h3>
+    <label class="sl" for="nM">Process mean μ (psi) <span id="nMV"></span></label><input type="range" id="nM" min="200" max="320" step="1" value="264">
+    <label class="sl" for="nS">Standard deviation σ (psi) <span id="nSV"></span></label><input type="range" id="nS" min="10" max="50" step="1" value="32">
+    <div class="row" id="nShape" style="margin-top:8px"><button class="btn alt on" data-s="norm">Normal output</button><button class="btn alt" data-s="skew">Skewed output</button></div>
+    <div class="stats four"><div class="stat"><b id="nL"></b><small>LNTL = μ − 3σ</small></div><div class="stat"><b id="nU"></b><small>UNTL = μ + 3σ</small></div><div class="stat"><b id="nIn"></b><small>inside μ ± 3σ</small></div><div class="stat"><b id="nPpm"></b><small>ppm outside</small></div></div>
+   </div>
+   <div class="panel"><h3>Distribution of bursting strength</h3><canvas id="nCanvas" width="760" height="380" aria-label="Distribution of the process output with the natural tolerance limits marked"></canvas></div>
+  </div>
+  <p class="why" id="nMsg"></p>
+ </div>
+</section>
+
+<section class="station" id="study">
+ <div class="scene"><svg class="ico"><use href="#i-search"/></svg><div><div class="lbl">Part 1 · Activity 2 of 2 · Section 8.1 · Around the plant</div><h2>Capability study or product characterization?</h2><p>A true process capability study watches the process and knows the time order of the data, so it can judge stability. With only sample units of product and no time history, you can estimate the distribution of the product but say nothing about the process over time. Sort each case.</p></div></div>
+ <div class="body">
+  <div class="cards" id="stCards"></div>
+  <div class="score" id="stScore">0 of 6 correct</div>
+ </div>
+</section>
+</div>
+
+<!-- Part 2 -->
+<div class="part" id="part2" style="--pc:#12A5B8">
+ <div class="parthead"><span class="pnum">Part 2</span><div><h2>Histograms and probability plots</h2><p>Section 8.2 · 2 activities</p></div></div>
+<section class="station" id="histogram">
+ <div class="scene"><svg class="ico"><use href="#i-hist"/></svg><div><div class="lbl">Part 2 · Activity 1 of 2 · Section 8.2.1, Example 8.1, Table 8.1 · 100 glass containers</div><h2>Capability from a histogram</h2><p>The bursting strengths of 100 glass containers give x̄ = 264.06 and s = 32.02. The capability is estimated as x̄ ± 3s. Change the cell width, then move the lower specification limit and compare the normal estimate with the count in the data.</p></div></div>
+ <div class="body">
+  <div class="grid2 wide">
+   <div class="panel"><h3>Settings</h3>
+    <label class="sl" for="hW">Cell width (psi) <span id="hWV"></span></label><input type="range" id="hW" min="5" max="40" step="5" value="20">
+    <label class="sl" for="hL">Lower specification limit LSL (psi) <span id="hLV"></span></label><input type="range" id="hL" min="150" max="260" step="5" value="200">
+    <div class="stats four"><div class="stat"><b id="hX"></b><small>x̄</small></div><div class="stat"><b id="hS"></b><small>s</small></div><div class="stat"><b id="hR"></b><small>x̄ ± 3s</small></div><div class="stat"><b id="hF"></b><small>below LSL: normal / data</small></div></div>
+   </div>
+   <div class="panel"><h3>Histogram of bursting strength (Table 8.1)</h3><canvas id="hCanvas" width="760" height="380" aria-label="Histogram of the 100 bursting strengths with x-bar plus and minus 3s and the LSL marked"></canvas></div>
+  </div>
+  <p class="why" id="hMsg"></p>
+ </div>
+</section>
+
+<section class="station" id="probplot">
+ <div class="scene"><svg class="ico"><use href="#i-line"/></svg><div><div class="lbl">Part 2 · Activity 2 of 2 · Section 8.2.2, Figures 8.4–8.5 · 20 containers</div><h2>Read a normal probability plot</h2><p>Plot the ordered data against cumulative percent on a normal scale. If the points follow a straight line, the data look normal. The 50th percentile estimates μ, and the 84th minus the 50th percentile estimates σ.</p></div></div>
+ <div class="body">
+  <div class="row" id="pBtns"><button class="btn alt on" data-d="book">Bursting strength (book, 20 values)</button><button class="btn alt" data-d="valve">Valve failure times (teaching data)</button></div>
+  <div class="grid2 wide">
+   <div class="panel"><h3>Read the line</h3>
+    <div class="stats"><div class="stat"><b id="pMu"></b><small>50th percentile = μ̂</small></div><div class="stat"><b id="p84"></b><small>84th percentile</small></div><div class="stat"><b id="pSig"></b><small>σ̂ = 84th − 50th</small></div></div>
+    <label class="sl" for="pL">LSL <span id="pLV"></span></label><input type="range" id="pL" min="150" max="260" step="5" value="200">
+    <div class="stats"><div class="stat"><b id="pBelow"></b><small>% below LSL, read off the line</small></div><div class="stat"><b id="pXbar"></b><small>sample x̄</small></div><div class="stat"><b id="pS"></b><small>sample s</small></div></div>
+   </div>
+   <div class="panel"><h3>Normal probability plot</h3><canvas id="pCanvas" width="760" height="420" aria-label="Normal probability plot with a fitted straight line"></canvas></div>
+  </div>
+  <p class="why" id="pMsg"></p>
+ </div>
+</section>
+</div>
+
+<!-- Part 3 -->
+<div class="part" id="part3" style="--pc:#1A9467">
+ <div class="parthead"><span class="pnum">Part 3</span><div><h2>The process capability ratio Cp</h2><p>Section 8.3.1 · 2 activities</p></div></div>
+<section class="station" id="cp">
+ <div class="scene"><svg class="ico"><use href="#i-ruler"/></svg><div><div class="lbl">Part 3 · Activity 1 of 2 · Section 8.3.1, Equations 8.4–8.6, Tables 8.2–8.3 · Shaft diameter</div><h2>Compute Cp and the share of the band used</h2><p>Cp = (USL − LSL)/6σ compares the width of the specifications with the natural spread. P = (1/Cp)·100 is the percentage of the specification band the process uses up. Estimate σ from the R chart as R̄/d₂. These numbers assume a centered, normal, in-control process.</p></div></div>
+ <div class="body">
+  <div class="row"><button class="btn alt" id="cpShaft">Shaft: 20.00 ± 0.06 mm, R̄ = 0.0465, n = 5</button><button class="btn alt" id="cpBake">Hard bake (book): 1.00 to 2.00 μm, σ̂ = 0.1398</button></div>
+  <div class="grid2 wide">
+   <div class="panel"><h3>Specifications and spread</h3>
+    <div class="fields">
+     <label for="cpLSL">LSL<input type="number" id="cpLSL" step="0.01" value="19.94"></label>
+     <label for="cpUSL">USL<input type="number" id="cpUSL" step="0.01" value="20.06"></label>
+     <label for="cpRbar">R̄<input type="number" id="cpRbar" step="0.0005" value="0.0465"></label>
+     <label for="cpN">Sample size n<select id="cpN"><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></label>
+    </div>
+    <div class="stats four"><div class="stat"><b id="cpSig"></b><small>σ̂ = R̄/d₂</small></div><div class="stat"><b id="cpV"></b><small>Ĉp</small></div><div class="stat"><b id="cpP"></b><small>P, band used</small></div><div class="stat"><b id="cpPpm"></b><small>ppm out (two-sided)</small></div></div>
+    <div class="row" style="margin-top:10px"><span class="verdict" id="cpE"></span><span class="verdict" id="cpNw"></span></div>
+   </div>
+   <div class="panel"><h3>Process spread against the specifications</h3><canvas id="cpCanvas" width="760" height="360" aria-label="Normal curve centered between LSL and USL"></canvas></div>
+  </div>
+  <p class="why" id="cpMsg"></p>
+ </div>
+</section>
+
+<section class="station" id="onesided">
+ <div class="scene"><svg class="ico"><use href="#i-floor"/></svg><div><div class="lbl">Part 3 · Activity 2 of 2 · Section 8.3.1, Equations 8.7–8.8, Example 8.2 · Strength, a one-sided spec</div><h2>One-sided capability ratios</h2><p>Strength only needs a lower limit, so use Cpl = (μ − LSL)/3σ. With an upper limit only, use Cpu = (USL − μ)/3σ. The fallout is the area beyond the one limit.</p></div></div>
+ <div class="body">
+  <div class="row"><button class="btn alt" id="osBook">Example 8.2: μ = 264, σ = 32, LSL = 200</button><button class="btn alt" id="osSeal">Bag seal: μ = 11 N, σ = 0.8, LSL = 8</button></div>
+  <div class="grid2 wide">
+   <div class="panel"><h3>Lower specification only</h3>
+    <div class="fields">
+     <label for="osM">Mean μ<input type="number" id="osM" step="0.1" value="264"></label>
+     <label for="osS">σ<input type="number" id="osS" step="0.1" value="32"></label>
+     <label for="osL">LSL<input type="number" id="osL" step="0.1" value="200"></label>
+     <label for="osSafe">Safety-related?<select id="osSafe"><option value="1" selected>Yes</option><option value="0">No</option></select></label>
+    </div>
+    <div class="stats"><div class="stat"><b id="osC"></b><small>Ĉpl</small></div><div class="stat"><b id="osZ"></b><small>Z = (LSL − μ)/σ</small></div><div class="stat"><b id="osPpm"></b><small>ppm below LSL</small></div></div>
+    <div class="row" style="margin-top:10px"><span class="verdict" id="osV"></span></div>
+   </div>
+   <div class="panel"><h3>Fallout below the lower limit</h3><canvas id="osCanvas" width="760" height="360" aria-label="Normal curve with the area below the lower specification shaded"></canvas></div>
+  </div>
+  <p class="why" id="osMsg"></p>
+ </div>
+</section>
+</div>
+
+<!-- Part 4 -->
+<div class="part" id="part4" style="--pc:#E8503F">
+ <div class="parthead"><span class="pnum">Part 4</span><div><h2>Cpk, normality and confidence intervals</h2><p>Sections 8.3.2–8.3.5 · 2 activities</p></div></div>
+<section class="station" id="cpk">
+ <div class="scene"><svg class="ico"><use href="#i-target"/></svg><div><div class="lbl">Part 4 · Activity 1 of 2 · Sections 8.3.2 and 8.3.4, Figures 8.8 and 8.11 · LSL = 38, USL = 62, target 50</div><h2>Move the mean: Cp, Cpk and Cpm</h2><p>Cp ignores where the process is centered: it measures potential capability. Cpk = min(Cpu, Cpl) measures actual capability. Cpm also penalizes distance from the target T. Slide the mean or pick a panel of Figure 8.8.</p></div></div>
+ <div class="body">
+  <div class="row" id="kBtns"><button class="btn alt" data-k="50,2">(a) μ = 50</button><button class="btn alt" data-k="53,2">(b) μ = 53</button><button class="btn alt" data-k="56,2">(c) μ = 56</button><button class="btn alt" data-k="62,2">(d) μ = 62</button><button class="btn alt" data-k="65,2">(e) μ = 65</button></div>
+  <div class="grid2 wide">
+   <div class="panel"><h3>Process</h3>
+    <label class="sl" for="kM">Process mean μ <span id="kMV"></span></label><input type="range" id="kM" min="34" max="66" step="0.5" value="53">
+    <label class="sl" for="kS">Standard deviation σ <span id="kSV"></span></label><input type="range" id="kS" min="0.5" max="6" step="0.1" value="2">
+    <div class="stats four"><div class="stat"><b id="kCp"></b><small>Cp</small></div><div class="stat"><b id="kCpk"></b><small>Cpk</small></div><div class="stat"><b id="kCpm"></b><small>Cpm</small></div><div class="stat"><b id="kPpm"></b><small>ppm out</small></div></div>
+    <div class="stats"><div class="stat"><b id="kCpu"></b><small>Cpu</small></div><div class="stat"><b id="kCpl"></b><small>Cpl</small></div><div class="stat"><b id="kPot"></b><small>ppm if centered</small></div></div>
+   </div>
+   <div class="panel"><h3>The process against the specifications</h3><canvas id="kCanvas" width="760" height="360" aria-label="Normal curve with LSL, USL and target marked"></canvas></div>
+  </div>
+  <p class="why" id="kMsg"></p>
+ </div>
+</section>
+
+<section class="station" id="ci">
+ <div class="scene"><svg class="ico"><use href="#i-range"/></svg><div><div class="lbl">Part 4 · Activity 2 of 2 · Section 8.3.5, Equations 8.20–8.21, Examples 8.4–8.5 · Any stable process</div><h2>How sure is Ĉp?</h2><p>Ĉp and Ĉpk are point estimates from a sample, so they vary. Report a confidence interval. A small sample gives a very wide interval. Simulate it: draw samples from a process whose true Cp you know.</p></div></div>
+ <div class="body">
+  <div class="row"><button class="btn alt" id="ciBook">Example 8.4: USL − LSL = 24, s = 1.75, n = 20</button><button class="btn alt" id="ciT">Try it: s = 2.0, n = 30</button></div>
+  <div class="grid2 wide">
+   <div class="panel"><h3>Confidence intervals</h3>
+    <div class="fields">
+     <label for="ciW">USL − LSL<input type="number" id="ciW" step="0.5" value="24"></label>
+     <label for="ciS">Sample s<input type="number" id="ciS" step="0.05" value="1.75"></label>
+     <label for="ciN">Sample size n<input type="number" id="ciN" min="5" max="500" step="1" value="20"></label>
+     <label for="ciC">Confidence<select id="ciC"><option value="0.90">90%</option><option value="0.95" selected>95%</option><option value="0.99">99%</option></select></label>
+     <label for="ciK">Ĉpk (for 8.21)<input type="number" id="ciK" step="0.01" value="1.33"></label>
+    </div>
+    <div class="stats"><div class="stat"><b id="ciCp"></b><small>Ĉp</small></div><div class="stat"><b id="ciCpI"></b><small>CI on Cp (8.20)</small></div><div class="stat"><b id="ciKI"></b><small>CI on Cpk (8.21)</small></div></div>
+    <div class="row" style="margin-top:10px"><button class="btn" id="ciSim">Draw 40 samples from a process with Cp = 1.33</button></div>
+   </div>
+   <div class="panel"><h3>40 simulated Ĉp values and their intervals</h3><canvas id="ciCanvas" width="760" height="400" aria-label="Simulated estimates of Cp with confidence intervals around the true value 1.33"></canvas></div>
+  </div>
+  <p class="why" id="ciMsg"></p>
+ </div>
+</section>
+</div>
+
+<!-- Part 5 -->
+<div class="part" id="part5" style="--pc:#7A5AF8">
+ <div class="parthead"><span class="pnum">Part 5</span><div><h2>Charts, experiments and attribute data</h2><p>Sections 8.4–8.6 · 3 activities</p></div></div>
+<section class="station" id="chart">
+ <div class="scene"><svg class="ico"><use href="#i-chart"/></svg><div><div class="lbl">Part 5 · Activity 1 of 3 · Section 8.4, Table 8.5, Figure 8.12 · 20 samples of 5 containers</div><h2>Capability from x̄ and R charts</h2><p>First check the charts: capability means something only for a process in control. Then estimate μ̂ = x̄̄ and σ̂ = R̄/d₂ and compute the PCR. Strength has LSL = 200 psi.</p></div></div>
+ <div class="body">
+  <div class="row"><button class="btn alt" id="chShift">Add an assignable cause to samples 15–20</button><label class="sl" for="chL" style="flex:1;min-width:220px">LSL (psi) <span id="chLV"></span></label><input type="range" id="chL" min="150" max="240" step="5" value="200" style="flex:2;min-width:200px"></div>
+  <div class="grid2 wide">
+   <div class="panel"><h3>Estimates</h3>
+    <div class="stats"><div class="stat"><b id="chX"></b><small>x̄̄ = μ̂</small></div><div class="stat"><b id="chR"></b><small>R̄</small></div><div class="stat"><b id="chS"></b><small>σ̂ = R̄/2.326</small></div></div>
+    <div class="stats"><div class="stat"><b id="chO"></b><small>points out of control</small></div><div class="stat"><b id="chC"></b><small>Ĉpl</small></div><div class="stat"><b id="chPpm"></b><small>ppm below LSL</small></div></div>
+    <p class="why" id="chMsg" style="margin-top:10px"></p>
+   </div>
+   <div class="panel"><h3>x̄ chart (top) and R chart (bottom)</h3><canvas id="chCanvas" width="760" height="480" aria-label="x-bar and R control charts for the container strength data"></canvas></div>
+  </div>
+ </div>
+</section>
+
+<section class="station" id="brix">
+ <div class="scene"><svg class="ico"><use href="#i-bottle"/></svg><div><div class="lbl">Part 5 · Activity 2 of 3 · Section 8.5, Figure 8.13 · Soft-drink bottling line</div><h2>Where does the variability come from?</h2><p>A designed experiment splits the variance of observed brix into parts: σ²B = σ²M + σ²H + σ²A (machines, filling heads, analytical test). Improve the process by attacking the biggest part. The numbers are teaching figures.</p></div></div>
+ <div class="body">
+  <div class="grid2">
+   <div class="panel"><h3>Variance components</h3>
+    <label class="sl" for="bM">Machine σ²M <span id="bMV"></span></label><input type="range" id="bM" min="0" max="0.2" step="0.005" value="0.02">
+    <label class="sl" for="bH">Head-to-head σ²H <span id="bHV"></span></label><input type="range" id="bH" min="0" max="0.2" step="0.005" value="0.10">
+    <label class="sl" for="bA">Analytical test σ²A <span id="bAV"></span></label><input type="range" id="bA" min="0" max="0.2" step="0.005" value="0.03">
+    <div class="stats"><div class="stat"><b id="bT"></b><small>σ²B total</small></div><div class="stat"><b id="bSd"></b><small>σB</small></div><div class="stat"><b id="bCut"></b><small>σB if the biggest part halves</small></div></div>
+   </div>
+   <div class="panel"><h3>Share of the total variance</h3>
+    <div class="stack" id="bStack" aria-label="Stacked bar of variance shares"></div>
+    <p class="why" id="bMsg" style="margin-top:12px"></p>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="station" id="dpmo">
+ <div class="scene"><svg class="ico"><use href="#i-doc"/></svg><div><div class="lbl">Part 5 · Activity 3 of 3 · Section 8.6 · Purchase invoices</div><h2>DPU and DPMO</h2><p>With defect counts, capability is often stated as defects per unit, DPU = defects/units, or defects per million opportunities, DPMO = defects/(units × opportunities). An invoice field can be wrong or blank, so each field counts as two opportunities.</p></div></div>
+ <div class="body">
+  <div class="grid2">
+   <div class="panel"><h3>Your data</h3>
+    <div class="fields">
+     <label for="dD">Defects found<input type="number" id="dD" min="0" step="1" value="120"></label>
+     <label for="dU">Units checked<input type="number" id="dU" min="1" step="1" value="500"></label>
+     <label for="dF">Fields per unit<input type="number" id="dF" min="1" step="1" value="20"></label>
+     <label for="dK">Opportunities per field (wrong or blank = 2)<select id="dK"><option value="1">1</option><option value="2" selected>2</option></select></label>
+    </div>
+   </div>
+   <div class="panel"><h3>Capability measures</h3>
+    <div class="stats four"><div class="stat"><b id="dDpu"></b><small>DPU</small></div><div class="stat"><b id="dOpp"></b><small>opportunities</small></div><div class="stat"><b id="dDpmo"></b><small>DPMO</small></div><div class="stat"><b id="dSig"></b><small>sigma level (1.5σ shift)</small></div></div>
+    <p class="why" id="dMsg" style="margin-top:10px"></p>
+   </div>
+  </div>
+ </div>
+</section>
+</div>
+
+<section class="station" id="quiz">
+ <div class="scene" style="background:var(--gold)"><svg class="ico"><use href="#i-star"/></svg><div><div class="lbl">Self-check · Whole chapter</div><h2>Star quiz</h2><p>Ten quick questions. Each right answer lights a star.</p></div></div>
+ <div class="body">
+  <div class="stars" id="qStars" aria-live="polite"></div>
+  <div class="quiz" id="qBox"></div>
+  <div class="row"><button class="btn" id="qNext" hidden>Next question</button><button class="btn alt" id="qAgain" hidden>Try the quiz again</button></div>
+ </div>
+</section>
+
+<footer>Activities built on Montgomery, <i>Introduction to Statistical Quality Control</i>, 8th ed., Wiley, Chapter 8. The container bursting-strength data (Tables 8.1 and 8.5, Section 8.2.2), the hard-bake process (Section 8.3.1), Example 8.2, Tables 8.2 and 8.3, the Figure 8.8 processes and Examples 8.4 and 8.5 are from the book; the shaft, bag seal, valve, bottling variance and invoice figures, all other examples and the quiz are teaching examples. Prepared for IE454 by Dr. Aseel Khanfar, Department of Industrial Engineering, Yarmouk University.<br><b>© 2026 Dr. Aseel Khanfar, Yarmouk University. All rights reserved.</b> No part of this page may be copied, adapted or republished without written permission.</footer>
+</main>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const erf=x=>{const s=Math.sign(x);x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y};
+const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
+/* tail probability with better accuracy far out (for alpha at 3 to 4 sigma) */
+const upper=z=>{if(z<5){const t=1/(1+0.2316419*z);const d=Math.exp(-z*z/2)/Math.sqrt(2*Math.PI);return d*t*(0.319381530+t*(-0.356563782+t*(1.781477937+t*(-1.821255978+t*1.330274429))))}return 0};
+const f4=v=>v.toFixed(4);
+function rng(seed){let s=seed>>>0||1;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+function gauss(r){let u=0,v=0;while(!u)u=r();v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+const redraws=[];
+function onTheme(f){redraws.push(f)}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>redraws.forEach(f=>f()));
+new MutationObserver(()=>redraws.forEach(f=>f())).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+/* shared chart frame */
+function frame(cv,{xmin,xmax,ymin=0,ymax,L=62,R=20,T=18,B=48,xt=[],yt=[],xl='',yl='',yfmt=v=>v,xfmt=v=>v}){
+  const g=cv.getContext('2d'),W=cv.width,H=cv.height;g.clearRect(0,0,W,H);g.fillStyle=css('--surface');g.fillRect(0,0,W,H);
+  const X=v=>L+(v-xmin)/(xmax-xmin)*(W-L-R),Y=v=>H-B-(v-ymin)/(ymax-ymin)*(H-T-B);
+  g.strokeStyle=css('--line');g.lineWidth=1;g.fillStyle=css('--muted');g.font='600 17px "Source Sans 3",sans-serif';
+  g.textAlign='right';yt.forEach(v=>{const y=Y(v);g.beginPath();g.moveTo(L,y);g.lineTo(W-R,y);g.stroke();g.fillText(yfmt(v),L-8,y+6)});
+  g.textAlign='center';xt.forEach(v=>g.fillText(xfmt(v),X(v),H-B+22));
+  g.strokeStyle=css('--fg');g.lineWidth=2;g.beginPath();g.moveTo(L,H-B);g.lineTo(W-R,H-B);g.stroke();
+  if(xl){g.font='800 16px Nunito,sans-serif';g.fillStyle=css('--muted');g.fillText(xl,(L+W-R)/2,H-4)}
+  return {g,X,Y,W,H,L,R,T,B};
+}
+const ticks=(a,b,n)=>{const st=Math.pow(10,Math.floor(Math.log10((b-a)/n)));const m=[1,2,2.5,5,10].map(k=>k*st).find(s=>(b-a)/s<=n)||st*10;const r=[];for(let v=Math.ceil(a/m)*m;v<=b+1e-9;v+=m)r.push(+v.toFixed(6));return r};
+function hline(F,y,color,dash,label,side){const g=F.g;g.strokeStyle=color;g.lineWidth=2.5;g.setLineDash(dash||[]);g.beginPath();g.moveTo(F.L,F.Y(y));g.lineTo(F.W-F.R,F.Y(y));g.stroke();g.setLineDash([]);
+  if(label){g.fillStyle=css('--fg');g.font='800 14px Nunito,sans-serif';g.textAlign=side==='l'?'left':'right';g.fillText(label,side==='l'?F.L+6:F.W-F.R-4,F.Y(y)-6)}}
+function dot(F,x,y,color,r){F.g.fillStyle=color;F.g.beginPath();F.g.arc(F.X(x),F.Y(y),r||6,0,7);F.g.fill()}
+
+/* multiple-choice card set (same as earlier labs) */
+function mcSet(boxId,scoreId,items,choices){
+  const box=$(boxId);let right=0,done=0;
+  items.forEach(it=>{const c=document.createElement('div');c.className='qcard';c.innerHTML='<div class="tx"></div><div class="opts"></div><div class="why" hidden></div>';
+    c.querySelector('.tx').textContent=it.q;const o=c.querySelector('.opts'),w=c.querySelector('.why');
+    choices.forEach(ch=>{const b=document.createElement('button');b.className='opt';b.type='button';b.textContent=ch;
+      b.onclick=()=>{if(c.dataset.done)return;c.dataset.done=1;done++;
+        if(ch===it.a){b.classList.add('right');right++}else{b.classList.add('wrong');[...o.children].find(x=>x.textContent===it.a).classList.add('right')}
+        w.hidden=false;w.textContent=it.why;$(scoreId).textContent=right+' of '+items.length+' correct'+(done===items.length?(right===items.length?'. Perfect!':'. Nice work.'):'')};o.appendChild(b)});
+    box.appendChild(c)});
+}
+
+
+/* Chapter 8 helpers */
+const Q=z=>{if(z<0)return 1-Q(-z);if(z<5)return upper(z);const d=Math.exp(-z*z/2)/Math.sqrt(2*Math.PI);return d/z*(1-1/(z*z)+3/Math.pow(z,4))};
+function invPhi(p){const a=[-39.6968302866538,220.946098424521,-275.928510446969,138.357751867269,-30.6647980661472,2.50662827745924],b=[-54.4760987982241,161.585836858041,-155.698979859887,66.8013118877197,-13.2806815528857],c=[-0.00778489400243029,-0.322396458041136,-2.40075827716184,-2.54973253934373,4.37466414146497,2.93816398269878],d=[0.00778469570904146,0.32246712907004,2.445134137143,3.75440866190742];
+  const pl=0.02425;let q,r;if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1)}
+  if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1)}
+  q=p-0.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1)}
+/* chi-square quantile (Wilson-Hilferty): value with lower-tail probability p */
+const chi2=(p,v)=>{const z=invPhi(p);return v*Math.pow(1-2/(9*v)+z*Math.sqrt(2/(9*v)),3)};
+const ppmFmt=v=>v>=100?Math.round(v).toLocaleString():v>=1?v.toFixed(1):v>=0.001?v.toFixed(3):'< 0.001';
+const pct=v=>(100*v).toFixed(2)+'%';
+const pdf=(x,m,s)=>Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
+function curve(F,fn,a,b,col,w){F.g.strokeStyle=col;F.g.lineWidth=w||3.5;F.g.beginPath();const st=(b-a)/300;for(let x=a,i=0;x<=b+1e-9;x+=st,i++){const X=F.X(x),Y=F.Y(fn(x));i?F.g.lineTo(X,Y):F.g.moveTo(X,Y)}F.g.stroke()}
+function shade(F,fn,a,b,col,alpha){if(b<=a)return;F.g.fillStyle=col;F.g.globalAlpha=alpha||.45;F.g.beginPath();F.g.moveTo(F.X(a),F.Y(0));const st=(b-a)/200;for(let x=a;x<=b+1e-9;x+=st)F.g.lineTo(F.X(x),F.Y(fn(x)));F.g.lineTo(F.X(b),F.Y(0));F.g.closePath();F.g.fill();F.g.globalAlpha=1}
+function vline(F,x,col,dash,label,w){const g=F.g;g.strokeStyle=col;g.lineWidth=w||2.5;g.setLineDash(dash||[]);g.beginPath();g.moveTo(F.X(x),F.T);g.lineTo(F.X(x),F.Y(F.ymin0||0));g.stroke();g.setLineDash([]);
+  if(label){g.fillStyle=css('--fg');g.font='800 14px Nunito,sans-serif';g.textAlign='center';g.fillText(label,F.X(x),F.T+12)}}
+const D2={2:1.128,3:1.693,4:2.059,5:2.326,6:2.534,7:2.704,8:2.847,9:2.970,10:3.078};
+const T85=[[265,205,263,307,220],[268,260,234,299,215],[197,286,274,243,231],[267,281,265,214,318],[346,317,242,258,276],[300,208,187,264,271],[280,242,260,321,228],[250,299,258,267,293],[265,254,281,294,223],[260,308,235,283,277],[200,235,246,328,296],[276,264,269,235,290],[221,176,248,263,231],[334,280,265,272,283],[265,262,271,245,301],[280,274,253,287,258],[261,248,260,274,337],[250,278,254,274,275],[278,250,265,270,298],[257,210,280,269,251]];
+const ALL=T85.flat();
+const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
+const sd=a=>{const m=mean(a);return Math.sqrt(a.reduce((s,x)=>s+(x-m)**2,0)/(a.length-1))};
+
+/* 1. natural tolerance limits */
+let nShape='norm';
+function ntl(){
+  const m=+$('nM').value,s=+$('nS').value;$('nMV').textContent=m;$('nSV').textContent=s;
+  document.querySelectorAll('#nShape .btn').forEach(b=>b.classList.toggle('on',b.dataset.s===nShape));
+  const L=m-3*s,U=m+3*s;$('nL').textContent=L.toFixed(0);$('nU').textContent=U.toFixed(0);
+  const out=nShape==='norm'?2*Q(3):Math.exp(-4);
+  $('nIn').textContent=pct(1-out);$('nPpm').textContent=Math.round(out*1e6).toLocaleString();
+  const fn=nShape==='norm'?x=>pdf(x,m,s):x=>x<m-s?0:Math.exp(-(x-(m-s))/s)/s;
+  const ymax=nShape==='norm'?pdf(m,m,s)*1.15:1.1/s;
+  const F=frame($('nCanvas'),{xmin:40,xmax:500,ymax,yt:[],xt:[50,100,150,200,250,300,350,400,450,500],xl:'Bursting strength (psi)'});
+  shade(F,fn,Math.max(40,L),Math.min(500,U),css('--sky'),0.9);
+  shade(F,fn,40,Math.max(40,L),css('--coral'),0.6);shade(F,fn,Math.min(500,U),500,css('--coral'),0.6);
+  curve(F,fn,40,500,css('--blue'));
+  vline(F,L,css('--fg'),[6,5],'LNTL');vline(F,U,css('--fg'),[6,5],'UNTL');vline(F,m,css('--muted'),[2,4],'μ');
+  $('nMsg').textContent=nShape==='norm'?`Natural tolerance limits: ${m} ± 3(${s}) = ${L.toFixed(0)} to ${U.toFixed(0)} psi. A normal process puts 99.73% of its output inside them and 0.27% outside. That sounds small, but it is 2,700 nonconforming parts per million. The book's containers (μ ≈ 264, σ ≈ 32) give about 168 to 360 psi.`:
+    `Same mean and σ, but skewed output (a shifted exponential). Nothing falls below μ − 3σ, but e⁻⁴ = 1.83% lies above μ + 3σ: 18,316 ppm instead of 2,700. If the output is not normal, the share outside μ ± 3σ can differ a lot from 0.27%.`;
+}
+['nM','nS'].forEach(id=>$(id).addEventListener('input',ntl));
+document.querySelectorAll('#nShape .btn').forEach(b=>b.onclick=()=>{nShape=b.dataset.s;ntl()});ntl();onTheme(ntl);
+
+/* 2. study or characterization */
+mcSet('stCards','stScore',shuffle([
+ {q:'An engineer stands at the extrusion line and measures 5 pipes every hour for three shifts, recording the time of each sample.',a:'Capability study',why:'The process is observed directly and the time order is known, so stability can be judged.'},
+ {q:'A supplier mails 50 bearings from a warehouse. Nobody knows when or on which machine they were made.',a:'Product characterization',why:'Only product units, no time history: you can estimate the distribution, not the process behavior over time.'},
+ {q:'A buyer measures every resistor in one incoming lot of 2,000 to estimate the fraction within tolerance.',a:'Product characterization',why:'You can estimate the yield of this lot, but you can say nothing about the supplier\'s state of statistical control.'},
+ {q:'x̄ and R charts are kept on a filling machine for two weeks across day and night shifts before Cp is computed.',a:'Capability study',why:'Data from two to three time periods with the charts in control is exactly what Section 8.4 recommends.'},
+ {q:'A customer audit pulls 30 finished housings from the shipping dock and measures wall thickness.',a:'Product characterization',why:'No access to the process or its time order.'},
+ {q:'An operator measures each tablet from a press in the order made, controlling how the samples are collected.',a:'Capability study',why:'The analyst controls the data collection and knows the time sequence.'}
+]),['Capability study','Product characterization']);
+
+/* 3. histogram */
+function hist(){
+  const w=+$('hW').value,L=+$('hL').value;$('hWV').textContent=w;$('hLV').textContent=L;
+  const x=mean(ALL),s=sd(ALL);
+  $('hX').textContent=x.toFixed(2);$('hS').textContent=s.toFixed(2);$('hR').textContent=(x-3*s).toFixed(0)+' to '+(x+3*s).toFixed(0);
+  const pn=Phi((L-x)/s),pd=ALL.filter(v=>v<L).length/ALL.length;
+  $('hF').textContent=(100*pn).toFixed(1)+'% / '+(100*pd).toFixed(0)+'%';
+  const lo=Math.floor(150/w)*w,bins=[];for(let a=lo;a<380;a+=w)bins.push({a,b:a+w,n:ALL.filter(v=>v>=a&&v<a+w).length});
+  const ymax=Math.max(...bins.map(b=>b.n))*1.2;
+  const F=frame($('hCanvas'),{xmin:140,xmax:390,ymax,yt:ticks(0,ymax,5),xt:[150,200,250,300,350],xl:'Bursting strength (psi)',yfmt:v=>Math.round(v)});
+  F.g.fillStyle=css('--sky');F.g.fillRect(F.X(x-3*s),F.T,F.X(x+3*s)-F.X(x-3*s),F.Y(0)-F.T);
+  bins.forEach(b=>{if(!b.n)return;F.g.fillStyle=b.b<=L?css('--coral'):css('--teal');const y=F.Y(b.n);F.g.fillRect(F.X(b.a)+1,y,F.X(b.b)-F.X(b.a)-2,F.Y(0)-y)});
+  curve(F,v=>pdf(v,x,s)*ALL.length*w,140,390,css('--fg'),2);
+  vline(F,L,css('--coral'),[],'LSL',3);vline(F,x-3*s,css('--fg'),[6,5]);vline(F,x+3*s,css('--fg'),[6,5]);
+  F.g.fillStyle=css('--fg');F.g.font='800 13px Nunito,sans-serif';F.g.textAlign='center';F.g.fillText('x̄ − 3s',F.X(x-3*s),F.T+28);F.g.fillText('x̄ + 3s',F.X(x+3*s),F.T+12);
+  $('hMsg').textContent=`x̄ ± 3s = 264.06 ± 3(32.02) = ${(x-3*s).toFixed(0)} to ${(x+3*s).toFixed(0)} psi: about 99.73% of the bottles burst in this range (Example 8.1), estimated without any specification. With LSL = ${L}, the normal model predicts ${(100*pn).toFixed(2)}% below it (Z = ${((L-x)/s).toFixed(2)}); the data have ${Math.round(pd*100)} of 100 bottles below. `+(L===200?'Example 8.2 gets the same 2.28% from Z = −2. ':'')+'The histogram needs at least 100 observations, and it says nothing about stability over time.';
+}
+['hW','hL'].forEach(id=>$(id).addEventListener('input',hist));hist();onTheme(hist);
+
+/* 4. probability plot */
+const PP={book:[197,200,215,221,231,242,245,258,265,265,271,275,277,278,280,283,290,301,318,346],
+  valve:[12,18,25,31,40,52,60,75,88,104,121,140,166,190,231,280,345,440,610,1050]};
+let pD='book';
+function prob(){
+  document.querySelectorAll('#pBtns .btn').forEach(b=>b.classList.toggle('on',b.dataset.d===pD));
+  const d=PP[pD].slice().sort((a,b)=>a-b),n=d.length,z=d.map((_,i)=>invPhi((i+0.5)/n));
+  const mz=mean(z),mx=mean(d);let sxz=0,szz=0;d.forEach((v,i)=>{sxz+=(v-mx)*(z[i]-mz);szz+=(z[i]-mz)**2});
+  const b=sxz/szz,a=mx-b*mz;
+  const L=+$('pL').value;$('pLV').textContent=L;$('pL').disabled=pD!=='book';
+  $('pMu').textContent=a.toFixed(0);$('p84').textContent=(a+b).toFixed(0);$('pSig').textContent=b.toFixed(0);
+  $('pXbar').textContent=mx.toFixed(2);$('pS').textContent=sd(d).toFixed(2);
+  $('pBelow').textContent=pD==='book'?(100*Phi((L-a)/b)).toFixed(1)+'%':'–';
+  const xmin=pD==='book'?170:-100,xmax=pD==='book'?370:1150;
+  const F=frame($('pCanvas'),{xmin,xmax,ymin:-3.1,ymax:3.1,L:70,yt:[0.001,0.01,0.05,0.2,0.5,0.8,0.95,0.99,0.999].map(invPhi),xt:ticks(xmin,xmax,6),xl:pD==='book'?'Container strength (psi)':'Time to failure (h)',yfmt:v=>{const p=100*Phi(v);return p<1||p>99?p.toFixed(1):p.toFixed(0)}});
+  F.g.strokeStyle=css('--sun');F.g.lineWidth=3.5;F.g.beginPath();F.g.moveTo(F.X(a+b*-3.1),F.Y(-3.1));F.g.lineTo(F.X(a+b*3.1),F.Y(3.1));F.g.stroke();
+  [[0,'50th'],[1,'84th']].forEach(([zz,t])=>{F.g.strokeStyle=css('--muted');F.g.lineWidth=1.5;F.g.setLineDash([5,5]);F.g.beginPath();F.g.moveTo(F.L,F.Y(zz));F.g.lineTo(F.X(a+b*zz),F.Y(zz));F.g.lineTo(F.X(a+b*zz),F.Y(-3.1));F.g.stroke();F.g.setLineDash([]);
+    F.g.fillStyle=css('--fg');F.g.font='800 13px Nunito,sans-serif';F.g.textAlign='left';F.g.fillText(t+' = '+(a+b*zz).toFixed(0),F.X(a+b*zz)+6,F.Y(-3.1)-8-(zz?18:0))});
+  if(pD==='book'){F.g.strokeStyle=css('--coral');F.g.lineWidth=2.5;F.g.beginPath();F.g.moveTo(F.X(L),F.T);F.g.lineTo(F.X(L),F.Y(-3.1));F.g.stroke();F.g.fillStyle=css('--coral');F.g.textAlign='center';F.g.fillText('LSL',F.X(L),F.T+12)}
+  d.forEach((v,i)=>dot(F,v,z[i],css('--teal'),6.5));
+  F.g.save();F.g.translate(16,(F.T+F.Y(-3.1))/2);F.g.rotate(-Math.PI/2);F.g.fillStyle=css('--muted');F.g.font='800 15px Nunito,sans-serif';F.g.textAlign='center';F.g.fillText('Cumulative percent',0,0);F.g.restore();
+  $('pMsg').textContent=pD==='book'?`The points lie close to a straight line, so bursting strength looks normal. The fitted line gives μ̂ = ${a.toFixed(0)} and σ̂ = ${(a+b).toFixed(0)} − ${a.toFixed(0)} = ${b.toFixed(0)} psi. Reading Figure 8.4 by eye, the book gets 265 and 298 − 265 = 33 psi, close to x̄ = 264.06 and s = 32.02 for all 100 bottles. Below LSL = ${L}: about ${(100*Phi((L-a)/b)).toFixed(1)}% (the book reads roughly 5% off its plot). A plot can't show whether the process is in control.`:
+    'These failure times bend away from the straight line: few long lives pull the upper end out, so the data are clearly not normal (compare Figure 8.5). A μ̂ and σ̂ read from a straight line, and any fallout based on them, would be badly wrong. Choose another distribution or transform the data, and back up the plot with a formal test such as Shapiro–Wilk.';
+}
+document.querySelectorAll('#pBtns .btn').forEach(b=>b.onclick=()=>{pD=b.dataset.d;prob()});$('pL').addEventListener('input',prob);prob();onTheme(prob);
+
+/* 5. Cp */
+function cpCalc(){
+  const L=parseFloat($('cpLSL').value),U=parseFloat($('cpUSL').value),R=parseFloat($('cpRbar').value),n=+$('cpN').value;
+  if(!(U>L)||!(R>0)){$('cpMsg').textContent='Enter USL above LSL and a positive R̄.';return}
+  const s=R/D2[n],cp=(U-L)/(6*s),ppm=2*Q(3*cp)*1e6,m=(U+L)/2;
+  $('cpSig').textContent=s.toPrecision(4);$('cpV').textContent=cp.toFixed(3);$('cpP').textContent=(100/cp).toFixed(1)+'%';$('cpPpm').textContent=ppmFmt(ppm);
+  const e=$('cpE'),nw=$('cpNw');e.textContent=(cp>=1.33?'Meets':'Below')+' 1.33 for existing processes';e.className='verdict '+(cp>=1.33?'ok':'bad');
+  nw.textContent=(cp>=1.5?'Meets':'Below')+' 1.50 for new processes';nw.className='verdict '+(cp>=1.5?'ok':'bad');
+  const span=Math.max(U-L,8*s),xmin=m-span*0.75,xmax=m+span*0.75,fn=x=>pdf(x,m,s);
+  const F=frame($('cpCanvas'),{xmin,xmax,ymax:fn(m)*1.2,yt:[],xt:[L,m,U],xfmt:v=>+v.toFixed(3)});
+  shade(F,fn,xmin,L,css('--coral'),.7);shade(F,fn,U,xmax,css('--coral'),.7);shade(F,fn,L,U,css('--sky'),.9);
+  curve(F,fn,xmin,xmax,css('--mint'));
+  vline(F,L,css('--coral'),[],'LSL',3);vline(F,U,css('--coral'),[],'USL',3);vline(F,m-3*s,css('--fg'),[6,5]);vline(F,m+3*s,css('--fg'),[6,5]);
+  F.g.fillStyle=css('--fg');F.g.font='800 13px Nunito,sans-serif';F.g.textAlign='center';F.g.fillText('6σ̂ = '+(6*s).toPrecision(3),F.X(m),F.T+30);
+  $('cpMsg').textContent=`σ̂ = R̄/d₂ = ${R}/${D2[n]} = ${s.toPrecision(4)}. Ĉp = (${U} − ${L})/(6 × ${s.toPrecision(4)}) = ${cp.toFixed(3)}, so the process uses P = 100/${cp.toFixed(3)} = ${(100/cp).toFixed(1)}% of the band. For a centered, normal, in-control process that means about ${ppmFmt(ppm)} ppm outside the specifications (Table 8.2, two-sided). `+(Math.abs(L-1)<1e-9&&Math.abs(U-2)<1e-9?'The book\'s hard-bake answer: Ĉp = 1.192 and P = 83.89%. Note the book prints the limits the wrong way round (USL = 1.00, LSL = 2.00); USL is 2.00 μm.':'');
+}
+['cpLSL','cpUSL','cpRbar','cpN'].forEach(id=>$(id).addEventListener('input',cpCalc));
+$('cpShaft').onclick=()=>{$('cpLSL').value=19.94;$('cpUSL').value=20.06;$('cpRbar').value=0.0465;$('cpN').value=5;cpCalc()};
+$('cpBake').onclick=()=>{$('cpLSL').value=1.00;$('cpUSL').value=2.00;$('cpRbar').value=0.3252;$('cpN').value=5;cpCalc()};
+cpCalc();onTheme(cpCalc);
+
+/* 6. one-sided */
+function os(){
+  const m=parseFloat($('osM').value),s=parseFloat($('osS').value),L=parseFloat($('osL').value),safe=$('osSafe').value==='1';
+  if(!(s>0)){$('osMsg').textContent='Enter a positive σ.';return}
+  const c=(m-L)/(3*s),z=(L-m)/s,ppm=Q(-z)*1e6,need=safe?1.45:1.25;
+  $('osC').textContent=c.toFixed(2);$('osZ').textContent=z.toFixed(2);$('osPpm').textContent=ppmFmt(ppm);
+  const v=$('osV');v.textContent=(c>=need?'Meets ':'Below ')+need.toFixed(2)+(safe?' (safety, existing process)':' (existing process)');v.className='verdict '+(c>=need?'ok':'bad');
+  const xmin=Math.min(L,m-4*s)-s,xmax=m+4.5*s,fn=x=>pdf(x,m,s);
+  const F=frame($('osCanvas'),{xmin,xmax,ymax:fn(m)*1.2,yt:[],xt:ticks(xmin,xmax,6)});
+  shade(F,fn,xmin,L,css('--coral'),.75);curve(F,fn,xmin,xmax,css('--mint'));
+  vline(F,L,css('--coral'),[],'LSL',3);vline(F,m,css('--muted'),[2,4],'μ');
+  $('osMsg').textContent=`Ĉpl = (${m} − ${L})/(3 × ${s}) = ${c.toFixed(2)}. The fallout is the area below Z = ${z.toFixed(2)}: ${(ppm/1e4).toFixed(ppm<1e3?4:2)}%, about ${ppmFmt(ppm)} per million (one-sided column of Table 8.2). Table 8.3 asks for at least ${need.toFixed(2)} here. `+(Math.abs(m-264)<1e-9&&Math.abs(s-32)<1e-9&&Math.abs(L-200)<1e-9?'Example 8.2: Ĉpl = 0.67 and about 2.28% (22,800 per million) of the containers burst below 200 psi. For a safety-related strength this is far too low.':'');
+}
+['osM','osS','osL','osSafe'].forEach(id=>$(id).addEventListener('input',os));
+$('osBook').onclick=()=>{$('osM').value=264;$('osS').value=32;$('osL').value=200;$('osSafe').value='1';os()};
+$('osSeal').onclick=()=>{$('osM').value=11;$('osS').value=0.8;$('osL').value=8;$('osSafe').value='0';os()};
+os();onTheme(os);
+
+/* 7. Cp, Cpk, Cpm */
+function cpk(){
+  const m=+$('kM').value,s=+$('kS').value,L=38,U=62,T=50;$('kMV').textContent=m;$('kSV').textContent=s.toFixed(1);
+  const cp=(U-L)/(6*s),cpu=(U-m)/(3*s),cpl=(m-L)/(3*s),k=Math.min(cpu,cpl),cpm=(U-L)/(6*Math.sqrt(s*s+(m-T)**2));
+  const ppm=(Q((U-m)/s)+Q((m-L)/s))*1e6,pot=2*Q(3*cp)*1e6;
+  $('kCp').textContent=cp.toFixed(2);$('kCpk').textContent=k.toFixed(2);$('kCpm').textContent=cpm.toFixed(2);$('kPpm').textContent=ppmFmt(ppm);
+  $('kCpu').textContent=cpu.toFixed(2);$('kCpl').textContent=cpl.toFixed(2);$('kPot').textContent=ppmFmt(pot);
+  document.querySelectorAll('#kBtns .btn').forEach(b=>b.classList.toggle('on',+b.dataset.k.split(',')[0]===m&&s===2));
+  const fn=x=>pdf(x,m,s),F=frame($('kCanvas'),{xmin:26,xmax:74,ymax:pdf(0,0,s)*1.2,yt:[],xt:[30,38,44,50,56,62,70]});
+  shade(F,fn,26,L,css('--coral'),.75);shade(F,fn,U,74,css('--coral'),.75);curve(F,fn,26,74,css('--coral'));
+  vline(F,L,css('--fg'),[],'LSL',3);vline(F,U,css('--fg'),[],'USL',3);vline(F,T,css('--muted'),[3,4],'T = 50');
+  const side=cpu<cpl?'USL':'LSL';
+  $('kMsg').textContent=`Cp = 24/(6 × ${s.toFixed(1)}) = ${cp.toFixed(2)} no matter where the mean is. Cpk = min(${cpu.toFixed(2)}, ${cpl.toFixed(2)}) = ${k.toFixed(2)}, the one-sided ratio for the limit nearest the mean (${side}). `+
+    (Math.abs(m-T)<1e-9?'Centered: Cp = Cpk = Cpm. ':k<0?'Cpk < 0: the mean is outside the specifications. ':Math.abs(k)<1e-9?'Cpk = 0: the mean sits on a specification limit, so half the output is out. ':'Cpk < Cp: the process is off center. ')+
+    `Fallout now ≈ ${ppmFmt(ppm)} ppm; centered it would be ${ppmFmt(pot)} ppm. Cpm = ${cpm.toFixed(2)} drops as μ moves away from the target. Cp is potential capability, Cpk actual capability.`;
+}
+['kM','kS'].forEach(id=>$(id).addEventListener('input',cpk));
+document.querySelectorAll('#kBtns .btn').forEach(b=>b.onclick=()=>{const [m,s]=b.dataset.k.split(',');$('kM').value=m;$('kS').value=s;cpk()});cpk();onTheme(cpk);
+
+/* 8. confidence intervals */
+let ciRuns=[];
+function ci(){
+  const W=parseFloat($('ciW').value),s=parseFloat($('ciS').value),n=Math.round(parseFloat($('ciN').value)),c=+$('ciC').value,K=parseFloat($('ciK').value);
+  if(!(W>0&&s>0&&n>=5)){$('ciMsg').textContent='Enter a positive width and s, and n of at least 5.';return}
+  const a=1-c,v=n-1,lo=chi2(a/2,v),hi=chi2(1-a/2,v),cp=W/(6*s),L=cp*Math.sqrt(lo/v),U=cp*Math.sqrt(hi/v);
+  const z=invPhi(1-a/2),h=z*Math.sqrt(1/(9*n*K*K)+1/(2*(n-1)));
+  $('ciCp').textContent=cp.toFixed(2);$('ciCpI').textContent=L.toFixed(2)+' to '+U.toFixed(2);$('ciKI').textContent=(K*(1-h)).toFixed(2)+' to '+(K*(1+h)).toFixed(2);
+  const F=frame($('ciCanvas'),{xmin:0.6,xmax:2.4,ymin:0,ymax:41,yt:[],xt:[0.6,1,1.33,1.6,2,2.4],xl:'Cp',xfmt:v=>v.toFixed(2)});
+  F.g.strokeStyle=css('--fg');F.g.lineWidth=2;F.g.setLineDash([6,5]);F.g.beginPath();F.g.moveTo(F.X(1.33),F.T);F.g.lineTo(F.X(1.33),F.Y(0));F.g.stroke();F.g.setLineDash([]);
+  let cover=0,under=0;
+  ciRuns.forEach((r,i)=>{const ok=r.L<=1.33&&r.U>=1.33;if(ok)cover++;if(r.c<1.33)under++;const y=F.Y(i+1);F.g.strokeStyle=ok?css('--teal'):css('--coral');F.g.lineWidth=3;F.g.beginPath();F.g.moveTo(F.X(Math.max(0.6,r.L)),y);F.g.lineTo(F.X(Math.min(2.4,r.U)),y);F.g.stroke();dot(F,Math.min(2.4,Math.max(0.6,r.c)),i+1,ok?css('--teal'):css('--coral'),4)});
+  if(!ciRuns.length){F.g.fillStyle=css('--muted');F.g.font='700 17px "Source Sans 3",sans-serif';F.g.textAlign='center';F.g.fillText('Press the button to draw 40 samples of size n = '+n,F.W/2,F.H/2)}
+  const book=Math.abs(W-24)<1e-9&&Math.abs(s-1.75)<1e-9&&n===20&&c===0.95;
+  $('ciMsg').textContent=`Ĉp = ${W}/(6 × ${s}) = ${cp.toFixed(2)}. With n − 1 = ${v}, χ² points ${lo.toFixed(2)} and ${hi.toFixed(2)} give ${Math.round(c*100)}% CI ${L.toFixed(2)} ≤ Cp ≤ ${U.toFixed(2)}. `+(book?'Example 8.4 (table values 8.91 and 32.85): 1.57 ≤ Cp ≤ 3.01. ':'')+`For Ĉpk = ${K} from n = ${n}: ${(K*(1-h)).toFixed(2)} ≤ Cpk ≤ ${(K*(1+h)).toFixed(2)}`+(Math.abs(K-1.33)<1e-9&&n===20&&c===0.95?' (Example 8.5: 0.88 to 1.78). ':'. ')+
+    (ciRuns.length?`Simulation: ${cover} of 40 intervals contain the true Cp = 1.33, and ${under} of the 40 estimates came out below 1.33 even though the process is exactly 1.33.`:'χ² points use the Wilson–Hilferty approximation, so they can differ from Appendix Table III in the second decimal.');
+}
+$('ciSim').onclick=()=>{const n=Math.round(parseFloat($('ciN').value)),c=+$('ciC').value,a=1-c,v=n-1,lo=chi2(a/2,v),hi=chi2(1-a/2,v),r=rng(Math.floor(Math.random()*1e9));
+  ciRuns=[];for(let k=0;k<40;k++){const x=[];for(let i=0;i<n;i++)x.push(gauss(r));const cp=1.33/sd(x);ciRuns.push({c:cp,L:cp*Math.sqrt(lo/v),U:cp*Math.sqrt(hi/v)})}ci()};
+['ciW','ciS','ciN','ciC','ciK'].forEach(id=>$(id).addEventListener('input',()=>{if(id==='ciN'||id==='ciC')ciRuns=[];ci()}));
+$('ciBook').onclick=()=>{$('ciW').value=24;$('ciS').value=1.75;$('ciN').value=20;$('ciC').value='0.95';$('ciK').value=1.33;ciRuns=[];ci()};
+$('ciT').onclick=()=>{$('ciW').value=24;$('ciS').value=2;$('ciN').value=30;$('ciC').value='0.95';ciRuns=[];ci()};
+ci();onTheme(ci);
+
+/* 9. capability from the control chart */
+let chShift=false;
+function chartCap(){
+  const LSL=+$('chL').value;$('chLV').textContent=LSL;
+  const base=T85.map(r=>({x:mean(r),R:Math.max(...r)-Math.min(...r)})),xbb=mean(base.map(b=>b.x)),Rb=mean(base.map(b=>b.R));
+  const UCL=xbb+0.577*Rb,LCL=xbb-0.577*Rb,RU=2.115*Rb;
+  const pts=T85.map((r,i)=>{const rr=(chShift&&i>=14)?r.map(v=>v+45):r;return{x:mean(rr),R:Math.max(...rr)-Math.min(...rr)}});
+  const out=pts.filter(p=>p.x>UCL||p.x<LCL||p.R>RU).length;
+  const s=Rb/2.326,c=(xbb-LSL)/(3*s);
+  $('chX').textContent=xbb.toFixed(2);$('chR').textContent=Rb.toFixed(1);$('chS').textContent=s.toFixed(2);$('chO').textContent=out;
+  $('chC').textContent=out?'–':c.toFixed(2);$('chPpm').textContent=out?'–':ppmFmt(Phi((LSL-xbb)/s)*1e6);
+  const cv=$('chCanvas'),g=cv.getContext('2d'),W=cv.width,H=cv.height;g.clearRect(0,0,W,H);g.fillStyle=css('--surface');g.fillRect(0,0,W,H);
+  const Lm=70,Rm=110,X=i=>Lm+(i+0.5)/20*(W-Lm-Rm);
+  const panel=(top,h,lo,hi,vals,lines,lab)=>{const Y=v=>top+h-(v-lo)/(hi-lo)*h;
+    g.strokeStyle=css('--line');g.lineWidth=1;g.strokeRect(Lm,top,W-Lm-Rm,h);
+    lines.forEach(([v,t,col,dash])=>{g.strokeStyle=col;g.lineWidth=2.2;g.setLineDash(dash);g.beginPath();g.moveTo(Lm,Y(v));g.lineTo(W-Rm,Y(v));g.stroke();g.setLineDash([]);g.fillStyle=css('--fg');g.font='800 13px Nunito,sans-serif';g.textAlign='left';g.fillText(t+' '+v.toFixed(1),W-Rm+6,Y(v)+4)});
+    g.strokeStyle=css('--violet');g.lineWidth=2.5;g.beginPath();vals.forEach((v,i)=>i?g.lineTo(X(i),Y(v)):g.moveTo(X(i),Y(v)));g.stroke();
+    vals.forEach((v,i)=>{const o=lines.some(([lv,t])=>t==='UCL'&&v>lv)||lines.some(([lv,t])=>t==='LCL'&&v<lv);g.fillStyle=o?css('--sun'):css('--violet');g.beginPath();g.arc(X(i),Y(v),o?8:5,0,7);g.fill();if(o){g.strokeStyle=css('--fg');g.lineWidth=2;g.stroke()}});
+    g.save();g.translate(18,top+h/2);g.rotate(-Math.PI/2);g.fillStyle=css('--muted');g.font='800 15px Nunito,sans-serif';g.textAlign='center';g.fillText(lab,0,0);g.restore()};
+  panel(14,220,190,340,pts.map(p=>p.x),[[UCL,'UCL',css('--coral'),[8,6]],[xbb,'CL',css('--fg'),[]],[LCL,'LCL',css('--coral'),[8,6]]],'x̄');
+  panel(262,170,0,200,pts.map(p=>p.R),[[RU,'UCL',css('--coral'),[8,6]],[Rb,'CL',css('--fg'),[]]],'R');
+  g.fillStyle=css('--muted');g.font='600 15px "Source Sans 3",sans-serif';g.textAlign='center';[1,5,10,15,20].forEach(i=>g.fillText(i,X(i-1),H-26));g.font='800 15px Nunito,sans-serif';g.fillText('Sample number',(Lm+W-Rm)/2,H-6);
+  $('chMsg').textContent=out?`${out} point${out>1?'s':''} out of control. Stop: with an assignable cause present the process parameters are unstable, and any PCR would be meaningless. Find and remove the cause first, then estimate capability.`:
+    `Both charts are in control (x̄ limits ${LCL.toFixed(2)} to ${UCL.toFixed(2)}, R chart UCL ${RU.toFixed(1)}). So μ̂ = ${xbb.toFixed(2)}, σ̂ = ${Rb.toFixed(1)}/2.326 = ${s.toFixed(2)}, and Ĉpl = (${xbb.toFixed(2)} − ${LSL})/(3 × ${s.toFixed(2)}) = ${c.toFixed(2)}.`+(LSL===200?' The book: 0.64. In control, but the capability is inadequate for a safety-related strength, so management and engineering must act.':'');
+}
+$('chShift').onclick=()=>{chShift=!chShift;$('chShift').classList.toggle('on',chShift);$('chShift').textContent=chShift?'Remove the assignable cause':'Add an assignable cause to samples 15–20';chartCap()};
+$('chL').addEventListener('input',chartCap);chartCap();onTheme(chartCap);
+
+/* 10. variance components */
+function brix(){
+  const M=+$('bM').value,Hh=+$('bH').value,A=+$('bA').value;$('bMV').textContent=M.toFixed(3);$('bHV').textContent=Hh.toFixed(3);$('bAV').textContent=A.toFixed(3);
+  const T=M+Hh+A;$('bT').textContent=T.toFixed(3);$('bSd').textContent=Math.sqrt(T).toFixed(3);
+  const parts=[['Machine',M,'--blue'],['Heads',Hh,'--violet'],['Test',A,'--teal']],big=parts.slice().sort((a,b)=>b[1]-a[1])[0];
+  $('bCut').textContent=T>0?Math.sqrt(T-big[1]/2).toFixed(3):'–';
+  $('bStack').innerHTML=T>0?parts.map(([n,v,c])=>v>0?`<div style="width:${(100*v/T).toFixed(2)}%;background:var(${c})">${n} ${(100*v/T).toFixed(0)}%</div>`:'').join(''):'';
+  $('bMsg').textContent=T>0?`σ²B = ${M.toFixed(3)} + ${Hh.toFixed(3)} + ${A.toFixed(3)} = ${T.toFixed(3)}. ${big[0]==='Heads'?'Head-to-head':big[0]==='Machine'?'Machine-to-machine':'Analytical test'} variability is ${(100*big[1]/T).toFixed(0)}% of the total, so start there`+(big[0]==='Heads'?' (more careful setup of the filling heads, as in the book).':big[0]==='Test'?' (a better measurement method; Section 8.7 covers gauge studies).':' (machine adjustment and control).')+` Halving it cuts σB from ${Math.sqrt(T).toFixed(3)} to ${Math.sqrt(T-big[1]/2).toFixed(3)}; halving the smallest part would barely help.`:'Move a slider above zero.';
+}
+['bM','bH','bA'].forEach(id=>$(id).addEventListener('input',brix));brix();
+
+/* 11. DPU and DPMO */
+function dpmo(){
+  const D=Math.max(0,parseFloat($('dD').value)||0),U=Math.max(1,parseFloat($('dU').value)||1),Fd=Math.max(1,parseFloat($('dF').value)||1),k=+$('dK').value;
+  const opp=U*Fd*k,dpu=D/U,dp=D/opp*1e6;
+  $('dDpu').textContent=dpu.toFixed(3);$('dOpp').textContent=opp.toLocaleString();$('dDpmo').textContent=Math.round(dp).toLocaleString();
+  const lvl=dp>0&&dp<1e6?invPhi(1-dp/1e6)+1.5:NaN,lvl0=dp>0&&dp<2e6?invPhi(1-dp/2e6):NaN;
+  $('dSig').textContent=isNaN(lvl)?'–':lvl.toFixed(2);
+  $('dMsg').textContent=`DPU = ${D}/${U} = ${dpu.toFixed(3)} defects per invoice. Each invoice has ${Fd} × ${k} = ${Fd*k} opportunities, so DPMO = ${D}/(${U} × ${Fd*k}) × 10⁶ = ${Math.round(dp).toLocaleString()}. `+(isNaN(lvl)?'':`With the 1.5σ shift that many Six Sigma organizations use, that is about a ${lvl.toFixed(1)}-sigma process; without the shift (two-sided, as in the book's 2,700 ppm = three-sigma example) about ${lvl0.toFixed(1)} sigma. `)+'Define opportunities the same way every time: adding opportunities makes DPMO look better without any real improvement.';
+}
+['dD','dU','dF','dK'].forEach(id=>$(id).addEventListener('input',dpmo));dpmo();
+
+/* quiz */
+const QZ=[
+ ['For a normal process, the natural tolerance limits μ ± 3σ leave how much of the output outside?',['0.27% (2,700 ppm)','5%','0.0027 ppm','1%'],0,'Only 0.27% falls outside, but that is 2,700 nonconforming parts per million (Section 8.1).'],
+ ['You measure 40 parts a supplier mailed you, with no time order. This is…',['a process capability study','product characterization','a designed experiment','a Phase II study'],1,'Without watching the process and knowing the time order, you can only characterize the product.'],
+ ['Specifications 10 ± 0.3 and σ̂ = 0.1. What is Ĉp?',['0.5','1.0','2.0','3.0'],1,'Cp = 0.6/(6 × 0.1) = 1.0.'],
+ ['Ĉp = 1.25. What share of the specification band does the process use?',['25%','80%','125%','75%'],1,'P = (1/1.25) × 100 = 80% (Equation 8.6).'],
+ ['A strength with only a lower limit: μ = 50, σ = 4, LSL = 38. Ĉpl = ?',['0.5','1.0','1.5','3.0'],1,'Cpl = (50 − 38)/(3 × 4) = 1.0.'],
+ ['Cp = 2.0 but Cpk = 1.0. What does this tell you?',['The process is centered','The process is off center','The process is out of control','σ is too large'],1,'Cpk < Cp means the mean is off center; Cp is potential, Cpk actual capability.'],
+ ['Which assumption does NOT underlie the ppm values in Table 8.2?',['Normal distribution','Process in statistical control','Mean centered (two-sided specs)','Sample size of at least 100'],3,'The three assumptions are normality, statistical control and centering.'],
+ ['Why report a confidence interval on Cp?',['Ĉp is an estimate that varies from sample to sample','Cp is always biased upward','Table 8.2 requires it','It replaces the control chart'],0,'With n = 20, Example 8.4 gives 1.57 ≤ Cp ≤ 3.01: a very wide range.'],
+ ['The book calls which of these the primary technique of process capability analysis?',['The histogram','The control chart','The probability plot','Pp and Ppk'],1,'Section 8.4: control charts show stability and patterns, so they come first.'],
+ ['500 orders, 10 opportunities each, 25 defects. DPMO = ?',['50','500','5,000','50,000'],2,'DPMO = 25/(500 × 10) × 10⁶ = 5,000.']
+];
+let qi=0,qs=0;
+function stars(){$('qStars').innerHTML=QZ.map((_,i)=>'<span'+(i<qs?' class="on"':'')+'>★</span>').join('')}
+function qShow(){stars();$('qNext').hidden=true;$('qAgain').hidden=true;const box=$('qBox');box.innerHTML='';
+  if(qi>=QZ.length){const f=document.createElement('div');f.className='feedback';f.textContent=`You earned ${qs} of ${QZ.length} stars. `+(qs>=9?'Excellent, you own Chapter 8.':qs>=7?'Strong work. Review the ones you missed.':'Revisit the activities above, then try again.');box.appendChild(f);$('qAgain').hidden=false;return}
+  const [q,o,a,w]=QZ[qi];const h=document.createElement('div');h.className='qcard';h.innerHTML='<div class="sec"></div><div class="tx"></div><div class="opts"></div><div class="why" hidden></div>';
+  h.querySelector('.sec').textContent='Question '+(qi+1)+' of '+QZ.length;h.querySelector('.tx').textContent=q;
+  o.forEach((t,i)=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=t;b.onclick=()=>{if(h.dataset.done)return;h.dataset.done=1;
+    if(i===a){b.classList.add('right');qs++}else{b.classList.add('wrong');h.querySelectorAll('.opt')[a].classList.add('right')}
+    const wy=h.querySelector('.why');wy.hidden=false;wy.textContent=w;stars();qi++;$('qNext').hidden=false;$('qNext').textContent=qi>=QZ.length?'See my stars':'Next question'};h.querySelector('.opts').appendChild(b)});
+  box.appendChild(h)}
+$('qNext').onclick=qShow;$('qAgain').onclick=()=>{qi=0;qs=0;qShow()};qShow();
+
+function jump(){const id=location.hash.slice(1);const el=id&&document.getElementById(id);if(el&&el.classList.contains('station')){el.scrollIntoView({behavior:'smooth',block:'start'});el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}}
+addEventListener('hashchange',jump);setTimeout(jump,300);
+})();
+</script>
+
+</body></html>
